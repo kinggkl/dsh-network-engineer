@@ -6,10 +6,10 @@ devices: S 系列交换机、AR/NE 路由器等 VRP 设备
 keywords: [ACL, acl number 2000, acl 3000 高级, rule permit source 反掩码, traffic-filter, display acl all, NAT, nat outbound Easy-IP, 规则步长]
 sources:
   - https://www.cnblogs.com/qzqdy/p/8962516.html
-  - https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1100414296/AZN1024P/06/resources/dc/traffic-filter_vlan_view_dc.html
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000075592/38fc9cfd
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 华为 · ACL 与 NAT 出口
@@ -74,5 +74,5 @@ updated: 2026-10-15
 ## 参考来源
 
 1. [华为交换机常用命令行操作总结 - 方面盘 - 博客园](https://www.cnblogs.com/qzqdy/p/8962516.html)
-2. [华为交换机路由器常用配置命令与排障命令大全（VRP） - 夜莺博客](https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html)
+2. [华为产品文档 · traffic-filter（VLAN 视图）命令（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100414296/AZN1024P/06/resources/dc/traffic-filter_vlan_view_dc.html)
 3. [华为企业支持中心 · 配置指南（EDOC1000075592）](https://support.huawei.com/enterprise/zh/doc/EDOC1000075592/38fc9cfd)

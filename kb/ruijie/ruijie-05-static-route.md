@@ -8,7 +8,7 @@ sources:
   - https://www.ruijie.com.cn/fw/wt/37267
   - https://zhuanlan.zhihu.com/p/1908554021154846073
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 锐捷 · 静态路由
@@ -73,8 +73,8 @@ S    192.168.2.0/24 [1/0] via 192.168.3.2      ← 方括号内为 [AD/度量值
 
 ## 高危操作 ⚠️
 
-- 默认路由指向错误下一跳或写成出接口 ⚠️：全网流量黑洞或 ARP 风暴，可导致整网断网。
-- no ip route 删除在用路由 ⚠️：对应业务立即中断，删除前用 show ip route 确认引用关系。
+- ⚠️ 默认路由指向错误下一跳或写成出接口：全网流量黑洞或 ARP 风暴，可导致整网断网。
+- ⚠️ no ip route 删除在用路由：对应业务立即中断，删除前用 show ip route 确认引用关系。
 
 ## 参考来源
 

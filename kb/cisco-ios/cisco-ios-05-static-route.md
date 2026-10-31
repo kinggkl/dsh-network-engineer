@@ -30,13 +30,9 @@ updated: 2026-10-30
 | 默认网络（动态协议用） | `ip default-network 192.168.0.0` | `(config)#` | 可被 IGRP/EIGRP/RIP 传播；OSPF 用 `default-information originate` |
 | 查看路由表 | `show ip route` | 特权 EXEC `#` | 看 `[1/0]` 前段为 AD / 度量，S 表示静态 |
 | 只看静态路由 | `show ip route static` | 特权 EXEC `#` | 确认是否真正进入路由表（而非仅在配置里） |
-| 查静态配置 | `show running-config | include ip route` | 特权 EXEC `#` | 审计谁下发了哪些静态路由 |
+| 查静态配置 | `show running-config \| include ip route` | 特权 EXEC `#` | 审计谁下发了哪些静态路由 |
 
-### 常见管理距离（缺省值，数值越小越优）
-
-| 路由来源 | 直连 | 静态 | eBGP | EIGRP 内部 | OSPF | IS-IS | RIP | iBGP | 未知 |
-|---|---|---|---|---|---|---|---|---|---|
-| 默认 AD | 0 | 1 | 20 | 90 | 110 | 115 | 120 | 200 | 255 |
+> 常见管理距离（缺省值，数值越小越优）：直连 0、静态 1、eBGP 20、EIGRP 内部 90、OSPF 110、IS-IS 115、RIP 120、iBGP 200、未知 255。
 
 ## 典型示例
 

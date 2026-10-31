@@ -70,7 +70,7 @@ switch# show ip route summary
 - ⚠️ `no ip routing` 会一次性删除所有三层转发能力（含 SVI、OSPF 邻居、静态路由），全网段中断；EOS 上最危险的"一行命令"。
 - ⚠️ 删除或改错默认路由（`no ip route 0.0.0.0/0 ...`）会让所有出网流量黑洞，且往往连远程管理回程一起断，先确认有 Console/带外。
 - ⚠️ 误配 `ip route 0.0.0.0/0 Null0` 或把业务网段指向 `Null0`，会造成完全静默丢包（无 ICMP 提示），极难定位。
-- 变更顺序：`show running-config` 导出 → `show ip route` 留存基线 → 变更 → `show ip route <前缀>` + `ping` 验证 → 异常时删新建路由并恢复原条目 → 确认后 `copy running-config startup-config`。
+- ⚠️ 变更顺序：`show running-config` 导出 → `show ip route` 留存基线 → 变更 → `show ip route <前缀>` + `ping` 验证 → 异常时删新建路由并恢复原条目 → 确认后 `copy running-config startup-config`。
 
 ## 参考来源
 

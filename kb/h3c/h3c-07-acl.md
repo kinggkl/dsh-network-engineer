@@ -69,10 +69,10 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- 远程会话场景对管理口/VTY 方向误配 `packet-filter deny` 或漏放行管理网段：会话被锁在设备外；建议先放行管理地址段、保持当前会话并另开新会话验证后再退出。
-- 在核心/上联口 inbound 方向应用含 `rule deny ip` 的 ACL：未放行的全部业务被丢，影响面大；先在边缘口或测试口验证。
-- 修改已应用的 ACL 规则（undo/重配 rule）立即生效；先确认当前匹配计数（display acl all）再变更。
-- QoS 策略中 `filter deny` 同样丢流量，且可与包过滤叠加，排查丢包时先 `display qos policy interface`（以版本手册为准）确认。
+- ⚠️ 远程会话场景对管理口/VTY 方向误配 `packet-filter deny` 或漏放行管理网段：会话被锁在设备外；建议先放行管理地址段、保持当前会话并另开新会话验证后再退出。
+- ⚠️ 在核心/上联口 inbound 方向应用含 `rule deny ip` 的 ACL：未放行的全部业务被丢，影响面大；先在边缘口或测试口验证。
+- ⚠️ 修改已应用的 ACL 规则（undo/重配 rule）立即生效；先确认当前匹配计数（display acl all）再变更。
+- ⚠️ QoS 策略中 `filter deny` 同样丢流量，且可与包过滤叠加，排查丢包时先 `display qos policy interface`（以版本手册为准）确认。
 
 ## 参考来源
 

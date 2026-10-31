@@ -77,7 +77,7 @@ SW-LEAF-01# show users
 - ⚠️ `no username <最后一个管理员>` 后再保存并退出全部会话，将失去远程管理入口；变更前先建好新账号并**另开一个 SSH 会话验证**。
 - ⚠️ `aaa root nopassword` / `no aaa root` 会改变底层 Linux root 登录策略，影响 TACACS+/密码恢复流程，仅在维护窗口操作。
 - ⚠️ 修改 `management ssh` 或服务 ACL（`management ssh` 视图下 `ip access-group ... in`）会立即切断现有 SSH，务必保留 Console 或带外通道。
-- 变更固定顺序：`show running-config` 导出 → 备份 `copy running-config flash:...` → 变更 → `show ...` 验证 → 异常时 `copy flash:backup-... running-config` 回退 → 确认后 `copy running-config startup-config`。
+- ⚠️ 变更固定顺序：`show running-config` 导出 → 备份 `copy running-config flash:...` → 变更 → `show ...` 验证 → 异常时 `copy flash:backup-... running-config` 回退 → 确认后 `copy running-config startup-config`。
 
 ## 参考来源
 

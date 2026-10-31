@@ -6,8 +6,9 @@ devices: RG-S 系列交换机、RG-R 系列路由器等 RGOS 设备
 keywords: [锐捷, RGOS, 命令模式, enable 特权模式, enable secret, hostname, write 保存配置, banner motd, show version, 恢复出厂]
 sources:
   - https://www.cnblogs.com/rkit/articles/8081534.html
+  - https://www.ruijie.com.cn/Fu/Article/68e41456-6eee-4dcc-85f1-6389deb6c816/v3/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/HTML/02-%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/2.5%20%E5%A4%87%E4%BB%BD%E4%B8%8E%E5%9B%9E%E9%80%80%E5%87%86%E5%A4%87.html
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 锐捷 · 系统管理与模式
@@ -65,11 +66,12 @@ switchA# write                                          ← 必须保存，否�
 
 ## 高危操作 ⚠️
 
-- del flash:config.text ⚠️：删除启动配置文件，重启后设备以空配置启动，管理 IP 与远程登录全部失效，通常只能现场 Console 恢复。
-- erase startup-config ⚠️：同上，清除启动配置（平台适用范围以官方手册为准）。
-- del flash:vlan.dat ⚠️：删除全部 VLAN 定义，重启后所有接入/干线端口的 VLAN 引用失效，下游用户断网。
-- reload ⚠️：立即重启设备，未保存配置丢失；生产设备重启前先 write 并确认维护窗口。
+- ⚠️ del flash:config.text：删除启动配置文件，重启后设备以空配置启动，管理 IP 与远程登录全部失效，通常只能现场 Console 恢复。
+- ⚠️ erase startup-config：同上，清除启动配置（平台适用范围以官方手册为准）。
+- ⚠️ del flash:vlan.dat：删除全部 VLAN 定义，重启后所有接入/干线端口的 VLAN 引用失效，下游用户断网。
+- ⚠️ reload：立即重启设备，未保存配置丢失；生产设备重启前先 write 并确认维护窗口。
 
 ## 参考来源
 
 1. [锐捷网络交换机的配置命令集 - 博客园](https://www.cnblogs.com/rkit/articles/8081534.html)
+2. [锐捷官网：升级前准备——备份与回退准备（write / show running-config 配置保存与回滚说明）](https://www.ruijie.com.cn/Fu/Article/68e41456-6eee-4dcc-85f1-6389deb6c816/v3/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/HTML/02-%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/2.5%20%E5%A4%87%E4%BB%BD%E4%B8%8E%E5%9B%9E%E9%80%80%E5%87%86%E5%A4%87.html)

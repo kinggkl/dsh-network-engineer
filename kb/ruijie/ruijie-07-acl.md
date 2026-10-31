@@ -8,7 +8,7 @@ sources:
   - https://www.ruijie.com.cn/fw/wt/37269
   - https://www.cnblogs.com/rkit/articles/8081534.html
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 锐捷 · ACL
@@ -63,9 +63,9 @@ Ruijie# show ip access-group       ← 查看 ACL 在接口下的应用
 
 ## 高危操作 ⚠️
 
-- 在远程管理路径（管理 SVI、VTY 关联接口）应用含隐含 deny 的 ACL ⚠️：可能把所有管理员锁在设备外，变更前确保 Console 可达。
-- no access-list 100 ⚠️：整条删除 ACL，已应用的接口瞬间失去过滤策略；重写编号式 ACL 前先备份 show access-lists 输出。
-- 生产接口上直接调整条目顺序 ⚠️：误序可能放行敏感流量或拒绝关键业务，先在测试环境验证。
+- ⚠️ 在远程管理路径（管理 SVI、VTY 关联接口）应用含隐含 deny 的 ACL：可能把所有管理员锁在设备外，变更前确保 Console 可达。
+- ⚠️ no access-list 100：整条删除 ACL，已应用的接口瞬间失去过滤策略；重写编号式 ACL 前先备份 show access-lists 输出。
+- ⚠️ 生产接口上直接调整条目顺序：误序可能放行敏感流量或拒绝关键业务，先在测试环境验证。
 
 ## 参考来源
 

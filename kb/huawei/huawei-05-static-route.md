@@ -6,10 +6,10 @@ devices: S 系列交换机、AR/NE 路由器等 VRP 设备
 keywords: [静态路由, ip route-static, 默认路由, 浮动静态路由, 黑洞路由, NULL0, 路由优先级, 负载分担, display ip routing-table]
 sources:
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000075592/38fc9cfd
-  - https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1100459181/AZP0409R/04/resources/vrp_ipv4-static-route_cfg_0030.html
   - https://bbs.huaweicloud.com/blogs/468203
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 华为 · 静态路由
@@ -31,7 +31,7 @@ updated: 2026-10-15
 | 查看路由表 | `display ip routing-table` | 用户视图 | 看 Proto/Pre/Cost/NextHop，确认路由是否 active |
 | 只看静态路由 | `display ip routing-table protocol static` | 用户视图 | inactive 即浮动备份路由，主用失效后自动转正 |
 
-### 常见路由优先级（缺省值，数值越小越优）
+## 常见路由优先级（缺省值，数值越小越优）
 
 | 路由类型 | 直连 Direct | OSPF | IS-IS | 静态 | RIP | OSPF ASE/NSSA | BGP |
 |---|---|---|---|---|---|---|---|
@@ -72,5 +72,5 @@ updated: 2026-10-15
 ## 参考来源
 
 1. [华为企业支持中心 · 配置指南（EDOC1000075592）](https://support.huawei.com/enterprise/zh/doc/EDOC1000075592/38fc9cfd)
-2. [华为交换机路由器常用配置命令与排障命令大全（VRP） - 夜莺博客](https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html)
+2. [华为产品文档 · 配置缺省 IPv4 静态路由（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100459181/AZP0409R/04/resources/vrp_ipv4-static-route_cfg_0030.html)
 3. [史上最强！华为交换机常用命令大全，网络工程师收藏！- 云社区 - 华为云](https://bbs.huaweicloud.com/blogs/468203)

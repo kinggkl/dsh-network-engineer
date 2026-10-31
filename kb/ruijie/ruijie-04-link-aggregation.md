@@ -7,8 +7,10 @@ keywords: [锐捷, RGOS, 链路聚合, channel-group, AggregatePort, LACP, mode 
 sources:
   - https://zhuanlan.zhihu.com/p/1908554021154846073
   - https://www.cnblogs.com/rkit/articles/8081534.html
+  - https://www-file.ruijie.com.cn/Fu/Article/856599fb-71ae-46bd-8219-964338425f13/v0/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/PDF/00-pdf/03-%E6%8E%A5%E5%8F%A3.pdf
+  - https://www-file.ruijie.com.cn/Fu/Article/5ae65c83-a729-4671-97fd-6b611e01ff6e/v1/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/PDF/00-pdf/04-%E6%8E%A5%E5%8F%A3.pdf
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 锐捷 · 链路聚合
@@ -58,11 +60,13 @@ Ruijie# show aggregatePort summary
 
 ## 高危操作 ⚠️
 
-- 在承载业务/管理流量的链路上增删成员口或切换聚合模式（如 on 改 active）⚠️：可能瞬时断流，须在变更窗口执行并准备回退。
-- 修改聚合口 allowed vlan 用整条覆盖写法 ⚠️：同 trunk，误覆盖可切断管理通道。
-- 删除聚合组（成员口 no channel-group 或 no interface AggregatePort 1）⚠️：聚合解散、链路瞬断，业务中断。
+- ⚠️ 在承载业务/管理流量的链路上增删成员口或切换聚合模式（如 on 改 active）：可能瞬时断流，须在变更窗口执行并准备回退。
+- ⚠️ 修改聚合口 allowed vlan 用整条覆盖写法：同 trunk，误覆盖可切断管理通道。
+- ⚠️ 删除聚合组（成员口 no channel-group 或 no interface AggregatePort 1）：聚合解散、链路瞬断，业务中断。
 
 ## 参考来源
 
 1. [锐捷网络设备（交换机、路由器、防火墙）常用命令整理 - 知乎](https://zhuanlan.zhihu.com/p/1908554021154846073)
 2. [锐捷网络交换机的配置命令集 - 博客园](https://www.cnblogs.com/rkit/articles/8081534.html)
+3. [锐捷官方文档《配置指南-接口》（链路聚合口章节，PDF）（www-file.ruijie.com.cn）](https://www-file.ruijie.com.cn/Fu/Article/856599fb-71ae-46bd-8219-964338425f13/v0/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/PDF/00-pdf/03-%E6%8E%A5%E5%8F%A3.pdf)
+4. [锐捷官方文档《命令参考-接口》（链路聚合口命令，PDF）（www-file.ruijie.com.cn）](https://www-file.ruijie.com.cn/Fu/Article/5ae65c83-a729-4671-97fd-6b611e01ff6e/v1/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/PDF/00-pdf/04-%E6%8E%A5%E5%8F%A3.pdf)

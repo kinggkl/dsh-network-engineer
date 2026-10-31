@@ -7,8 +7,10 @@ keywords: [锐捷, RGOS, 远程管理, line vty, show cpu, show logging, ping, t
 sources:
   - https://www.cnblogs.com/rkit/articles/8081534.html
   - https://zhuanlan.zhihu.com/p/1908554021154846073
+  - https://www-file.ruijie.com.cn/Fu/Article/313740fb-d969-4304-a625-d84561fa8fbd/v13/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/PDF/00-pdf/01-%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE.pdf
+  - https://www-file.ruijie.com.cn/Fu/Article/6c470414-e594-4277-98e3-40c11e3dc211/v0/20240913092259/PDF/00-pdf/01-%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86.pdf
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 锐捷 · 远程管理与诊断
@@ -88,12 +90,14 @@ Ruijie# traceroute 8.8.8.8
 
 ## 高危操作 ⚠️
 
-- 修改 NAT/DHCP 生产配置 ⚠️：直接影响在线用户上网与地址获取，变更前导出 show running-config 备份并准备回退。
-- 删除 DHCP 池或关闭 service dhcp ⚠️：客户端租期到期后无法续租，全网终端逐步断网。
-- 误改 line vty 认证或关闭远程服务 ⚠️：可能中断所有远程管理会话，确保 Console 通道可用后再操作。
+- ⚠️ 修改 NAT/DHCP 生产配置：直接影响在线用户上网与地址获取，变更前导出 show running-config 备份并准备回退。
+- ⚠️ 删除 DHCP 池或关闭 service dhcp：客户端租期到期后无法续租，全网终端逐步断网。
+- ⚠️ 误改 line vty 认证或关闭远程服务：可能中断所有远程管理会话，确保 Console 通道可用后再操作。
 
 ## 参考来源
 
 1. [锐捷网络交换机的配置命令集 - 博客园](https://www.cnblogs.com/rkit/articles/8081534.html)
 2. [锐捷网络设备（交换机、路由器、防火墙）常用命令整理 - 知乎](https://zhuanlan.zhihu.com/p/1908554021154846073)
 3. [锐捷设备命令大全，网络工程师收藏！- 阿里云开发者社区](https://developer.aliyun.com/article/1573480)（注意：该文混入华为 VRP 写法，仅作检索甄别参考，锐捷命令表未采用）
+4. [锐捷官方文档《基础配置》（设备登录 Console/Telnet/SSH、日志配置，PDF）（www-file.ruijie.com.cn）](https://www-file.ruijie.com.cn/Fu/Article/313740fb-d969-4304-a625-d84561fa8fbd/v13/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/PDF/00-pdf/01-%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE.pdf)
+5. [锐捷官方文档《命令参考-系统管理》（CPU-LOG、内存等排障命令，PDF）（www-file.ruijie.com.cn）](https://www-file.ruijie.com.cn/Fu/Article/6c470414-e594-4277-98e3-40c11e3dc211/v0/20240913092259/PDF/00-pdf/01-%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86.pdf)

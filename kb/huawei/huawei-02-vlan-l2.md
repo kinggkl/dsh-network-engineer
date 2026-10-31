@@ -8,8 +8,9 @@ sources:
   - https://bbs.huaweicloud.com/blogs/468203
   - https://www.cnblogs.com/qzqdy/p/8962516.html
   - https://zhuanlan.zhihu.com/p/2041468327910953284
+  - https://support.huawei.com/hedex/api/pages/EDOC1100512221/AZP10107/02/resources/vrp_vlan_cfg_0018.html
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 华为 · VLAN 与二层交换
@@ -69,12 +70,13 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- 上行 Trunk 上误执行 `undo port trunk allow-pass vlan`（尤其管理 VLAN）会瞬间失联。
-- 修改 link-type 报错后若脚本继续执行，会造成端口配置残缺。
-- 两端互联端口 PVID/放行 VLAN 不一致，导致单通或跨 VLAN 串流。
+- ⚠️ 上行 Trunk 上误执行 `undo port trunk allow-pass vlan`（尤其管理 VLAN）会瞬间失联。
+- ⚠️ 修改 link-type 报错后若脚本继续执行，会造成端口配置残缺。
+- ⚠️ 两端互联端口 PVID/放行 VLAN 不一致，导致单通或跨 VLAN 串流。
 
 ## 参考来源
 
 1. [华为云社区博客 468203（bbs.huaweicloud.com）](https://bbs.huaweicloud.com/blogs/468203)
 2. [博客园文章 qzqdy/p/8962516（cnblogs.com）](https://www.cnblogs.com/qzqdy/p/8962516.html)
 3. [知乎文章 p/2041468327910953284（zhuanlan.zhihu.com）](https://zhuanlan.zhihu.com/p/2041468327910953284)
+4. [华为产品文档 · 配置基于接口划分 VLAN（静态配置接口类型）（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100512221/AZP10107/02/resources/vrp_vlan_cfg_0018.html)

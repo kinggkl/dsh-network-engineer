@@ -5,11 +5,11 @@ topic: 远程管理与诊断
 devices: S 系列交换机、AR/NE 路由器等 VRP 设备
 keywords: [stelnet server enable, user-interface vty, authentication-mode aaa, display dhcp server ip-in-use, display arp, display cpu-usage, display logbuffer, terminal monitor, ping -f -s 1472, tracert]
 sources:
-  - https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1100292731/AZM03027/11/resources/dc/dc_lsw_troubleshooting_log_command.html
   - https://bbs.huaweicloud.com/blogs/468203
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000069491/a25a2d1a
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 华为 · 远程管理与诊断
@@ -92,6 +92,6 @@ updated: 2026-10-15
 
 ## 参考来源
 
-1. [华为交换机路由器常用配置命令与排障命令大全（VRP） - 夜莺博客](https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html)
+1. [华为产品文档 · 通过命令行获取日志和告警信息（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100292731/AZM03027/11/resources/dc/dc_lsw_troubleshooting_log_command.html)
 2. [史上最强！华为交换机常用命令大全，网络工程师收藏！- 云社区 - 华为云](https://bbs.huaweicloud.com/blogs/468203)
 3. [华为企业支持中心 · 配置指南（EDOC1000069491）](https://support.huawei.com/enterprise/zh/doc/EDOC1000069491/a25a2d1a)

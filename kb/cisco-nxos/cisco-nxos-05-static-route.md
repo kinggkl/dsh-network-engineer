@@ -9,13 +9,13 @@ sources:
   - https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/103x/unicast-routing-configuration/cisco-nexus-9000-series-nx-os-unicast-routing-configuration-guide-release-103x.html
   - https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/103x/configuration/interfaces/cisco-nexus-9000-nx-os-interfaces-configuration-guide-103x.html
 verified: high
-updated: 2026-10-30
+updated: 2026-10-31
 ---
 
 # 思科 Cisco NX-OS · 静态路由
 
 > 适用于 Nexus 的三层静态路由：出口默认路由、浮动备份、黑洞汇总与 SVI 直连型静态路由。
-> 与 IOS 差异：**目标网段写 `前缀/长度`**，管理距离关键字是 `preference`（不是 `distance` 位置参数）。
+> 与 IOS 差异：**目标网段写 `前缀/长度`**（IOS 写「网络地址 + 掩码」）；AD（管理距离）同样写在 `ip route <前缀/长度> <下一跳> [AD]` 的**末尾位置参数**——官方文档称 Administrative distance，NX-OS CLI 与 `show ip route` 回显称 `preference`，取值 1–255、缺省 1。
 
 ## 命令速查
 
@@ -36,11 +36,7 @@ updated: 2026-10-30
 | 看路由表 | `show ip route` | `switch#` | 查 URIB；静态路由前面标 `S`，直连 `C`，OSPF `O` |
 | 只筛静态条目 | `show ip route static` | `switch#` | 快速确认某条静态路由是否真的进了表 |
 
-### 常见管理距离（AD，数值越小越优）
-
-| 路由类型 | 直连 | 静态 | eBGP | EIGRP(内部) | OSPF | IS-IS | RIP | iBGP |
-|---|---|---|---|---|---|---|---|---|
-| NX-OS AD | 0 | 1 | 20 | 90 | 110 | 115 | 120 | 200 |
+> NX-OS 常见管理距离 AD（数值越小越优）：直连 0、静态 1、eBGP 20、EIGRP 内部 90、OSPF 110、IS-IS 115、RIP 120、iBGP 200。
 
 ## 典型示例
 
@@ -66,7 +62,7 @@ switch# copy running-config startup-config                          // 不落盘
 ## 陷阱与版本差异
 
 - **网段写法**：NX-OS 只认 `ip route 10.1.1.0/24 ...`；IOS 风格 `ip route 10.1.1.0 255.255.255.0 ...` 会被拒或解析异常。掩码与 ACL 反掩码也别混。
-- **AD 关键字位置**：NX-OS 用末尾位置参数 `preference`（1–255，缺省 1），官方默认值表明确 Administrative distance = 1；不是 IOS 那种独立的 `distance` 子句，也不是华为的 `preference` 视图命令。
+- **AD（preference）是末尾位置参数**：NX-OS 的 `ip route <前缀/长度> <下一跳> [preference]` 末尾数字就是管理距离（官方文档称 Administrative distance，CLI 与 `show ip route` 回显称 `preference`），取值 1–255、缺省 1；与 IOS 的 `ip route <目的网络> <掩码> <下一跳> [AD]` 一样都是命令末尾的位置数字，**不是**独立的 `distance` 子句——两者差异只在网段写法（`前缀/长度` vs 网络地址 + 掩码）与称呼，别把它误当成 IOS 的 `distance` 子命令或华为协议视图里的 preference 配置。
 - **下一跳不可达则不入表**：官方前提写明，若 URIB 中不存在覆盖该下一跳的单播路由，静态路由不会被安装（下一跳为直连网段的情况除外）。这正是"配了但不生效"的头号原因。
 - **下一跳只解析一次**：静态路由不会感知远端故障，只要本端接口 up 就保持生效，可能黑洞丢包。官方建议对该类静态路由配合 BFD 或对象跟踪（object tracking）验证下一跳可达性，语法随版本，以官方手册为准。
 - **SVI 直连型静态路由**需要先 `feature interface-vlan` 并已建 VLAN 接口，官方的静态路由章节把这条列为独立流程。

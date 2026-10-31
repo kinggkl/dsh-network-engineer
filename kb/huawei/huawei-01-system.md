@@ -5,11 +5,11 @@ topic: 系统管理与视图
 devices: S 系列交换机、AR/NE 路由器等 VRP 设备
 keywords: [VRP 视图, system-view, sysname, save, display current-configuration, commit, rollback configuration, AAA, local-user, console 登录]
 sources:
-  - https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1100087046/AZJ0324D/12/resources/dc/save.html
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000041691/a0f4f7e4
   - https://support.huawei.com/enterprise/zh/doc/EDOC1100383073/135b2760
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 华为 · 系统管理与视图
@@ -85,12 +85,12 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- `reset saved-configuration`：清空启动配置，误执行并重启后设备空配置失联，操作前必须导出备份。
-- `reboot`：中断业务；先 `save` 并与团队确认变更窗口。
-- Console 未启用认证（authentication-mode none）时，物理接触即可完全控制设备，生产环境禁止。
+- ⚠️ `reset saved-configuration`：清空启动配置，误执行并重启后设备空配置失联，操作前必须导出备份。
+- ⚠️ `reboot`：中断业务；先 `save` 并与团队确认变更窗口。
+- ⚠️ Console 未启用认证（authentication-mode none）时，物理接触即可完全控制设备，生产环境禁止。
 
 ## 参考来源
 
-1. [华为 VRP 常用命令与故障排查（gitgit.ee）](https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html)
+1. [华为产品文档 · save 命令（保存当前配置）（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100087046/AZJ0324D/12/resources/dc/save.html)
 2. [华为企业支持文档 EDOC1000041691（support.huawei.com）](https://support.huawei.com/enterprise/zh/doc/EDOC1000041691/a0f4f7e4)
 3. [华为企业支持文档 EDOC1100383073（support.huawei.com）](https://support.huawei.com/enterprise/zh/doc/EDOC1100383073/135b2760)

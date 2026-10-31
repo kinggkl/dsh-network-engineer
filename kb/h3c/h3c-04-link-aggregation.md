@@ -62,9 +62,9 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- `undo interface Bridge-Aggregation 1`：删除聚合口会释放全部成员口，业务立即中断且端口恢复独立配置。
-- 变更聚合模式（manual↔dynamic）或在业务口上增删成员：造成秒级闪断，选路/负载随之变化。
-- 把已经承载业务、带有 VLAN/STP 配置的端口直接划入属性不一致的聚合组：端口 Unselected 或触发环路，变更前先比对属性。
+- ⚠️ `undo interface Bridge-Aggregation 1`：删除聚合口会释放全部成员口，业务立即中断且端口恢复独立配置。
+- ⚠️ 变更聚合模式（manual↔dynamic）或在业务口上增删成员：造成秒级闪断，选路/负载随之变化。
+- ⚠️ 把已经承载业务、带有 VLAN/STP 配置的端口直接划入属性不一致的聚合组：端口 Unselected 或触发环路，变更前先比对属性。
 
 ## 参考来源
 

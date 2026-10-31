@@ -93,7 +93,7 @@ switch# show tech-support > flash:tech-20261030.txt     // 输出落到 flash �
 - ⚠️ `write erase` / `delete startup-config` 清空启动配置，重启后设备回到出厂状态并**失去全部 IP 与管理入口**；只能在有 Console 与完整备份的前提下操作。
 - ⚠️ `no ip routing` 立即中断全部三层转发（SVI、路由口、OSPF 全断），是 EOS 最危险的"一行命令"。
 - ⚠️ 在 `management ssh` 下 `shutdown` 或配错服务 ACL，会当场切断远程登录；操作前保留 Console/带外通道，并记住 EOS 默认无 Telnet 兜底。
-- 标准变更流程：`show running-config` 导出 → `copy running-config flash:backup-<日期>.cfg` → 变更 → `show ...` 验证 → 异常时 `copy flash:backup-<日期>.cfg running-config` 回退 → 确认后 `copy running-config startup-config`。
+- ⚠️ 标准变更流程：`show running-config` 导出 → `copy running-config flash:backup-<日期>.cfg` → 变更 → `show ...` 验证 → 异常时 `copy flash:backup-<日期>.cfg running-config` 回退 → 确认后 `copy running-config startup-config`。
 
 ## 参考来源
 

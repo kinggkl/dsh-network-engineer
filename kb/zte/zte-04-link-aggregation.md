@@ -7,10 +7,10 @@ keywords: [中兴, ZXR10, smartgroup, 链路聚合, LACP, mode active, mode pass
 sources:
   - https://xxc.lyu.edu.cn/_upload/article/files/f2/64/a9cd33264ad69c07614429415226/79074bd1-be96-47e3-b95c-f9e34595b03b.pdf
   - https://developer.aliyun.com/article/1171627
-  - http://nova-minsk.com/ZTE/59E/SJ-20150114102049-005-ZXR10%205900E%20Series%20(V3.00.11)Configuration%20Guide%20(Link%20Layer).pdf
+  - http://www.nova-minsk.com/ZTE/59E/SJ-20150114102049-005-ZXR10%205900E%20Series%20%28V3.00.11%29Configuration%20Guide%20%28Link%20Layer%29.pdf
   - https://csl.zte.com.cn/manual_zh/topics/1684391333553.html
 verified: medium
-updated: 2026-10-30
+updated: 2026-10-31
 ---
 
 # 中兴 · 链路聚合（smartgroup）
@@ -89,6 +89,6 @@ ZXR10(config-if)#smartgroup 1 mode passive       // 注意：两端都 passive �
 ## 参考来源
 
 1. [中兴 ZXR10 配置手册（PDF，含 `smartgroup 2 mode active` / `smartgroup 1 mode passive`、`switchport mode hybrid` 等成员口配置回显）](https://xxc.lyu.edu.cn/_upload/article/files/f2/64/a9cd33264ad69c07614429415226/79074bd1-be96-47e3-b95c-f9e34595b03b.pdf)
-2. [ZXR10 5900E 系列（V3.00.11）配置指导 · 链路层（官方文档镜像，含 `smartgroup` 聚合章节）](http://nova-minsk.com/ZTE/59E/SJ-20150114102049-005-ZXR10%205900E%20Series%20(V3.00.11)Configuration%20Guide%20(Link%20Layer).pdf)
+2. [ZXR10 5900E 系列（V3.00.11）Configuration Guide · Link Layer（中兴官方手册镜像，含 `smartgroup`/LACP 章节；原无 www 链接已 302 至站点首页失效，改引 www 域名，实测 HTTP 200、application/pdf、176 页）](http://www.nova-minsk.com/ZTE/59E/SJ-20150114102049-005-ZXR10%205900E%20Series%20%28V3.00.11%29Configuration%20Guide%20%28Link%20Layer%29.pdf)
 3. [中兴设备 show 命令大全（`show lacp internal` 查看聚合状态）](https://developer.aliyun.com/article/1171627)
 4. [中兴官方手册站 · CLI 配置（变更后 `write` 保存与配置导出）](https://csl.zte.com.cn/manual_zh/topics/1684391333553.html)（官方）

@@ -92,7 +92,7 @@ switch# show ip route
 - ⚠️ 运行中修改 `distance ospf` 官方明确提示会**导致 OSPF 链路抖动**，必须在维护窗口操作并准备回退。
 - ⚠️ 误删 `passive-interface` 或错误宣告大网段（如 `network 0.0.0.0/0 area 0`）会把不该进 OSPF 的接口拉进来，引发邻居震荡与路由泄漏。
 - ⚠️ 修改 `ip ospf authentication` 相关配置需两端同时变更；单端先改会立即拆邻居，建议先配好新 key 再切换。
-- 变更顺序：`show running-config` + `show ip ospf neighbor` 留存基线 → 变更 → `show ip ospf neighbor` / `show ip route` 验证 → 异常时 `shutdown` 该进程或回退配置 → 确认后 `copy running-config startup-config`。
+- ⚠️ 变更顺序：`show running-config` + `show ip ospf neighbor` 留存基线 → 变更 → `show ip ospf neighbor` / `show ip route` 验证 → 异常时 `shutdown` 该进程或回退配置 → 确认后 `copy running-config startup-config`。
 
 ## 参考来源
 

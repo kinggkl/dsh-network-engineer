@@ -8,7 +8,7 @@ sources:
   - https://www.ruijie.com.cn/fw/wt/37269
   - https://www.cnblogs.com/rkit/articles/8081534.html
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 锐捷 · 接口配置
@@ -60,8 +60,8 @@ Ruijie# show interfaces gigabitEthernet 0/1 counters    ← 观察收发与错�
 
 ## 高危操作 ⚠️
 
-- shutdown ⚠️：在上联口、级联口或管理 SVI 关联的物理口执行会立即中断业务与远程登录会话；变更前确认 Console/带外通道可达。
-- 对在用接口强制 speed/duplex ⚠️：与对端不匹配会瞬间大量丢包，等同于链路故障。
+- ⚠️ shutdown：在上联口、级联口或管理 SVI 关联的物理口执行会立即中断业务与远程登录会话；变更前确认 Console/带外通道可达。
+- ⚠️ 对在用接口强制 speed/duplex：与对端不匹配会瞬间大量丢包，等同于链路故障。
 
 ## 参考来源
 

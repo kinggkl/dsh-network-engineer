@@ -8,8 +8,9 @@ sources:
   - https://bbs.huaweicloud.com/blogs/468203
   - https://support.huawei.com/enterprise/zh/doc/EDOC1100383073/135b2760
   - https://zhuanlan.zhihu.com/p/2041468327910953284
+  - https://support.huawei.com/hedex/api/pages/EDOC1100558244/AZQ0401T/02/resources/vrp_eth-trunk_cfg_0012.html
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 华为 · 链路聚合 Eth-Trunk
@@ -60,12 +61,13 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- 成员口加入/退出聚合、切换工作模式会造成该链路短暂中断，需安排变更窗口。
-- `undo interface Eth-Trunk 1` 删除聚合口前先移出全部成员口，否则相关业务全部中断。
-- 堆叠/M-LAG 跨设备聚合另有专有配置要求，勿按单机方式直配（以官方手册为准）。
+- ⚠️ 成员口加入/退出聚合、切换工作模式会造成该链路短暂中断，需安排变更窗口。
+- ⚠️ `undo interface Eth-Trunk 1` 删除聚合口前先移出全部成员口，否则相关业务全部中断。
+- ⚠️ 堆叠/M-LAG 跨设备聚合另有专有配置要求，勿按单机方式直配（以官方手册为准）。
 
 ## 参考来源
 
 1. [华为云社区博客 468203（bbs.huaweicloud.com）](https://bbs.huaweicloud.com/blogs/468203)
 2. [华为企业支持文档 EDOC1100383073（support.huawei.com）](https://support.huawei.com/enterprise/zh/doc/EDOC1100383073/135b2760)
 3. [知乎文章 p/2041468327910953284（zhuanlan.zhihu.com）](https://zhuanlan.zhihu.com/p/2041468327910953284)
+4. [华为产品文档 · 创建 Eth-Trunk 接口并配置链路聚合模式（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100558244/AZQ0401T/02/resources/vrp_eth-trunk_cfg_0012.html)

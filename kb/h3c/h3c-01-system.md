@@ -62,10 +62,10 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- `reboot`：整机重启、业务中断；重启前确认已 `save` 或明确不需要保存当前运行配置。
-- `reset saved-configuration`：误操作后设备重启将回到空配置；执行前先 `display saved-configuration` 导出备份。
-- `startup saved-configuration` 指向错误或损坏的文件：下次启动可能加载错误配置甚至启动失败。
-- 生产环境 `save` 覆盖旧配置前，确认当前运行配置正确，并保留一份带日期后缀的备份文件。
+- ⚠️ `reboot`：整机重启、业务中断；重启前确认已 `save` 或明确不需要保存当前运行配置。
+- ⚠️ `reset saved-configuration`：误操作后设备重启将回到空配置；执行前先 `display saved-configuration` 导出备份。
+- ⚠️ `startup saved-configuration` 指向错误或损坏的文件：下次启动可能加载错误配置甚至启动失败。
+- ⚠️ 生产环境 `save` 覆盖旧配置前，确认当前运行配置正确，并保留一份带日期后缀的备份文件。
 
 ## 参考来源
 

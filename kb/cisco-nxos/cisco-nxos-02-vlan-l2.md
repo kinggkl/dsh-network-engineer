@@ -37,7 +37,7 @@ updated: 2026-10-30
 | 看 Trunk 协商 | `show interface Ethernet1/1 trunk` | `switch#` | 实际放通的 VLAN 列表 |
 | 看 STP | `show spanning-tree` / `show spanning-tree summary` | `switch#` | 输出显示 `protocol rstp` 即缺省快速生成树 |
 | 改 STP 模式 | `spanning-tree mode mst` | `switch(config)#` | 缺省 `rapid-pvst`；MST 需显式切换并配 `spanning-tree mst configuration` |
-| 看 MAC 表 | `show mac address-table` | `switch#` | 支持 `| include`、`vlan 10` 过滤 |
+| 看 MAC 表 | `show mac address-table` | `switch#` | 支持 `\| include`、`vlan 10` 过滤 |
 
 ## 典型示例
 

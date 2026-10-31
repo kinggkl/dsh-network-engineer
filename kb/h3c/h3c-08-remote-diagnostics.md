@@ -83,10 +83,10 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- `debugging all`：对所有模块开调试，极易打满 CPU 导致设备卡顿甚至失联，生产环境严禁随意使用；一旦执行立即 `undo debugging all`。
-- 修改 VTY 认证/本地用户/用户级别：改错会把合法管理员也锁在门外；保持已登录会话直至新会话验证通过。
-- `undo dhcp enable`：全局关闭 DHCP，正在从本机获取地址的终端续租失败。
-- 远程变更 `user-interface vty 0 4` 范围、协议（telnet/ssh）开关：先确认带外 Console/管理网可达再操作。
+- ⚠️ `debugging all`：对所有模块开调试，极易打满 CPU 导致设备卡顿甚至失联，生产环境严禁随意使用；一旦执行立即 `undo debugging all`。
+- ⚠️ 修改 VTY 认证/本地用户/用户级别：改错会把合法管理员也锁在门外；保持已登录会话直至新会话验证通过。
+- ⚠️ `undo dhcp enable`：全局关闭 DHCP，正在从本机获取地址的终端续租失败。
+- ⚠️ 远程变更 `user-interface vty 0 4` 范围、协议（telnet/ssh）开关：先确认带外 Console/管理网可达再操作。
 
 ## 参考来源
 

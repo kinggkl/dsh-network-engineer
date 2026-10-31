@@ -72,9 +72,9 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- `undo vlan`：删除 VLAN 会将其下 Access 端口踢回缺省 VLAN、并删除对应 Vlan-interface 三层接口，直接中断该网段业务。
-- `port trunk permit vlan all`：全 VLAN 放行，广播域与安全边界失控，安全加固要求收敛放行列表；取消时用 `undo port trunk permit vlan all` 后按需重建。
-- 批量改多个核心互联口的 link-type / 放行列表：易造成环路或大面积断网，变更前核对 STP 与放行 VLAN。
+- ⚠️ `undo vlan`：删除 VLAN 会将其下 Access 端口踢回缺省 VLAN、并删除对应 Vlan-interface 三层接口，直接中断该网段业务。
+- ⚠️ `port trunk permit vlan all`：全 VLAN 放行，广播域与安全边界失控，安全加固要求收敛放行列表；取消时用 `undo port trunk permit vlan all` 后按需重建。
+- ⚠️ 批量改多个核心互联口的 link-type / 放行列表：易造成环路或大面积断网，变更前核对 STP 与放行 VLAN。
 
 ## 参考来源
 

@@ -5,11 +5,11 @@ topic: 接口配置
 devices: S 系列交换机、AR/NE 路由器等 VRP 设备
 keywords: [接口配置, interface, Vlanif, undo shutdown, ip address, LoopBack, display ip interface brief, transceiver, storm-control, adjust-mss]
 sources:
-  - https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1000177836/AZG11278/16/resources/dc/dc_cfg_int-basic_0009.html
   - https://bbs.huaweicloud.com/blogs/468203
   - https://www.cnblogs.com/qzqdy/p/8962516.html
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 华为 · 接口配置
@@ -65,12 +65,12 @@ updated: 2026-10-15
 
 ## 高危操作 ⚠️
 
-- `shutdown` 上行口或管理口：直接断业务或失联，操作前确认备用路径。
-- `reset counters interface`：清零流量统计，监控告警会误判（不影响转发）。
-- 修改在用接口的 speed/duplex 会造成短暂断链。
+- ⚠️ `shutdown` 上行口或管理口：直接断业务或失联，操作前确认备用路径。
+- ⚠️ `reset counters interface`：清零流量统计，监控告警会误判（不影响转发）。
+- ⚠️ 修改在用接口的 speed/duplex 会造成短暂断链。
 
 ## 参考来源
 
-1. [华为 VRP 常用命令与故障排查（gitgit.ee）](https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html)
+1. [华为产品文档 · 配置开启或关闭接口（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1000177836/AZG11278/16/resources/dc/dc_cfg_int-basic_0009.html)
 2. [华为云社区博客 468203（bbs.huaweicloud.com）](https://bbs.huaweicloud.com/blogs/468203)
 3. [博客园文章 qzqdy/p/8962516（cnblogs.com）](https://www.cnblogs.com/qzqdy/p/8962516.html)

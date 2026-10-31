@@ -8,7 +8,7 @@ sources:
   - https://www.cnblogs.com/rkit/articles/8081534.html
   - https://www.ruijie.com.cn/fw/wt/37269
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 锐捷 · VLAN 与二层
@@ -75,9 +75,9 @@ Ruijie# write
 
 ## 高危操作 ⚠️
 
-- no vlan 888 ⚠️：删除 VLAN 使其下所有 Access 端口失去所属 VLAN，对应用户立即断网。
-- 在上联 Trunk 上整条覆盖 allowed vlan ⚠️：可能同时切断业务 VLAN 与管理 VLAN，远程会话掉线后无法回收配置。
-- 修改 Native VLAN 且两端不一致 ⚠️：引发跨交换机流量错路与安全隐患。
+- ⚠️ no vlan 888：删除 VLAN 使其下所有 Access 端口失去所属 VLAN，对应用户立即断网。
+- ⚠️ 在上联 Trunk 上整条覆盖 allowed vlan：可能同时切断业务 VLAN 与管理 VLAN，远程会话掉线后无法回收配置。
+- ⚠️ 修改 Native VLAN 且两端不一致：引发跨交换机流量错路与安全隐患。
 
 ## 参考来源
 

@@ -5,11 +5,11 @@ topic: OSPF
 devices: S 系列交换机、AR/NE 路由器等 VRP 设备
 keywords: [OSPF, ospf 1, router-id, network 反掩码, display ospf peer, import-route static, default-route-advertise, filter-policy, ospf cost, 区域认证]
 sources:
-  - https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1100414172/AZN1024J/06/resources/dc/dc_cfg_ospf_0007.html
   - https://bbs.huaweicloud.com/blogs/468203
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000069491/a25a2d1a
 verified: high
-updated: 2026-10-15
+updated: 2026-10-31
 ---
 
 # 华为 · OSPF
@@ -77,6 +77,6 @@ updated: 2026-10-15
 
 ## 参考来源
 
-1. [华为交换机路由器常用配置命令与排障命令大全（VRP） - 夜莺博客](https://gitgit.ee/huawei-vrp-common-commands-troubleshooting.html)
+1. [华为产品文档 · 使能 OSPF（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100414172/AZN1024J/06/resources/dc/dc_cfg_ospf_0007.html)
 2. [史上最强！华为交换机常用命令大全，网络工程师收藏！- 云社区 - 华为云](https://bbs.huaweicloud.com/blogs/468203)
 3. [华为企业支持中心 · 配置指南（EDOC1000069491）](https://support.huawei.com/enterprise/zh/doc/EDOC1000069491/a25a2d1a)

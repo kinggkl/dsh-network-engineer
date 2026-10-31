@@ -80,7 +80,7 @@ switch# show ip access-lists summary
 - ⚠️ 在 `control-plane` 上误配过严的 ACL 会阻断 OSPF/BGP/SSH/SNMP 等上送 CPU 的协议报文，表现为"接口 up、邻居全 down"，排查成本高。
 - ⚠️ `no ip access-group ... in` 与 `default interface ...` 会移除整条 ACL 绑定，等于防火墙失效；变更前 `show running-config interfaces <口>` 留存。
 - ⚠️ `no ip access-list <name>` 删除正在被引用的 ACL，绑定点会回落到无 ACL 状态（流量全放行），务必先解绑再删。
-- 变更顺序：`show running-config` + `show ip access-lists` 备份 → 变更（用 `show pending` 预演）→ `exit` 提交 → `show ip access-lists` 验证 `Active on` → 异常时 `no ip access-group` 立即解绑 → 确认后 `copy running-config startup-config`。
+- ⚠️ 变更顺序：`show running-config` + `show ip access-lists` 备份 → 变更（用 `show pending` 预演）→ `exit` 提交 → `show ip access-lists` 验证 `Active on` → 异常时 `no ip access-group` 立即解绑 → 确认后 `copy running-config startup-config`。
 
 ## 参考来源
 
