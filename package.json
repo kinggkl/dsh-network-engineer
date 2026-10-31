@@ -1,15 +1,24 @@
 {
-  "name": "dsh-network-engineer",
-  "version": "0.1.0",
-  "description": "网络工程师助手 for DeepSeek Harness：十厂商（迪普/新华三/华为/锐捷/思科 IOS·NX-OS/Junos/EOS/FortiOS/中兴）交换机路由器防火墙命令知识库（80 篇）+ 可切换预设 Agent，支持跨厂商对照、截图识别与联网查手册",
+  "name": "@kinggkl/dsh-network-engineer",
+  "version": "0.1.1",
+  "description": "网络工程师助手 for DeepSeek Harness：12 厂商（华为/新华三/锐捷/迪普/思科 IOS·NX-OS/Junos/Arista EOS/FortiOS/中兴/VyOS/MikroTik）交换机、路由器、防火墙命令知识库（96 篇）+ 可切换预设 Agent，支持跨厂商对照、截图识别与联网查手册",
   "type": "module",
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
   "files": [
     "index.js",
     "cordis.patch.yml",
     "skills/**",
     "kb/**",
+    "locale/*.json",
+    "icon.svg",
     "README.md",
+    "NOTICE.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "keywords": [
@@ -22,16 +31,32 @@
     "huawei",
     "h3c",
     "ruijie",
-    "dptech"
+    "dptech",
+    "cisco",
+    "nxos",
+    "juniper",
+    "arista",
+    "fortinet",
+    "zte",
+    "vyos",
+    "mikrotik",
+    "routeros"
   ],
+  "scripts": {
+    "test": "node --test test/",
+    "validate": "bash tools/kb-validate.sh kb"
+  },
+  "devDependencies": {
+    "js-yaml": "^4.1.0"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sososilencing/dsh-network-engineer.git"
+    "url": "git+https://github.com/kinggkl/dsh-network-engineer.git"
   },
-  "homepage": "https://github.com/sososilencing/dsh-network-engineer#readme",
+  "homepage": "https://github.com/kinggkl/dsh-network-engineer#readme",
   "bugs": {
-    "url": "https://github.com/sososilencing/dsh-network-engineer/issues"
+    "url": "https://github.com/kinggkl/dsh-network-engineer/issues"
   },
   "dsh": {
     "bundle": {
