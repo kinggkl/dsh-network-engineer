@@ -1,7 +1,9 @@
 // Package manifest, exports, display metadata and attribution tests.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync, statSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { execFileSync } from 'node:child_process'
 
 import { packageRoot, pathOf, read } from './_helpers.mjs'
@@ -89,10 +91,19 @@ test('attribution to the upstream project is present', () => {
 })
 
 test('npm pack tarball contains every runtime asset and no test/dev files', () => {
-  const output = execFileSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], {
-    cwd: packageRoot,
-    encoding: 'utf8',
-  })
+  // Keep npm's cache inside the platform temp area: a sandboxed test run may not
+  // be allowed to write to the user's ~/.npm cache.
+  const cacheDir = mkdtempSync(join(tmpdir(), 'dsh-npm-cache-'))
+  let output
+  try {
+    output = execFileSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], {
+      cwd: packageRoot,
+      encoding: 'utf8',
+      env: { ...process.env, npm_config_cache: cacheDir },
+    })
+  } finally {
+    rmSync(cacheDir, { recursive: true, force: true })
+  }
   const files = JSON.parse(output)[0].files.map((entry) => entry.path)
   const required = [
     'index.js',

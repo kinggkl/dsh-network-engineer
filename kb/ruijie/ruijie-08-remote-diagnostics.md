@@ -7,6 +7,7 @@ keywords: [锐捷, RGOS, 远程管理, line vty, show cpu, show logging, ping, t
 sources:
   - https://www.cnblogs.com/rkit/articles/8081534.html
   - https://zhuanlan.zhihu.com/p/1908554021154846073
+  - https://developer.aliyun.com/article/1573480
   - https://www-file.ruijie.com.cn/Fu/Article/313740fb-d969-4304-a625-d84561fa8fbd/v13/%E5%AE%98%E7%BD%91%E5%8F%91%E5%B8%83/PDF/00-pdf/01-%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE.pdf
   - https://www-file.ruijie.com.cn/Fu/Article/6c470414-e594-4277-98e3-40c11e3dc211/v0/20240913092259/PDF/00-pdf/01-%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86.pdf
 verified: high
