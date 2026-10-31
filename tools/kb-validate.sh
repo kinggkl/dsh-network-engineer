@@ -30,6 +30,9 @@ total=0
 # 固定节标题（按顺序）
 SECTIONS=('## 命令速查' '## 典型示例' '## 陷阱与版本差异' '## 高危操作' '## 参考来源')
 
+# 预期厂商目录集合（R1：kb 根目录缺整个厂商目录也必须报错）
+EXPECTED_VENDORS=(huawei h3c ruijie dptech cisco-ios cisco-nxos juniper arista fortinet zte vyos mikrotik)
+
 check_file() {
   local f="$1" base dir prefix fseq topic err=() lines
   base="$(basename "$f")"
@@ -78,6 +81,30 @@ check_file() {
   local src_count
   src_count="$(awk '/^sources:/{f=1;next} f&&/^[[:space:]]*-[[:space:]]*"?https?:/{c++} f&&!/^[[:space:]]*-/{f=0} END{print c+0}' <<<"$head_block")"
   (( src_count >= 2 )) || err+=("sources 的 http(s) URL 仅 ${src_count} 条（要求 ≥2）")
+
+  # --- 4a. verified: high 必须有官方域名来源（R2）；keywords 不得重复（R4） ---
+  local src_urls domain_re kw_line kw_uniq
+  src_urls="$(awk '/^sources:/{f=1;next} f&&/^[[:space:]]*-[[:space:]]*"?https?:/{print} f&&!/^[[:space:]]*-/{f=0}' <<<"$head_block")"
+  case "$dir" in
+    huawei) domain_re='support\.huawei\.com' ;;
+    h3c) domain_re='h3c\.com' ;;
+    ruijie) domain_re='ruijie\.com\.cn' ;;
+    cisco-ios | cisco-nxos) domain_re='cisco\.com' ;;
+    juniper) domain_re='juniper\.net|networkingdocs\.hpe\.com' ;;
+    arista) domain_re='arista\.com' ;;
+    fortinet) domain_re='docs\.fortinet\.com|support\.fortinet\.com\.cn' ;;
+    zte) domain_re='csl\.zte\.com\.cn|zte\.com\.cn' ;;
+    vyos) domain_re='docs\.vyos\.io|vyos\.io' ;;
+    mikrotik) domain_re='help\.mikrotik\.com|wiki\.mikrotik\.com' ;;
+  esac
+  if [[ "${verified:-}" == "high" && -n "${domain_re:-}" ]]; then
+    grep -Eq "$domain_re" <<<"$src_urls" || err+=("verified: high 但 sources 无官方域名来源")
+  fi
+  if grep -q '^keywords:[[:space:]]*\[' <<<"$head_block"; then
+    kw_line="$(grep -m1 '^keywords:' <<<"$head_block" | sed 's/^keywords:[[:space:]]*\[//; s/\][[:space:]]*$//; s/[[:space:]]//g')"
+    kw_uniq="$(tr ',' '\n' <<<"$kw_line" | sed '/^$/d' | sort -u | wc -l | tr -d ' ')"
+    (( kw_uniq == kw_count )) || err+=("keywords 有重复项（${kw_count} 个中 ${kw_uniq} 个唯一）")
+  fi
 
   # --- 4b. vendor/topic 字段与目录/主题交叉一致 ---
   local vtoken ttopic vfield tfield
@@ -234,6 +261,18 @@ TARGET="$1"
 if [[ -d "$TARGET" ]]; then
   # 目录级：先查主题齐全，再逐文件（kb 根目录逐厂商检查，不能让 npm run validate 漏检缺篇）
   if [[ "$(basename "$TARGET")" == "kb" ]]; then
+    if [[ ! -f "$TARGET/README.md" ]]; then
+      fail=$((fail + 1))
+      printf '✗ kb/ 缺少 README.md\n'
+    fi
+    local expected_sorted actual_sorted
+    expected_sorted="$(printf '%s\n' "${EXPECTED_VENDORS[@]}" | sort)"
+    actual_sorted="$(find "$TARGET" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort)"
+    if [[ "$expected_sorted" != "$actual_sorted" ]]; then
+      fail=$((fail + 1))
+      printf '✗ kb 厂商目录集合与预期不一致（缺目录/多目录都算失败）\n'
+      diff <(echo "$expected_sorted") <(echo "$actual_sorted") | sed 's/^/    /' || true
+    fi
     for vendor_dir in "$TARGET"/*/; do
       [[ -d "$vendor_dir" ]] && check_dir_topics "${vendor_dir%/}"
     done
