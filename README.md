@@ -6,7 +6,7 @@ DPtech CLI, Cisco IOS/IOS-XE and NX-OS, Juniper Junos, Arista EOS, Fortinet Fort
 MikroTik RouterOS. It covers vendor command reference, cross-vendor translation, routing-priority analysis,
 screenshot reading and online manual lookup, and only answers networking topics.
 
-> **社区延续版本 v0.1.1。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
+> **社区延续版本 v0.1.2。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
 > 0.1.0（MIT）重构：修复上游 issue #3 的 skill 注册路径与预设工具链缺陷，新增 8 个厂商 64 篇文档，
 > 把知识库扩展到 12 厂商 / 96 篇。原作者的插件骨架、预设思路与首批 4 厂商 32 篇文档是这条工作的基础，
 > 来源与致谢见 [NOTICE.md](NOTICE.md)。
@@ -168,7 +168,7 @@ npm run validate       # 12 厂商 96 篇文档结构校验
 
 1. `npm publish --access public`（scoped 包 `@kinggkl/dsh-network-engineer`；如需换名，改 `package.json.name`
    并在 `cordis.patch.yml` 的插件行同步）。
-2. 推送到 GitHub 仓库并打 tag：`git tag v0.1.1 && git push origin v0.1.1`。
+2. 推送到 GitHub 仓库并打 tag：`git tag v0.1.2 && git push origin v0.1.2`。
 3. 向 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 目录提交一条条目；
    [dshmarket](https://dshmarket.com) 通常随后自动收录（详见 `NOTICE.md` 与仓库 Issues）。
 

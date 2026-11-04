@@ -12,7 +12,7 @@ const pkg = JSON.parse(read('package.json'))
 
 test('package identity and version', () => {
   assert.equal(pkg.name, '@kinggkl/dsh-network-engineer')
-  assert.equal(pkg.version, '0.1.1')
+  assert.equal(pkg.version, '0.1.2')
   assert.equal(pkg.type, 'module')
   assert.equal(pkg.license, 'MIT')
   assert.match(pkg.description, /96 篇/)

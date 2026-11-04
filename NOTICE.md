@@ -1,6 +1,6 @@
 # NOTICE · 来源与致谢
 
-本仓库是社区延续版本（v0.1.1），基于 **sososilencing/dsh-network-engineer 0.1.0**（MIT）重构而来。
+本仓库是社区延续版本（v0.1.2），基于 **sososilencing/dsh-network-engineer 0.1.0**（MIT）重构而来。
 原作者的插件骨架、预设与 persona 提示词、以及首批 4 厂商 32 篇命令知识库是这条工作的基础，
 在此明确引用出处并向原作者及所有原始贡献者致谢。
 
@@ -15,7 +15,7 @@
 ## 本仓库（kinggkl/dsh-network-engineer）
 
 - 维护者：kinggkl（GitHub：https://github.com/kinggkl）
-- 版本：0.1.1（2026-10-31）
+- 版本：0.1.2（2026-11-04）
 - 新增知识库：`kb/cisco-ios/`、`kb/cisco-nxos/`、`kb/juniper/`、`kb/arista/`、
   `kb/fortinet/`、`kb/zte/`、`kb/vyos/`、`kb/mikrotik/` 八个目录共 64 篇；
   知识库合计 **12 厂商 / 96 篇**。

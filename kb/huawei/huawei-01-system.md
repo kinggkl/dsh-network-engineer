@@ -2,14 +2,15 @@
 vendor: 华为（Huawei）
 os: VRP
 topic: 系统管理与视图
-devices: S 系列交换机、AR/NE 路由器等 VRP 设备
-keywords: [VRP 视图, system-view, sysname, save, display current-configuration, commit, rollback configuration, AAA, local-user, console 登录]
+devices: S/CE 系列交换机、AR/NE 路由器（平台差异见正文）
+keywords: [VRP 视图, system-view, sysname, save, display current-configuration, commit, rollback configuration, AAA, local-user, console 登录, 平台差异]
 sources:
   - https://support.huawei.com/hedex/api/pages/EDOC1100087046/AZJ0324D/12/resources/dc/save.html
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000041691/a0f4f7e4
   - https://support.huawei.com/enterprise/zh/doc/EDOC1100383073/135b2760
+  - https://support.huawei.com/enterprise/zh/doc/EDOC1100389671/b6bc6158
 verified: high
-updated: 2026-10-31
+updated: 2026-11-04
 ---
 
 # 华为 · 系统管理与视图
@@ -45,7 +46,7 @@ updated: 2026-10-31
 | 查看提交历史 | display configuration commit list | 用户视图 | 列出各次 commit 的 ID 与标签 |
 | 回滚到指定提交 | rollback configuration to <commit-id> | 用户视图 | 按历史 commit ID 整体回滚 |
 
-> 传统盒式交换机（S5700/S6720 等）无两阶段机制，配置即时生效；回滚只能依靠事先 `save` 并导出的配置文件备份。
+> 经典 V200R 版本（如 S5700 V200R019、S6720 V200R019）无两阶段机制，配置即时生效；CloudEngine S 系列 V600 新平台支持两阶段提交与配置回退（缺省模式以对应产品文档为准）；无两阶段的平台回滚只能依靠事先 `save` 并导出的配置文件备份。
 
 ## AAA 账号与 Console 登录
 
@@ -78,10 +79,21 @@ updated: 2026-10-31
 
 ## 陷阱与版本差异
 
-- 传统盒式（S5700/S6720 等）与 CE 系列差异最大：前者无 `commit`/`rollback configuration`，回滚靠配置文件备份；后者配置不 `commit` 不生效。
+- 经典 V200R 版本（如 S5700 V200R019、S6720 V200R019）与 CE 系列差异最大：前者无 `commit`/`rollback configuration`，回滚靠配置文件备份；CE 数据中心系列与 CloudEngine S V600 配置不 `commit` 不生效（V600 的缺省模式以产品文档为准）。
 - 本地账号密码：新版本用 `password irreversible-cipher`，旧版本为 `password cipher`，两种写法互不兼容（以官方手册为准）。
 - `clock timezone` 只设置时区不设置时间，需配合 `clock datetime` 或 NTP 才能对齐时间。
 - `display saved-configuration` 与 `display current-configuration` 不一致，说明改动尚未 `save`，重启即丢。
+
+## 平台差异（交换机 vs 路由器）
+
+| 维度 | S/CE 系列交换机 | AR/NE 路由器 |
+|---|---|---|
+| 配置生效模型 | 经典 S 系列（V200R 等）：配置即时生效、无 `commit`；CloudEngine S V600 与 CE 数据中心系列：两阶段提交，编辑后需 `commit` 才生效，也可用 `system-view immediately` 切换为立即生效模式（缺省模式以对应产品文档为准） | NE 系列（VRP V8）：支持两阶段，缺省即两阶段，需 `commit`；AR 各版本能力不同，以对应平台产品文档为准 |
+| 两阶段提交/回滚 | CE 数据中心系列与 CloudEngine S V600 支持 `commit` 与配置回退点命令；经典 S 系列 V200R 无这些命令 | NE（VRP V8）支持 `commit` 并生成配置回退点；AR 平台两阶段/回退能力随版本，以对应平台产品文档为准 |
+| 配置持久化 | 都要 `save` 写入下次启动配置；`commit` 只让运行配置生效，不等于已保存 | 同左：两种生效模式都需 `save` 落盘，不 save 重启即丢 |
+| 堆叠/多机虚拟化 | 支持 iStack/CSS 等堆叠与多机虚拟化（随型号） | 路由器无 iStack 堆叠概念；NE 的集群类特性以对应平台产品文档为准 |
+
+两阶段配置是 VRP V8 平台的特性（CE 数据中心系列、CloudEngine S V600 与 NE 路由器），经典 S 系列 V200R 与经典 AR 路由器为即时生效模式；无论哪种模式，`save` 才是持久化动作。
 
 ## 高危操作 ⚠️
 
@@ -94,3 +106,4 @@ updated: 2026-10-31
 1. [华为产品文档 · save 命令（保存当前配置）（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100087046/AZJ0324D/12/resources/dc/save.html)
 2. [华为企业支持文档 EDOC1000041691（support.huawei.com）](https://support.huawei.com/enterprise/zh/doc/EDOC1000041691/a0f4f7e4)
 3. [华为企业支持文档 EDOC1100383073（support.huawei.com）](https://support.huawei.com/enterprise/zh/doc/EDOC1100383073/135b2760)
+4. [华为产品文档 · 选择命令行配置生效模式（立即生效、两阶段生效）（support.huawei.com）](https://support.huawei.com/enterprise/zh/doc/EDOC1100389671/b6bc6158)

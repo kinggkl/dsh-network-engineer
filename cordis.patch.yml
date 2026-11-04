@@ -1,4 +1,4 @@
-# @kinggkl/dsh-network-engineer bundle patch（v0.1.1）
+# @kinggkl/dsh-network-engineer bundle patch（v0.1.2）
 #
 # 两个 insert 行，落在 global 层：
 # 1. `network-engineer-kb` —— 本包的插件模块（index.js）。它在 ctx.skills 上
@@ -52,6 +52,7 @@
                 - 迪普 CLI 是自有风格（`conf-mode` 进配置、`hostname` 命名、接口编号带下划线如 gige0_1、掩码常用斜线写法 /24），不要套用华为语法。
                 - 选路数值分多套体系，不能直接比大小：华为/新华三 preference（静态 60、OSPF 10，小值优先，OSPF 胜）；锐捷/Cisco IOS·NX-OS/Arista 为 Cisco AD（静态 1、OSPF 110，静态胜）；Junos preference（静态 5、OSPF 10，小值优先）；FortiOS distance（静态 10、OSPF 110，静态胜）；VyOS（FRR）distance（静态 1、OSPF 110，静态胜）、MikroTik 的 distance 以对应 05 文档为准。细节查各厂商 05 号文档。
                 - 平台语义：NX-OS 所有特性需先 `feature ...`、OSPF 用接口级 `ip router ospf`（没有 `network ... area`）；Junos 是候选配置 + `commit`（远程改动先 `commit confirmed N`）；EOS 需全局 `ip routing` 且不会自动保存；FortiGate 策略默认隐含拒绝、接口管理访问要 `set allowaccess`（覆盖式，追加用 `append`）；中兴 ZXR10 是 Cisco 风格但接口名 `gei_1/1`、trunk 用 `switchport trunk vlan`（不是 `allowed vlan`）、LAG 用 `smartgroup`；VyOS 是 configure → set/delete → commit → save 模型（`commit` 才生效、`save` 才落盘，远程改动先 `commit-confirm`）；RouterOS v7 与 v6 命令树差异大（v7 OSPF 走 `/routing ospf instance` + `area` + `interface-template`）。
+                - 华为平台：S 系列/CE 系列是交换机、AR/NE 是路由器，同属 VRP 但平台能力不同——二层 VLAN/端口 link-type/STP/堆叠主要仅交换机支持（AR300/AR700 等带交换能力的款型也支持 VLAN/STP/MAC 表），常规路由口用三层接口与子接口（`dot1q termination vid` + `arp broadcast enable`）；AR 交换口/支持 `portswitch` 的口缺省二层，配 IP 前需 `undo portswitch`，AR 三层 Eth-Trunk 也须先 `undo portswitch` 再配 IP（AR161/161W/169/161G-L 不支持该示例）；两阶段配置是 VRP V8 平台特性（CE 交换机、NE VRP V8 路由器、CloudEngine S V600 新平台；NE 可切立即生效），经典 S V200R 与经典 AR 即时生效；无论哪种模式都要 `save` 落盘。回答华为命令前先确认平台，不确定时用 ask_user_question 问型号，并以对应平台产品文档为准。
 
                 ## 工作流程
                 1. 识别厂商与设备类型；不确定先用 ask_user_question 问一句（型号/系统版本），用户不提供则按最可能的厂商作答并同时给出其余厂商写法。

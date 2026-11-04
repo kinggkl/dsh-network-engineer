@@ -17,13 +17,15 @@
 #   8. 高危操作节含 ⚠️，且每条列表项以 `- ⚠️` 开头
 #   9. 参考来源节 ≥2 条 Markdown 链接
 #  10. 篇幅 60–130 行，文件以换行结尾
+#  11. 华为篇（v0.1.2 起）：必须有且仅有一个「## 平台差异（交换机 vs 路由器）」节，
+#      位于「陷阱与版本差异」之后、「高危操作」之前，正文含表格，keywords 含「平台差异」
 #
 # 退出码: 0 全通过；1 有失败；2 用法/未找到文件
 
 set -uo pipefail
 
 TOPIC_RE='system|vlan-l2|interface|link-aggregation|static-route|ospf|acl|remote-diagnostics'
-UPDATED_RE='^(2026-10-15|2026-10-30|2026-10-31)$'
+UPDATED_RE='^(2026-10-15|2026-10-30|2026-10-31|2026-11-04)$'
 fail=0
 total=0
 
@@ -66,7 +68,7 @@ check_file() {
   [[ "$verified" == "high" || "$verified" == "medium" ]] || err+=("verified 取值 '${verified}' 不是 high/medium")
 
   updated="$(sed -n 's/^updated:[[:space:]]*//p' <<<"$head_block" | head -1 | tr -d '"'"'")"
-  [[ "$updated" =~ $UPDATED_RE ]] || err+=("updated '${updated}' 不在受支持日期 (2026-10-15/30/31)")
+  [[ "$updated" =~ $UPDATED_RE ]] || err+=("updated '${updated}' 不在受支持日期 (2026-10-15/30/31、2026-11-04)")
 
   # keywords 数量（支持 [a, b, c] 与逐行 - 两种写法）
   local kw_count
@@ -176,6 +178,27 @@ check_file() {
     (( sec_body >= 2 )) || err+=("固定节 ${sec_name} 正文为空或过短（${sec_body} 行）")
   done
 
+  # --- 5c. 华为平台差异节（v0.1.2 起强制：存在、唯一、位置、表格、keywords） ---
+  if [[ "$dir" == "huawei" ]]; then
+    local plat plat_line trap_line risk_line plat_body kw_have
+    plat='## 平台差异（交换机 vs 路由器）'
+    plat_line="$(grep -n "^${plat}$" "$f" | head -1 | cut -d: -f1)"
+    if [[ -z "$plat_line" ]]; then
+      err+=("华为篇缺少「${plat}」节")
+    else
+      (( $(grep -c "^${plat}$" "$f") == 1 )) || err+=("「平台差异」节必须唯一")
+      trap_line="$(grep -n '^## 陷阱与版本差异' "$f" | head -1 | cut -d: -f1)"
+      risk_line="$(grep -n '^## 高危操作' "$f" | head -1 | cut -d: -f1)"
+      [[ -n "$trap_line" ]] && (( plat_line > trap_line )) || err+=("「平台差异」节必须在「陷阱与版本差异」之后")
+      [[ -n "$risk_line" ]] && (( plat_line < risk_line )) || err+=("「平台差异」节必须在「高危操作」之前")
+      plat_body="$(awk -v tag="$plat" 'index($0, tag)==1 {f=1; next} /^## /{f=0} f && NF>0 {c++} END{print c+0}' "$f")"
+      (( plat_body >= 3 )) || err+=("「平台差异」节正文过短（${plat_body} 行）")
+      awk -v tag="$plat" 'index($0, tag)==1 {f=1; next} /^## /{f=0} f && /^\|/' "$f" | grep -q . || err+=("「平台差异」节缺少表格")
+      kw_have="$(grep -m1 '^keywords:' <<<"$head_block" || true)"
+      [[ "$kw_have" == *平台差异* ]] || err+=("华为篇 keywords 缺少「平台差异」")
+    fi
+  fi
+
   # --- 6. 命令速查表（支持节内多张表，逐表对齐列数） ---
   local rows
   rows="$(awk '/^## 命令速查/{f=1; next} /^## /{f=0} f && /^\|/' "$f" | grep -vc '^|\s*-\|^|---\|^| *功能' || true)"
@@ -265,7 +288,6 @@ if [[ -d "$TARGET" ]]; then
       fail=$((fail + 1))
       printf '✗ kb/ 缺少 README.md\n'
     fi
-    local expected_sorted actual_sorted
     expected_sorted="$(printf '%s\n' "${EXPECTED_VENDORS[@]}" | sort)"
     actual_sorted="$(find "$TARGET" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort)"
     if [[ "$expected_sorted" != "$actual_sorted" ]]; then

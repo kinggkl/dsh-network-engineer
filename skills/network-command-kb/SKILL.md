@@ -27,6 +27,7 @@ description: 12 厂商交换机/路由器/防火墙命令知识库（华为/新�
 2. 跨厂商对照问题同时读多家同名主题文档（如 05 静态路由的 12 篇），用表格对照、不分段重复。
 3. 序号主题之外的细节用 grep 按命令关键字跨目录检索（如 `grep -rn "port trunk" kb/`）。
 4. 先确认平台再答：Cisco IOS-XE 与 NX-OS 是两套文档；Junos 的 EX（交换）与 MX/SRX（路由/安全）语法不同；
+   **华为**的 S/CE 系列是交换机、AR/NE 是路由器，同属 VRP 但二层能力与接口模型不同（见各篇「平台差异」节）；
    FortiGate 是防火墙视角；VyOS 是 configure/set/commit/save 模型；RouterOS v7 与 v6 命令树差异大。
 
 ## 使用规则

@@ -2,6 +2,35 @@
 
 本项目遵循语义化版本；上游基线为 `dsh-network-engineer 0.1.0`。
 
+## 0.1.2 — 2026-11-04
+
+### Added
+
+- **华为平台差异层**：`kb/huawei/` 8 篇新增「平台差异（交换机 vs 路由器）」节，区分 S/CE 系列交换机与
+  AR/NE 路由器的二层能力、接口模型、路由/ACL 应用点与诊断命令；frontmatter `devices` 改为双平台并指向差异节。
+- `kb/README.md` 增加华为平台矩阵（8 主题 × 交换机/路由器）；persona 与 `SKILL.md` 增加
+  「回答华为命令前先确认交换机/路由器平台」提示。
+
+### Changed
+
+- 版本号 0.1.1 → 0.1.2；命令知识库仍为 12 厂商 / 96 篇。
+- 校验器 `updated` 允许 `2026-11-04`（R1–R4 门禁不变）。
+
+### Fixed
+
+- `kb/huawei/huawei-08-remote-diagnostics.md`：修正「交换机只作 DHCP 中继/侦听、`display dhcp server ip-in-use`
+  是路由器命令」的表述——华为 S 系列官方支持 DHCP 服务器（`dhcp enable` + `ip pool`），补充官方配置指南来源。
+- `tools/kb-validate.sh` 与 `test/kb.test.mjs` 新增华为平台节门禁：8 篇必须各有一个
+  「平台差异（交换机 vs 路由器）」节，位于「陷阱与版本差异」之后、「高危操作」之前，含表格，且
+  `keywords` 含「平台差异」；删除/移位/丢关键字均会红灯。
+- 华为 8 篇平台差异节按独立事实审计修正：AR 交换口/支持 `portswitch` 的口缺省二层需 `undo portswitch`、
+  AR 三层 Eth-Trunk 须先 `undo portswitch` 再配 IP（AR161/161W/169/161G-L 例外）、AR 交换款型
+  （AR300/AR700 等）支持 VLAN/STP/二层诊断、经典 S V200R 与 CloudEngine S V600/CE 的两阶段差异、
+  VLAN 视图 `traffic-filter acl 3000 inbound` 语法、去掉「全系支持」等绝对化断言；`kb/README.md` 平台矩阵、
+  `AGENTS.md` 与预设 persona 同步改写。
+- `test/kb.test.mjs` 平台节唯一性改为对原文正则计数（此前 `_helpers.mjs` 的 `Map` 会吞掉重复标题）；
+  `tools/kb-validate.sh` 修复顶层 `local` 在非函数上下文报错的问题。
+
 ## 0.1.1 — 2026-10-31
 
 社区延续版本，修复上游 issue #3 并完成知识库扩展。

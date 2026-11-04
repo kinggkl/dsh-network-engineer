@@ -2,20 +2,20 @@
 vendor: 华为（Huawei）
 os: VRP
 topic: VLAN 与二层交换
-devices: S 系列交换机、AR/NE 路由器等 VRP 设备
-keywords: [VLAN, vlan batch, access, trunk, hybrid, pvid, allow-pass, link-type, display mac-address, STP]
+devices: S/CE 系列交换机、AR/NE 路由器（平台差异见正文）
+keywords: [VLAN, vlan batch, access, trunk, hybrid, pvid, allow-pass, link-type, display mac-address, STP, 平台差异]
 sources:
   - https://bbs.huaweicloud.com/blogs/468203
   - https://www.cnblogs.com/qzqdy/p/8962516.html
-  - https://zhuanlan.zhihu.com/p/2041468327910953284
+  - https://support.huawei.com/hedex/api/pages/EDOC1100021773/AEN0709J/06/resources/dc/dc_cfg_logical-int_0071.html
   - https://support.huawei.com/hedex/api/pages/EDOC1100512221/AZP10107/02/resources/vrp_vlan_cfg_0018.html
 verified: high
-updated: 2026-10-31
+updated: 2026-11-04
 ---
 
 # 华为 · VLAN 与二层交换
 
-> 适用于 S 系列交换机（S5700/S6720/CE 等）的 VLAN 划分、端口类型（Access/Trunk/Hybrid）配置与二层状态查看。
+> 适用于 S 系列交换机（S5700/S6720/CE 等）的 VLAN 划分、端口类型（Access/Trunk/Hybrid）配置与二层状态查看；AR 路由器对应能力见文末「平台差异」节。
 
 ## 命令速查
 
@@ -68,6 +68,17 @@ updated: 2026-10-31
 - Hybrid 的 `port hybrid untagged vlan` 需与 `port hybrid pvid vlan` 配合使用，否则无标签收发不对称。
 - 部分版本查看命令为 `display port vlan active`；MAC 表可加过滤参数如 `display mac-address dynamic`（以官方手册为准）。
 
+## 平台差异（交换机 vs 路由器）
+
+| 维度 | S/CE 系列交换机 | AR/NE 路由器 |
+|---|---|---|
+| 二层 VLAN/端口类型 | `port link-type access/trunk/hybrid`、`port trunk allow-pass vlan` 等完整二层交换模型 | 常规纯三层口以子接口 `dot1q termination vid <vid>` + `arp broadcast enable` 承载 VLAN；部分交换款型（如 AR300/AR700 等）内置交换口，支持 VLAN/端口类型等二层能力，不限于插卡 |
+| 三层网关 | 用 `interface Vlanif<vlan-id>` 作 VLAN 内主机网关 | 常规用物理三层口或子接口地址作网关；具备 VLAN/交换能力的 AR 款型支持 `interface Vlanif` 作三层网关（以对应产品文档为准） |
+| STP/MAC 表 | 支持 STP/RSTP/MSTP，`display mac-address` 查 MAC 表 | 纯三层口无 STP/MAC 表概念；带交换能力的 AR 款型（如 AR300/AR700 等）支持 VLAN、STP/RSTP/MSTP 与 MAC 表（命令以对应产品文档为准） |
+| 设备形态 | 二层转发是核心能力，适合接入/汇聚 | 以三层路由与广域接口为主，VLAN 间互通通常在子接口做 802.1Q 终结 |
+
+VLAN 划分与端口类型在 AR 上属于其交换款型/插卡的二层能力，常规路由口对应"子接口 + 802.1Q 终结"，两套用法按接口角色区分；AR 子接口的 `arp broadcast enable` 在 V200R003C01 及之后版本缺省已使能，可省略（以对应产品文档为准）。
+
 ## 高危操作 ⚠️
 
 - ⚠️ 上行 Trunk 上误执行 `undo port trunk allow-pass vlan`（尤其管理 VLAN）会瞬间失联。
@@ -78,5 +89,5 @@ updated: 2026-10-31
 
 1. [华为云社区博客 468203（bbs.huaweicloud.com）](https://bbs.huaweicloud.com/blogs/468203)
 2. [博客园文章 qzqdy/p/8962516（cnblogs.com）](https://www.cnblogs.com/qzqdy/p/8962516.html)
-3. [知乎文章 p/2041468327910953284（zhuanlan.zhihu.com）](https://zhuanlan.zhihu.com/p/2041468327910953284)
+3. [华为产品文档 · 逻辑接口（VLANIF/Eth-Trunk 二三层能力）（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100021773/AEN0709J/06/resources/dc/dc_cfg_logical-int_0071.html)
 4. [华为产品文档 · 配置基于接口划分 VLAN（静态配置接口类型）（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100512221/AZP10107/02/resources/vrp_vlan_cfg_0018.html)

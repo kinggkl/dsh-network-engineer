@@ -2,14 +2,14 @@
 vendor: 华为（Huawei）
 os: VRP
 topic: OSPF
-devices: S 系列交换机、AR/NE 路由器等 VRP 设备
-keywords: [OSPF, ospf 1, router-id, network 反掩码, display ospf peer, import-route static, default-route-advertise, filter-policy, ospf cost, 区域认证]
+devices: S/CE 系列交换机、AR/NE 路由器（平台差异见正文）
+keywords: [OSPF, ospf 1, router-id, network 反掩码, display ospf peer, import-route static, default-route-advertise, filter-policy, ospf cost, 区域认证, 平台差异]
 sources:
   - https://support.huawei.com/hedex/api/pages/EDOC1100414172/AZN1024J/06/resources/dc/dc_cfg_ospf_0007.html
-  - https://bbs.huaweicloud.com/blogs/468203
+  - https://support.huawei.com/hedex/api/pages/EDOC1100408789/AZN1010R/05/resources/dc/portswitch_ethernet.html
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000069491/a25a2d1a
 verified: high
-updated: 2026-10-31
+updated: 2026-11-04
 ---
 
 # 华为 · OSPF
@@ -69,6 +69,17 @@ updated: 2026-10-31
 - 引入的路由成为 ASE，优先级 150（数值大于内部 10，不如内部路由优）；`default-route-advertise` 不加 always 时，本机没有活动默认路由则不下发。
 - 修改 Router ID、进程参数后常需 `reset ospf <进程号> process` 重启进程才生效。
 
+## 平台差异（交换机 vs 路由器）
+
+| 维度 | S/CE 系列交换机 | AR/NE 路由器 |
+|---|---|---|
+| 三层接口前提 | 先在 `Vlanif`（或已切三层的物理口/Eth-Trunk）配 IP 且状态 up，`network` 覆盖该网段才能建邻居 | 物理三层口/子接口配 IP 即可参与 OSPF；交换款型的二层口需先切三层（以产品文档为准） |
+| 特性支持 | 纯二层型号不支持 OSPF；支持三层的 S/CE 型号以基础 OSPF 为主 | 主流型号支持 OSPF 多进程/多区域及较完整的高级特性；低端/老版本具体支持范围以产品文档为准 |
+| 高级特性 | NSSA、虚连接、GR 等按型号/版本裁剪（以产品文档为准） | NSSA、虚连接、GR、BFD、多进程等支持情况随型号/版本，以产品文档为准 |
+| 路由引入与过滤 | 支持 `import-route`、`filter-policy`，组合手段相对有限（以产品文档为准） | `import-route` 可结合 `route-policy`，过滤与选路手段相对更丰富（以产品文档为准） |
+
+`ospf`、`area`、`network` 命令骨架两平台一致；差异来自接口形态与特性集，低端型号可能完全没有 OSPF 进程，实际支持范围以对应平台产品文档为准。
+
 ## 高危操作 ⚠️
 
 - ⚠️ `reset ospf <进程号> process` 重启 OSPF 进程，邻居与路由全部重算，业务短暂中断。
@@ -78,5 +89,5 @@ updated: 2026-10-31
 ## 参考来源
 
 1. [华为产品文档 · 使能 OSPF（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100414172/AZN1024J/06/resources/dc/dc_cfg_ospf_0007.html)
-2. [史上最强！华为交换机常用命令大全，网络工程师收藏！- 云社区 - 华为云](https://bbs.huaweicloud.com/blogs/468203)
+2. [华为产品文档 · portswitch（AR 以太网接口二层/三层切换，support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100408789/AZN1010R/05/resources/dc/portswitch_ethernet.html)
 3. [华为企业支持中心 · 配置指南（EDOC1000069491）](https://support.huawei.com/enterprise/zh/doc/EDOC1000069491/a25a2d1a)

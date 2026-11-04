@@ -2,14 +2,15 @@
 vendor: 华为（Huawei）
 os: VRP
 topic: 接口配置
-devices: S 系列交换机、AR/NE 路由器等 VRP 设备
-keywords: [接口配置, interface, Vlanif, undo shutdown, ip address, LoopBack, display ip interface brief, transceiver, storm-control, adjust-mss]
+devices: S/CE 系列交换机、AR/NE 路由器（平台差异见正文）
+keywords: [接口配置, interface, Vlanif, undo shutdown, ip address, LoopBack, display ip interface brief, transceiver, storm-control, adjust-mss, 平台差异]
 sources:
   - https://support.huawei.com/hedex/api/pages/EDOC1000177836/AZG11278/16/resources/dc/dc_cfg_int-basic_0009.html
   - https://bbs.huaweicloud.com/blogs/468203
   - https://www.cnblogs.com/qzqdy/p/8962516.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1100408789/AZN1010R/05/resources/dc/portswitch_ethernet.html
 verified: high
-updated: 2026-10-31
+updated: 2026-11-04
 ---
 
 # 华为 · 接口配置
@@ -63,6 +64,17 @@ updated: 2026-10-31
 - 光模块查看命令的短格式与参数在不同版本差异较大（以官方手册为准）。
 - `speed`/`duplex` 一端 auto 一端强制会起不来或出现大量 CRC 错包。
 
+## 平台差异（交换机 vs 路由器）
+
+| 维度 | S/CE 系列交换机 | AR/NE 路由器 |
+|---|---|---|
+| 接口命名 | 编号多为槽位/子卡/端口，如 `GigabitEthernet0/0/1`；CE 还有 `10GE1/0/1` 等 | 编号规则随平台不同：AR 常见 `GigabitEthernet0/0/0`，NE 常见 `GigabitEthernet1/0/0` |
+| 缺省工作模式 | 以太口缺省二层（加入 VLAN 1），配 IP 前需 `undo portswitch` 切三层（可切换端口随型号） | NE 与 AR 的 WAN 三层口缺省三层，可直接 `ip address`；AR 的 LAN 交换口/支持 `portswitch` 的接口缺省二层（如 AR300 GE0/0/0–3、AR720 GE0/0/0–7），配 IP 前同样需 `undo portswitch`，具体以《了解产品-硬件描述》为准 |
+| 子接口/WAN | 主要提供以太口与聚合口，二层特性以 PPPoE+ 接入代理等为主，拨号客户端能力以对应平台产品文档为准 | 支持子接口（`dot1q termination vid` + `arp broadcast enable`）、PPP/PPPoE 等广域接口与拨号能力（以对应平台产品文档为准） |
+| 接口形态 | 以以太网口与 Eth-Trunk 为主 | 除以太口外还有 Serial/POS 等广域接口（随型号）；部分款型自身具备交换口（如 AR300/AR700 等）或支持交换插卡 |
+
+最易踩的坑是"交换机以太口缺省二层、AR 交换口同样缺省二层"：交换机与 AR 交换口配 IP 前都要 `undo portswitch`，只有 NE 与 AR 的 WAN 三层口可直接配 IP（接口角色与型号能力以对应平台产品文档为准）。
+
 ## 高危操作 ⚠️
 
 - ⚠️ `shutdown` 上行口或管理口：直接断业务或失联，操作前确认备用路径。
@@ -74,3 +86,4 @@ updated: 2026-10-31
 1. [华为产品文档 · 配置开启或关闭接口（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1000177836/AZG11278/16/resources/dc/dc_cfg_int-basic_0009.html)
 2. [华为云社区博客 468203（bbs.huaweicloud.com）](https://bbs.huaweicloud.com/blogs/468203)
 3. [博客园文章 qzqdy/p/8962516（cnblogs.com）](https://www.cnblogs.com/qzqdy/p/8962516.html)
+4. [华为产品文档 · portswitch（以太网接口二/三层模式切换，AR300/AR700 等）（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100408789/AZN1010R/05/resources/dc/portswitch_ethernet.html)

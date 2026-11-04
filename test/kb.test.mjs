@@ -6,7 +6,7 @@ import { readdirSync, statSync } from 'node:fs'
 
 import { pathOf, read, parseFrontmatter, sections, tableStats, SECTIONS, TOPICS, VENDORS } from './_helpers.mjs'
 
-const UPDATED_DATES = new Set(['2026-10-15', '2026-10-30', '2026-10-31'])
+const UPDATED_DATES = new Set(['2026-10-15', '2026-10-30', '2026-10-31', '2026-11-04'])
 const TOPIC_CODES = Object.keys(TOPICS)
 const DOCS = []
 for (const vendor of VENDORS) {
@@ -122,6 +122,25 @@ for (const doc of DOCS) {
       assert.equal(matches.length, 1, `fixed section ${heading} must appear exactly once (got ${matches.length})`)
       const body = [...map.entries()].find(([actual]) => actual.startsWith(heading))[1].filter((line) => line.trim() !== '')
       assert.ok(body.length >= 2, `fixed section ${heading} body is empty or too short`)
+    }
+
+    // v0.1.2: every Huawei document must carry one platform-difference section
+    // between the pitfalls and high-risk sections, with a table, and the keyword.
+    if (doc.vendor === 'huawei') {
+      // Count raw headings: helper's Map collapses duplicate headings, so the
+      // uniqueness check must not rely on it (validator catches duplicates too).
+      const platformCount = (text.match(/^## 平台差异（交换机 vs 路由器）$/gm) ?? []).length
+      assert.equal(platformCount, 1, 'huawei doc must carry exactly one 平台差异 section')
+      const platformHeadings = ordered.filter((actual) => actual.startsWith('## 平台差异'))
+      const platformIndex = ordered.indexOf(platformHeadings[0])
+      const trapIndex = ordered.findIndex((actual) => actual.startsWith('## 陷阱与版本差异'))
+      const riskIndex = ordered.findIndex((actual) => actual.startsWith('## 高危操作'))
+      assert.ok(platformIndex > trapIndex, '平台差异 section must follow 陷阱与版本差异')
+      assert.ok(platformIndex < riskIndex, '平台差异 section must precede 高危操作')
+      const platformBody = map.get(platformHeadings[0]).filter((line) => line.trim() !== '')
+      assert.ok(platformBody.length >= 3, '平台差异 body is too short')
+      assert.ok(platformBody.some((line) => line.startsWith('|')), '平台差异 body lacks a table')
+      assert.ok(fields.keywords.includes('平台差异'), 'huawei keywords must include 平台差异')
     }
 
     const quick = [...map.entries()].find(([heading]) => heading.startsWith('## 命令速查'))?.[1].join('\n') ?? ''

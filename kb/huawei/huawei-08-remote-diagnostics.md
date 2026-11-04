@@ -2,14 +2,15 @@
 vendor: 华为（Huawei）
 os: VRP
 topic: 远程管理与诊断
-devices: S 系列交换机、AR/NE 路由器等 VRP 设备
-keywords: [stelnet server enable, user-interface vty, authentication-mode aaa, display dhcp server ip-in-use, display arp, display cpu-usage, display logbuffer, terminal monitor, ping -f -s 1472, tracert]
+devices: S/CE 系列交换机、AR/NE 路由器（平台差异见正文）
+keywords: [stelnet server enable, user-interface vty, authentication-mode aaa, display dhcp server ip-in-use, display arp, display cpu-usage, display logbuffer, terminal monitor, ping -f -s 1472, tracert, 平台差异]
 sources:
   - https://support.huawei.com/hedex/api/pages/EDOC1100292731/AZM03027/11/resources/dc/dc_lsw_troubleshooting_log_command.html
-  - https://bbs.huaweicloud.com/blogs/468203
+  - https://support.huawei.com/enterprise/zh/doc/EDOC1100411240/3622db8f
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000069491/a25a2d1a
+  - https://support.huawei.com/enterprise/en/doc/EDOC1100301660/609ffe30/configuring-a-dhcp-server
 verified: high
-updated: 2026-10-31
+updated: 2026-11-04
 ---
 
 # 华为 · 远程管理与诊断
@@ -82,7 +83,19 @@ updated: 2026-10-31
 - `ping -f -s 1472`：1472 字节报文 + 28 字节头部恰为 1500；测路径 MTU 应从小到大逐级尝试。
 - `protocol inbound ssh` 生效后 Telnet 立即不可用；确认 SSH 可登录后再退出现有会话。
 - VTY 数量、密钥对生成方式因版本/形态而异，用 `display user-interface` 与官方手册核对（以官方手册为准）。
-- `display dhcp server ip-in-use` 是路由器 DHCP 服务器命令；交换机 DHCP 场景常用 `display dhcp snooping` / `display ip pool`（以官方手册为准）。
+- `display dhcp server ip-in-use` 用于 DHCP 服务器场景，交换机与路由器均可能支持（取决于型号/版本、`dhcp enable` 与地址池配置）；交换机接入侧排障常用 `display dhcp snooping`，地址池侧可用 `display ip pool`（以官方手册为准）。
+
+## 平台差异（交换机 vs 路由器）
+
+| 维度 | S/CE 系列交换机 | AR/NE 路由器 |
+|---|---|---|
+| 远程管理 | `stelnet server enable`、VTY/AAA 配置一致 | 同左 |
+| 二层诊断 | `display mac-address`、`display stp`、`display vlan`、`display port vlan` | 纯三层口无二层交换特性；带交换能力的 AR 款型（如 AR300/AR700）支持 `display mac-address`、`display stp`、`display vlan` 等二层诊断命令，以产品文档为准 |
+| 路由诊断 | 三层型号可用 `display ip routing-table` 等，协议排障能力随型号/版本，以产品文档为准 | `display ip routing-table`、`display ospf peer`、`display bgp peer` 等通常可用，具体以产品文档为准 |
+| DHCP 角色 | 三层交换机与路由器都可作 DHCP 服务器（`dhcp enable` + `ip pool`，受型号/版本限制）；接入交换机更常见 DHCP snooping/中继 | 常兼作 DHCP 服务器，`display dhcp server ip-in-use` 查租约；交换机支持该命令时同样可用 |
+| 通用命令 | `display version`、`display interface`、`display logbuffer` 等 | 同左 |
+
+SSH/Telnet 开通命令通用；诊断差异来自设备角色——交换机侧重二层转发表与端口，路由器侧重路由表与路由协议邻居，具体命令可用性以对应平台产品文档为准。
 
 ## 高危操作 ⚠️
 
@@ -93,5 +106,6 @@ updated: 2026-10-31
 ## 参考来源
 
 1. [华为产品文档 · 通过命令行获取日志和告警信息（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100292731/AZM03027/11/resources/dc/dc_lsw_troubleshooting_log_command.html)
-2. [史上最强！华为交换机常用命令大全，网络工程师收藏！- 云社区 - 华为云](https://bbs.huaweicloud.com/blogs/468203)
+2. [华为企业支持中心 · AR300/AR700 配置指南-以太网交换（STP/RSTP 配置注意事项）](https://support.huawei.com/enterprise/zh/doc/EDOC1100411240/3622db8f)
 3. [华为企业支持中心 · 配置指南（EDOC1000069491）](https://support.huawei.com/enterprise/zh/doc/EDOC1000069491/a25a2d1a)
+4. [华为企业支持中心 · S 系列交换机 DHCP 服务器配置（Configuring a DHCP Server）](https://support.huawei.com/enterprise/en/doc/EDOC1100301660/609ffe30/configuring-a-dhcp-server)

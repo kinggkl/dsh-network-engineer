@@ -2,14 +2,14 @@
 vendor: 华为（Huawei）
 os: VRP
 topic: ACL 与 NAT 出口
-devices: S 系列交换机、AR/NE 路由器等 VRP 设备
-keywords: [ACL, acl number 2000, acl 3000 高级, rule permit source 反掩码, traffic-filter, display acl all, NAT, nat outbound Easy-IP, 规则步长]
+devices: S/CE 系列交换机、AR/NE 路由器（平台差异见正文）
+keywords: [ACL, acl number 2000, acl 3000 高级, rule permit source 反掩码, traffic-filter, display acl all, NAT, nat outbound Easy-IP, 规则步长, 平台差异]
 sources:
-  - https://www.cnblogs.com/qzqdy/p/8962516.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1000135331/31189148/19/resources/dc/traffic-filter_interface_view.html
   - https://support.huawei.com/hedex/api/pages/EDOC1100414296/AZN1024P/06/resources/dc/traffic-filter_vlan_view_dc.html
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000075592/38fc9cfd
 verified: high
-updated: 2026-10-31
+updated: 2026-11-04
 ---
 
 # 华为 · ACL 与 NAT 出口
@@ -65,6 +65,18 @@ updated: 2026-10-31
 - `nat outbound` 引用的 ACL 匹配内网「源」地址：permit 的流被转换，deny 的流原样转发不做 NAT。
 - `display acl` 的 matches 计数为 0 不一定代表规则错误，先核对应用的接口与方向是否正确。
 
+## 平台差异（交换机 vs 路由器）
+
+| 维度 | S/CE 系列交换机 | AR/NE 路由器 |
+|---|---|---|
+| ACL 定义 | `acl number`、`rule` 语法一致 | 同左 |
+| 主要应用点（接口视图） | `traffic-filter inbound acl 3000`（物理口/Eth-Trunk 等接口视图） | 接口视图写法相同（以对应平台产品文档为准）；除 `traffic-filter` 外，还常被 NAT、PBR、路由策略引用 |
+| 主要应用点（VLAN 视图） | CE 的 VLAN 视图为 `traffic-filter acl 3000 inbound`（方向在 acl 之后，以 CE 文档为准） | VLAN 视图命令及支持情况以对应平台产品文档为准 |
+| NAT 能力 | 一般不做 NAT | 支持 `nat outbound`、`nat server` 等出口 NAT |
+| 引用方式 | `traffic-filter` 可挂物理口/Eth-Trunk（接口视图）；CE 的 VLAN 视图亦支持；`Vlanif` 是否支持以对应平台产品文档为准（本次未核到官方命令页） | ACL 可作为 `nat outbound`、`policy-based-route` 的匹配条件 |
+
+ACL 规则本身跨平台通用，差异在「挂到哪里」：交换机以接口/VLAN 流量过滤为主，路由器的 ACL 还常作为 NAT、PBR、路由策略的匹配器；应用视图与支持范围以对应平台产品文档为准。
+
 ## 高危操作 ⚠️
 
 - ⚠️ 在在用接口应用含 `rule deny` 的 ACL 前，先确保放行管理网段与 SSH/Telnet，否则可能远程掉线锁死。
@@ -73,6 +85,6 @@ updated: 2026-10-31
 
 ## 参考来源
 
-1. [华为交换机常用命令行操作总结 - 方面盘 - 博客园](https://www.cnblogs.com/qzqdy/p/8962516.html)
+1. [华为产品文档 · traffic-filter（接口视图）命令（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1000135331/31189148/19/resources/dc/traffic-filter_interface_view.html)
 2. [华为产品文档 · traffic-filter（VLAN 视图）命令（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100414296/AZN1024P/06/resources/dc/traffic-filter_vlan_view_dc.html)
 3. [华为企业支持中心 · 配置指南（EDOC1000075592）](https://support.huawei.com/enterprise/zh/doc/EDOC1000075592/38fc9cfd)

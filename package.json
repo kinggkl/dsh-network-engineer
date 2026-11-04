@@ -1,6 +1,6 @@
 {
   "name": "@kinggkl/dsh-network-engineer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "网络工程师助手 for DeepSeek Harness：12 厂商（华为/新华三/锐捷/迪普/思科 IOS·NX-OS/Junos/Arista EOS/FortiOS/中兴/VyOS/MikroTik）交换机、路由器、防火墙命令知识库（96 篇）+ 可切换预设 Agent，支持跨厂商对照、截图识别与联网查手册",
   "type": "module",
   "main": "index.js",

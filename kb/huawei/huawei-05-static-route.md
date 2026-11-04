@@ -2,14 +2,15 @@
 vendor: 华为（Huawei）
 os: VRP
 topic: 静态路由
-devices: S 系列交换机、AR/NE 路由器等 VRP 设备
-keywords: [静态路由, ip route-static, 默认路由, 浮动静态路由, 黑洞路由, NULL0, 路由优先级, 负载分担, display ip routing-table]
+devices: S/CE 系列交换机、AR/NE 路由器（平台差异见正文）
+keywords: [静态路由, ip route-static, 默认路由, 浮动静态路由, 黑洞路由, NULL0, 路由优先级, 负载分担, display ip routing-table, 平台差异]
 sources:
   - https://support.huawei.com/enterprise/zh/doc/EDOC1000075592/38fc9cfd
   - https://support.huawei.com/hedex/api/pages/EDOC1100459181/AZP0409R/04/resources/vrp_ipv4-static-route_cfg_0030.html
-  - https://bbs.huaweicloud.com/blogs/468203
+  - https://support.huawei.com/hedex/api/pages/EDOC1000017231/DZC0221K/11/resources/dc/dc_cfg_static-route_0005.html
+  - https://support.huawei.com/hedex/api/pages/EDOC1100276038/AEL11133/13/resources/dc/ip_route-static.html
 verified: high
-updated: 2026-10-31
+updated: 2026-11-04
 ---
 
 # 华为 · 静态路由
@@ -63,6 +64,17 @@ updated: 2026-10-31
 - 黑洞路由常与汇总网段配合：明细失效后流量被 NULL0 丢弃而不是绕环；掩码范围过大会吞掉正常业务网段。
 - 不同 VRP 版本对 `preference`、`description` 等关键字的支持略有差异，以对应产品形态手册为准。
 
+## 平台差异（交换机 vs 路由器）
+
+| 维度 | S/CE 系列交换机 | AR/NE 路由器 |
+|---|---|---|
+| 三层出口形态 | 多用 `Vlanif` 作网关/出接口，静态路由指向下一跳 | 直接用物理三层口或子接口作出口 |
+| 三层路由能力 | 纯二层型号不支持三层转发；支持三层的 S/CE 型号命令与路由器一致 | 主流 AR/NE 型号支持 IPv4/IPv6 静态路由；IPv6 能力随型号/版本，低端/老版本以产品文档为准 |
+| VPN 实例 | 部分 S/CE 型号支持 `ip route-static vpn-instance`（如 S3700EI，以产品文档为准） | 支持 `ip vpn-instance` 与 VPN 实例静态路由，具体特性随型号/版本，以产品文档为准 |
+| 出口选路特性 | PBR、路由策略等特性支持范围随型号/版本，以产品文档为准 | PBR、路由策略等出口选路手段通常更丰富，具体以产品文档为准 |
+
+`ip route-static` 命令字面量在两类平台一致，差异主要在可用的三层出口与高级路由特性；设备形态、License 与支持范围以对应平台产品文档为准。
+
 ## 高危操作 ⚠️
 
 - ⚠️ 删除出口默认路由 `undo ip route-static 0.0.0.0 0 <下一跳>` 会立即断网，变更前先准备回退配置。
@@ -73,4 +85,5 @@ updated: 2026-10-31
 
 1. [华为企业支持中心 · 配置指南（EDOC1000075592）](https://support.huawei.com/enterprise/zh/doc/EDOC1000075592/38fc9cfd)
 2. [华为产品文档 · 配置缺省 IPv4 静态路由（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100459181/AZP0409R/04/resources/vrp_ipv4-static-route_cfg_0030.html)
-3. [史上最强！华为交换机常用命令大全，网络工程师收藏！- 云社区 - 华为云](https://bbs.huaweicloud.com/blogs/468203)
+3. [华为产品文档 · 在 VPN 实例中配置 IPv4 静态路由（support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1000017231/DZC0221K/11/resources/dc/dc_cfg_static-route_0005.html)
+4. [华为产品文档 · ip route-static 命令（AR 路由器，support.huawei.com）](https://support.huawei.com/hedex/api/pages/EDOC1100276038/AEL11133/13/resources/dc/ip_route-static.html)
