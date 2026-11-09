@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "网络工程师助手（network-command-kb）",
-    "description": "三合一插件：12 厂商 / 96 篇交换机、路由器、防火墙命令知识库（华为、新华三、锐捷、迪普、思科 IOS·NX-OS、瞻博 Junos、Arista EOS、飞塔 FortiOS、中兴 ZXR10、VyOS、MikroTik RouterOS），可加载的 network-command-kb 技能，以及「网络工程师助手」预设。"
+    "description": "插件同时提供：12 厂商 / 96 篇交换机、路由器、防火墙命令知识库（华为、新华三、锐捷、迪普、思科 IOS·NX-OS、瞻博 Junos、Arista EOS、飞塔 FortiOS、中兴 ZXR10、VyOS、MikroTik RouterOS）、可加载的 network-command-kb 技能、「网络工程师助手」预设，以及原生 MikroTik WinBox 终端工具 mt_winbox_exec（默认只读，适合只开放 8291 端口的设备）。"
   }
 }

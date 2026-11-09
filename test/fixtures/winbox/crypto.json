@@ -1,0 +1,68 @@
+{
+  "aes": {
+    "cipher_hex": "82e19dc4c68f99acf3066a85d9438c73ccc50b24c90caa3801294559a7b84ba0",
+    "iv_hex": "101112131415161718191a1b1c1d1e1f",
+    "key_hex": "000102030405060708090a0b0c0d0e0f",
+    "plain_hex": "4d3200676f6c64656e2d6165732d706c61696e74657874000000000000000000"
+  },
+  "constants": {
+    "a_mont": 486662,
+    "a_w_hex": "2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa984914a144",
+    "b_w_hex": "7b425ed097b425ed097b425ed097b425ed097b4260b5e9c7710c864",
+    "conversion_from_m_hex": "2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2451",
+    "conversion_hex": "555555555555555555555555555555555555555555555555555555555552db9c",
+    "gx": 9,
+    "h": 8,
+    "p_hex": "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed",
+    "r_hex": "1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed"
+  },
+  "hkdf": {
+    "input_hex": "0102676f6c64656e2d686b64662d696e707574",
+    "output_hex": "02fedb6854c02ee45c4d6e2d4e22b2d0a7eb807f8ad05cc1de093707c5239a59707fab16"
+  },
+  "hmac_sha1": {
+    "data_hex": "4869205468657265",
+    "key_hex": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+    "mac_hex": "b617318655057264e28bc0b6fb378c8ef146be00"
+  },
+  "keys": {
+    "client_parity": 1,
+    "client_priv_hex": "5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c",
+    "client_pub_hex": "30f4a594d46c8522c8f2de2e2e1060803b2b1abb49f865e83bc2e0b8d9429cdc",
+    "server_parity": 0,
+    "server_priv_hex": "3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a",
+    "server_pub_hex": "3a9fa30be71938718fb9feb54971ae63f03b149aa1357b0fa764f0ac84af118c"
+  },
+  "sha256": {
+    "digest_hex": "5c6ab819ddf144884f297eeba27f840003a7da7057efad4bec2bdbe8144003ff",
+    "input_hex": "4d3220676f6c64656e20736861"
+  },
+  "srp": {
+    "client_cc_hex": "812d4ceeea5d7e0d9b522e262cadf75fd534d3a23410760de8c5c33bebe3a173",
+    "finite_field_input": "986840357111605882082170317411777480818571121296879596308398434079904171620041747010027892661282325997264565570843923556627736640622559760998481024871402",
+    "finite_field_value": "226039336317748691432728474062548361977735466729601267555990138038580335242",
+    "j_hex": "98a13d70c4a49b738418bb98a551342852d5adb62bfd6584d59d41433bf66b07",
+    "secret_hex": "ccc1bfb9b244c2e906aeb6ad9973468920b7fa1f55d2ee60a08566c93b0a9ab0",
+    "server_cc_hex": "310df3eec5cb9b21722d9158e96f531746311408a7f4fc889fc8dd7e9d9bf457",
+    "w_b_x_hex": "30d43a21ace71fd2b7f39e8baa56aaf84f4c2923b9eb60d39392c069e75b2e40",
+    "w_b_y_hex": "72b3449ee9a114cf2110acdb70b7b7479afd1fbc973a694cb99725ead06e9a07",
+    "z_hex": "557c68776257f7d3e694fac9d6cfd4ae04f0aaea103ac1b8e9eadf6e1fda66ea",
+    "z_parity": 1
+  },
+  "stream_keys": {
+    "receive_aes_key_hex": "d670a80f47fb2a44c4e0ffe3fffc7d24",
+    "receive_hmac_key_hex": "feb0399d69e54a73a9eb249b073be55782f383bb",
+    "send_aes_key_hex": "8a282eb56aeac52e64248b8c8d4a70c5",
+    "send_hmac_key_hex": "bcb76ba745db32ff4b9f27700b9e9f028b325248"
+  },
+  "validator": {
+    "password": "s3cret!",
+    "redp1_x_hex": "48aa9ee48ce99c74f7d30fb888ac68d5c5730257ea88a21d1c3d938b33a502cb",
+    "redp1_y_hex": "2f501b24b4db428d6d0e18f7da7d0ee12022f903f9c81942e38cdca7a15fe6c9",
+    "salt_hex": "000102030405060708090a0b0c0d0e0f",
+    "username": "admin",
+    "validator_priv_hex": "1f9a6451f2d9c3697c5813b186606285a3bd439cea29f5cc037c0453a5681a82",
+    "x_gamma_hex": "5fe3acb97d2999b8ae136c0a49f8ec73cb7279732665a8ed49bd583c6f4846d0",
+    "x_gamma_parity": 0
+  }
+}

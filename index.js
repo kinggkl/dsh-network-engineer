@@ -1,21 +1,28 @@
 /**
  * 网络工程师助手（network-command-kb）for DeepSeek Harness.
  *
- * Registers the bundled `network-command-kb` skill on `ctx.skills`. The skill
- * instructs the agent to search the 96 command reference documents shipped in
- * this package's `kb/` directory. The harness exposes the skill's resource base
- * to the agent when the skill loads, so the knowledge base stays portable with
- * the plugin and the `kb/...` paths in SKILL.md resolve against this package
- * root.
+ * Registers two capabilities on the plugin context:
+ *
+ * 1. The bundled `network-command-kb` skill on `ctx.skills`. The skill
+ *    instructs the agent to search the 96 command reference documents shipped
+ *    in this package's `kb/` directory. The harness exposes the skill's
+ *    resource base to the agent when the skill loads, so the knowledge base
+ *    stays portable with the plugin and the `kb/...` paths in SKILL.md resolve
+ *    against this package root.
+ * 2. The global `mt_winbox_exec` tool on `ctx.tools`: an encrypted MikroTik
+ *    WinBox terminal (port 8291, EC-SRP5 + M2 + AES-128-CBC) for devices that
+ *    expose the CLI only through WinBox. Read-only commands are enforced by
+ *    default; write commands require `allowWrite: true` and are documented as
+ *    high-risk.
  *
  * The companion "网络工程师助手" agent preset is declared in
  * `cordis.patch.yml` as a `@deepseek-ai/dsh-agent-preset` row and needs no
  * code here.
  *
- * The plugin imports nothing but Node builtins: a third-party plugin cannot
- * rely on `@deepseek-ai/*` packages resolving from its own directory — they
- * are nested inside the dsh installation — so every registry is reached
- * through `ctx` alone.
+ * The plugin imports nothing but Node builtins and its own modules: a
+ * third-party plugin cannot rely on `@deepseek-ai/*` packages resolving from
+ * its own directory — they are nested inside the dsh installation — so every
+ * registry is reached through `ctx` alone.
  *
  * @module dsh-network-engineer
  */
@@ -24,11 +31,16 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { createWinboxTool } from './lib/mikrotik-tool.mjs'
+
 /** Cordis plugin name used by loader diagnostics. */
 export const name = 'network-engineer-kb'
 
-/** The registry this plugin registers into. */
-export const inject = ['skills']
+/** The registries this plugin registers into. */
+export const inject = ['skills', 'tools']
+
+/** Stable tool name referenced by docs and tests. */
+export const WINBOX_TOOL_NAME = 'mt_winbox_exec'
 
 const packageRoot = dirname(fileURLToPath(import.meta.url))
 
@@ -126,9 +138,50 @@ export function registerBundledSkill(ctx, roots = defaultRoots()) {
 }
 
 /**
- * Register the bundled knowledge-base skill.
- * @param ctx - plugin context; the registration is disposed with it.
+ * Register the MikroTik WinBox terminal tool on `ctx.tools`.
+ *
+ * The tool is best-effort: hosts whose harness has no `tools` service (or
+ * whose registration fails) keep the knowledge-base skill and only lose the
+ * WinBox capability, with a warning. The plugin must never fail to load
+ * because a companion tool could not register.
+ *
+ * @param ctx - plugin context.
+ * @param options - `createTool` override for tests.
+ * @returns `registered` plus the tool name, or `skipped` plus the reason.
+ */
+export function registerWinboxTool(ctx, options = {}) {
+  const createTool = options.createTool ?? (() => createWinboxTool())
+  const tools = ctx?.tools
+  if (tools?.register === undefined) {
+    ctx.logger?.warn?.('network-engineer: tools registry unavailable; mt_winbox_exec not registered')
+    return { status: 'skipped', reason: 'tools-unavailable' }
+  }
+
+  let tool
+  try {
+    tool = createTool()
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    ctx.logger?.warn?.(`network-engineer: cannot build ${WINBOX_TOOL_NAME}: ${reason}`)
+    return { status: 'skipped', reason: 'tool-build-failed' }
+  }
+
+  try {
+    const dispose = tools.register(tool)
+    ctx.logger?.info?.(`network-engineer: registered global tool "${tool.name ?? WINBOX_TOOL_NAME}" (MikroTik WinBox, read-only by default)`)
+    return { status: 'registered', name: tool.name ?? WINBOX_TOOL_NAME, dispose }
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    ctx.logger?.warn?.(`network-engineer: cannot register ${WINBOX_TOOL_NAME}: ${reason}`)
+    return { status: 'skipped', reason: 'tool-registration-failed' }
+  }
+}
+
+/**
+ * Register the bundled knowledge-base skill and the WinBox terminal tool.
+ * @param ctx - plugin context; registrations are disposed with it.
  */
 export function apply(ctx) {
   registerBundledSkill(ctx, defaultRoots())
+  registerWinboxTool(ctx)
 }

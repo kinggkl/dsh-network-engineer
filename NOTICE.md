@@ -1,6 +1,6 @@
 # NOTICE · 来源与致谢
 
-本仓库是社区延续版本（v0.1.2），基于 **sososilencing/dsh-network-engineer 0.1.0**（MIT）重构而来。
+本仓库是社区延续版本（v0.1.3），基于 **sososilencing/dsh-network-engineer 0.1.0**（MIT）重构而来。
 原作者的插件骨架、预设与 persona 提示词、以及首批 4 厂商 32 篇命令知识库是这条工作的基础，
 在此明确引用出处并向原作者及所有原始贡献者致谢。
 
@@ -15,7 +15,7 @@
 ## 本仓库（kinggkl/dsh-network-engineer）
 
 - 维护者：kinggkl（GitHub：https://github.com/kinggkl）
-- 版本：0.1.2（2026-11-04）
+- 版本：0.1.3（2026-11-09）
 - 新增知识库：`kb/cisco-ios/`、`kb/cisco-nxos/`、`kb/juniper/`、`kb/arista/`、
   `kb/fortinet/`、`kb/zte/`、`kb/vyos/`、`kb/mikrotik/` 八个目录共 64 篇；
   知识库合计 **12 厂商 / 96 篇**。
@@ -27,8 +27,22 @@
   3. 删除 persona 中未注册的 `{{cwd}}` 变量，避免预设激活失败。
 - 新增工程质量设施：`tools/kb-validate.sh` 结构校验器、`test/` 下的 Node 原生测试
   （插件单元、打包、预设组合、知识库结构、跨厂商一致性）、`CHANGELOG.md`。
+- 新增 **MikroTik WinBox 终端工具** `mt_winbox_exec`：`lib/winbox/` 为纯 Node 的 WinBox
+  终端协议移植（EC-SRP5 认证、M2 消息、AES-128-CBC、vt102 会话），`lib/mikrotik-tool.mjs`
+  为 raw DSH ToolDefinition（默认只读命令门禁、凭据文件解析与脱敏输出）。
 - 安装元数据：`locale/en.json`、`locale/zh.json`（插件管理器中显示的名称与说明）与
   `icon.svg`（本仓库原创图标）。
+
+## WinBox 终端协议（v0.1.3 新增能力）
+
+- 上游项目：https://github.com/subixonfire/winbox-terminal-protocol
+- 版本：master 分支（参考 clone HEAD `a377741`；MIT License，Copyright (c) 2026 subixonfire@gmail.com）
+- 参考文件：`winbox_terminal_client.py`（Python 参考实现）与 `PROTOCOL.md`（协议说明）。
+- 本仓库 `lib/winbox/` 是该协议的 **JavaScript 移植**，用于提供 `mt_winbox_exec` 工具；
+  移植时以 Python 参考实现的输出生成 golden vectors 做逐字节对齐测试。
+- 上游 Python 代码与 `PROTOCOL.md` 仅作为开发参考资料位于工作区 `tools/winbox/`，
+  不进入 npm 发布包（`package.json` 的 `files` 不含 `tools/**`）。
+- 完整许可文本见 [`lib/winbox/THIRD_PARTY_LICENSE`](lib/winbox/THIRD_PARTY_LICENSE)。
 
 ## 知识库来源
 

@@ -2,6 +2,47 @@
 
 本项目遵循语义化版本；上游基线为 `dsh-network-engineer 0.1.0`。
 
+## 0.1.3 — 2026-11-09
+
+### Added
+
+- **MikroTik WinBox 终端工具 `mt_winbox_exec`**（全局 DSH 工具，注册到 `ctx.tools`）：
+  纯 Node 实现的 WinBox 终端协议——TCP 8291、EC-SRP5 认证（RouterOS ≥ 6.43）、M2 消息、
+  AES-128-CBC、vt102 终端会话；面向只开放 WinBox 端口、没有 SSH 的 RouterOS 设备。
+  默认只读命令门禁（写命令须 `allowWrite: true`），凭据从 `~/.dsh/secrets/winbox.json`
+  解析（`host:port` > `host` > `default`），密码不进入工具输出/错误/日志，输出按字符数截断。
+- `lib/winbox/crypto.mjs`、`lib/winbox/m2.mjs`、`lib/winbox/client.mjs`：协议移植，附
+  工作区 `tools/winbox/gen_vectors.py`（不随包发布）由 Python 参考实现生成的 golden vectors。
+- `lib/mikrotik-tool.mjs`：raw DSH `ToolDefinition`（参数 Schema、凭据解析、只读门禁、
+  文本渲染、超时/截断）；`test/winbox-proto.test.mjs` 与 `test/winbox-tool.test.mjs`。
+- `lib/winbox/THIRD_PARTY_LICENSE`：上游 `subixonfire/winbox-terminal-protocol`（MIT）许可与移植说明。
+- README 增加 WinBox 工具章节（使用方式、凭据文件、只读/写操作与安全说明）；
+  NOTICE 增加 WinBox 上游归属。
+
+### Changed
+
+- 版本号 0.1.2 → 0.1.3；命令知识库仍为 12 厂商 / 96 篇。
+- 插件 `inject` 由 `['skills']` 扩为 `['skills', 'tools']`；`package.json` 的 `files`
+  增加 `lib/**`，`keywords` 增加 `winbox`。
+- 预设 persona 增加 WinBox 场景提示（仅 WinBox 可达时优先 `mt_winbox_exec`，
+  写操作先备份并说明回退）。
+
+### Fixed
+
+- 真机 E2E 修正：口令错误时 RouterOS 回 `tag 0x06` 的原因串（如
+  `invalid user name or password`），旧实现误报 `invalid server confirmation frame`；
+  现映射为 `AUTH_FAILED` 并附脱敏后的服务端原因（控制字符剥离、长度上限 120），
+  `details` 增加 `tag`/`serverReplyLength`；确认阶段连接被关闭也映射为 `AUTH_FAILED`。
+- 只读门禁放行 `/export hide-sensitive`（标准只读导出），仍拒绝 `/export file=`
+  与 `/export show-sensitive`；README、`findings/winbox-tool-spec.md` §3 与门禁测试同步更新。
+- 只读门禁安全加固（v0.1.3 独立 QA 高危发现，已修）：写动词匹配改为大小写不敏感并补齐
+  `insert`/`run`/`start`/`stop`/`load`/`save`/`fetch`/`erase`/`unset`/`execute`/`flush`/`sign`/`purge`/`edit`
+  等动词；`/export` 的 `file=`/`show-sensitive` 匹配改为大小写不敏感；`print` 允许清单由
+  「任意含 print」收紧为命令词级锚定（`isPrintCommand`），`/system backup save name=print`、
+  `/system script run print` 等不再绕过；任何查询命令带 `file=` 输出重定向（如
+  `/ip address print file=backup`）同样按写设备存储拒绝；新增对应拒绝回归用例（含大写动词、
+  `/export FILE=`、`/system backup save name=print`、`print file=` 等）。
+
 ## 0.1.2 — 2026-11-04
 
 ### Added

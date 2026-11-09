@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "name": "banner_prompt",
+      "pagination": false,
+      "prompt": true,
+      "raw_hex": "1b5b3f376c1b5b324a1b5b480d0a20204d4d4d2020202020204d4d4d202020202020204d4d4d4d2020204d4d4d0d0a20204d4d4d2020202020204d4d4d202020202020204d4d4d4d2020204d4d4d0d0a20204d696b726f54696b20526f757465724f5320372e31392e310d0a0d0a5b61646d696e404d696b726f54696b5d203e20",
+      "stripped": "\n  MMM      MMM       MMMM   MMM\n  MMM      MMM       MMMM   MMM\n  MikroTik RouterOS 7.19.1\n\n[admin@MikroTik] > "
+    },
+    {
+      "name": "command_output_prompt",
+      "pagination": false,
+      "prompt": true,
+      "raw_hex": "5b61646d696e404d696b726f54696b5d203e202f73797374656d207265736f75726365207072696e740d0a2020202020202020202020202020202020757074696d653a2031643268336d34730d0a202020202020202020202020667265652d6d656d6f72793a203130343835373630300d0a2020202020202020202020746f74616c2d6d656d6f72793a203236383433353435360d0a5b61646d696e404d696b726f54696b5d203e20",
+      "stripped": "[admin@MikroTik] > /system resource print\n                 uptime: 1d2h3m4s\n            free-memory: 104857600\n           total-memory: 268435456\n[admin@MikroTik] > "
+    },
+    {
+      "name": "directory_prompt",
+      "pagination": false,
+      "prompt": true,
+      "raw_hex": "5b61646d696e404d696b726f54696b5d202f697020616464726573733e202f69702061646472657373207072696e740d0a466c6167733a2058202d2064697361626c65642c2049202d20696e76616c69640d0a2023202020414444524553532020202020202020202020204e4554574f524b202020202020202020494e544552464143450d0a20302020203139322e3136382e38382e312f3234202020203139322e3136382e38382e30202020206272696467650d0a5b61646d696e404d696b726f54696b5d202f697020616464726573733e20",
+      "stripped": "[admin@MikroTik] /ip address> /ip address print\nFlags: X - disabled, I - invalid\n #   ADDRESS            NETWORK         INTERFACE\n 0   192.168.88.1/24    192.168.88.0    bridge\n[admin@MikroTik] /ip address> "
+    },
+    {
+      "name": "pagination",
+      "pagination": true,
+      "prompt": false,
+      "raw_hex": "5b61646d696e404d696b726f54696b5d203e202f696e74657266616365207072696e740d0a466c6167733a2044202d2064796e616d69633b2058202d2064697361626c65640d0a203020204420206574686572310d0a203120204420206574686572320d0a2d2d4d6f72652d2d205b5120717569747c44756d707c4261636b7c53706163655d0d0a",
+      "stripped": "[admin@MikroTik] > /interface print\nFlags: D - dynamic; X - disabled\n 0  D  ether1\n 1  D  ether2\n--More-- [Q quit|Dump|Back|Space]\n"
+    },
+    {
+      "name": "window_title_osc",
+      "pagination": false,
+      "prompt": true,
+      "raw_hex": "1b5d303b57696e426f78202d204d696b726f54696b071b5b481b5b324a5465726d696e616c2072656164790d0a5b61646d696e404d696b726f54696b5d203e20",
+      "stripped": "Terminal ready\n[admin@MikroTik] > "
+    },
+    {
+      "name": "plain_name_prompt",
+      "pagination": false,
+      "prompt": true,
+      "raw_hex": "736f6d65206f7574707574206c696e650d0a7231203e20",
+      "stripped": "some output line\nr1 > "
+    },
+    {
+      "name": "ansi_colors",
+      "pagination": false,
+      "prompt": true,
+      "raw_hex": "1b5b33326d4f4b1b5b306d20201b5b313b33316d6572726f721b5b306d0d0a5b61646d696e404d696b726f54696b5d203e20",
+      "stripped": "OK  error\n[admin@MikroTik] > "
+    }
+  ],
+  "normalization": {
+    "raw_hex": "6f6e650d0a74776f0d74687265650a0807656e64",
+    "stripped": "one\ntwo\nthree\nend"
+  }
+}

@@ -12,11 +12,12 @@ const pkg = JSON.parse(read('package.json'))
 
 test('package identity and version', () => {
   assert.equal(pkg.name, '@kinggkl/dsh-network-engineer')
-  assert.equal(pkg.version, '0.1.2')
+  assert.equal(pkg.version, '0.1.3')
   assert.equal(pkg.type, 'module')
   assert.equal(pkg.license, 'MIT')
   assert.match(pkg.description, /96 篇/)
   assert.match(pkg.description, /12 厂商/)
+  assert.match(pkg.description, /WinBox/)
 })
 
 test('dsh bundle patch is declared and exists', () => {
@@ -34,6 +35,9 @@ test('files whitelist covers every runtime asset', () => {
   const required = [
     'index.js',
     'cordis.patch.yml',
+    'lib/mikrotik-tool.mjs',
+    'lib/winbox/client.mjs',
+    'lib/winbox/THIRD_PARTY_LICENSE',
     'skills/network-command-kb/SKILL.md',
     'kb/huawei/huawei-01-system.md',
     'kb/vyos/vyos-01-system.md',
@@ -90,6 +94,16 @@ test('attribution to the upstream project is present', () => {
   assert.match(license, /Copyright \(c\) 2026 dsh-network-engineer contributors/)
 })
 
+test('WinBox port attribution is present', () => {
+  const notice = read('NOTICE.md')
+  const thirdParty = read('lib/winbox/THIRD_PARTY_LICENSE')
+  assert.match(notice, /subixonfire\/winbox-terminal-protocol/)
+  assert.match(notice, /winbox_terminal_client\.py/)
+  assert.match(thirdParty, /MIT License/)
+  assert.match(thirdParty, /Copyright \(c\) 2026 subixonfire@gmail\.com/)
+  assert.match(thirdParty, /JavaScript port/)
+})
+
 test('npm pack tarball contains every runtime asset and no test/dev files', () => {
   // Keep npm's cache inside the platform temp area: a sandboxed test run may not
   // be allowed to write to the user's ~/.npm cache.
@@ -108,6 +122,9 @@ test('npm pack tarball contains every runtime asset and no test/dev files', () =
   const required = [
     'index.js',
     'cordis.patch.yml',
+    'lib/mikrotik-tool.mjs',
+    'lib/winbox/client.mjs',
+    'lib/winbox/THIRD_PARTY_LICENSE',
     'skills/network-command-kb/SKILL.md',
     'kb/huawei/huawei-06-ospf.md',
     'kb/zte/zte-01-system.md',

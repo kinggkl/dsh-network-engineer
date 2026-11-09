@@ -12,6 +12,7 @@ import { packageRoot, read, VENDORS } from './_helpers.mjs'
 
 function createFakeContext() {
   const registrations = []
+  const toolRegistrations = []
   const warnings = []
   const infos = []
   const ctx = {
@@ -21,12 +22,18 @@ function createFakeContext() {
         return () => {}
       },
     },
+    tools: {
+      register(tool) {
+        toolRegistrations.push(tool)
+        return () => {}
+      },
+    },
     logger: {
       warn: (message) => warnings.push(message),
       info: (message) => infos.push(message),
     },
   }
-  return { ctx, registrations, warnings, infos }
+  return { ctx, registrations, toolRegistrations, warnings, infos }
 }
 
 function makeFixture({ skillFile, kb = true }) {
@@ -49,7 +56,8 @@ function makeFixture({ skillFile, kb = true }) {
 
 test('plugin metadata: name and inject', () => {
   assert.equal(plugin.name, 'network-engineer-kb')
-  assert.deepEqual(plugin.inject, ['skills'])
+  assert.deepEqual(plugin.inject, ['skills', 'tools'])
+  assert.equal(plugin.WINBOX_TOOL_NAME, 'mt_winbox_exec')
 })
 
 test('defaultRoots() resolves the packaged skill and knowledge base', () => {
@@ -74,6 +82,29 @@ test('apply() registers the bundled network-command-kb skill', () => {
   assert.equal(skill.path, join(packageRoot, 'skills', 'network-command-kb', 'SKILL.md'))
 })
 
+test('apply() registers the global mt_winbox_exec tool', () => {
+  const { ctx, toolRegistrations } = createFakeContext()
+  plugin.apply(ctx)
+
+  assert.equal(toolRegistrations.length, 1)
+  const tool = toolRegistrations[0]
+  assert.equal(tool.name, 'mt_winbox_exec')
+  assert.match(tool.description, /WinBox/)
+  assert.match(tool.description, /MikroTik/)
+  assert.equal(tool.parameters.type, 'object')
+  assert.ok(tool.parameters.properties.host)
+  assert.ok(tool.parameters.properties.commands)
+  assert.deepEqual(tool.parameters.required, ['host', 'commands'])
+  assert.equal(tool.output.schema.type, 'object')
+  const rendered = tool.output.render({ host: '192.0.2.1' }, { ok: true, host: '192.0.2.1', port: 8291, commands: [], outputs: [], durationMs: 1, bytes: 0 })
+  assert.ok(Array.isArray(rendered))
+  assert.equal(rendered[0].type, 'text')
+  assert.equal(typeof rendered[0].text, 'string')
+  assert.equal(tool.isConcurrencySafe({}), false)
+  assert.equal(typeof tool.execute, 'function')
+  assert.equal(typeof tool.timeoutMs, 'number')
+})
+
 test('resourceBase points at the package root, not the skill directory (upstream issue #3)', () => {
   const { ctx, registrations } = createFakeContext()
   plugin.apply(ctx)
@@ -87,8 +118,8 @@ test('resourceBase points at the package root, not the skill directory (upstream
   assert.match(read('skills/network-command-kb/SKILL.md'), /resource base 是插件包根目录/)
 })
 
-test('apply() registers exactly one skill per call and is re-entrant', () => {
-  const { ctx, registrations } = createFakeContext()
+test('apply() registers exactly one skill and one tool per call and is re-entrant', () => {
+  const { ctx, registrations, toolRegistrations } = createFakeContext()
   plugin.apply(ctx)
   plugin.apply(ctx)
   assert.equal(registrations.length, 2)
@@ -96,6 +127,54 @@ test('apply() registers exactly one skill per call and is re-entrant', () => {
     registrations.map((skill) => skill.name),
     ['network-command-kb', 'network-command-kb'],
   )
+  assert.equal(toolRegistrations.length, 2)
+  assert.deepEqual(
+    toolRegistrations.map((tool) => tool.name),
+    ['mt_winbox_exec', 'mt_winbox_exec'],
+  )
+})
+
+test('registerWinboxTool() degrades to a warning when the tools registry is unavailable', () => {
+  const { ctx, warnings } = createFakeContext()
+  delete ctx.tools
+  const result = plugin.registerWinboxTool(ctx)
+  assert.deepEqual(result, { status: 'skipped', reason: 'tools-unavailable' })
+  assert.equal(warnings.length, 1)
+  assert.match(warnings[0], /tools registry unavailable/)
+})
+
+test('registerWinboxTool() degrades to a warning when the tool cannot be built or registered', () => {
+  const broken = createFakeContext()
+  const build = plugin.registerWinboxTool(broken.ctx, {
+    createTool: () => {
+      throw new Error('boom-build')
+    },
+  })
+  assert.deepEqual(build, { status: 'skipped', reason: 'tool-build-failed' })
+  assert.match(broken.warnings[0], /cannot build mt_winbox_exec: boom-build/)
+
+  const rejected = createFakeContext()
+  rejected.ctx.tools.register = () => {
+    throw new Error('duplicate tool')
+  }
+  const registration = plugin.registerWinboxTool(rejected.ctx, {
+    createTool: () => ({ name: 'mt_winbox_exec' }),
+  })
+  assert.deepEqual(registration, { status: 'skipped', reason: 'tool-registration-failed' })
+  assert.match(rejected.warnings[0], /cannot register mt_winbox_exec: duplicate tool/)
+})
+
+test('registerWinboxTool() returns the tool registration disposer', () => {
+  let disposed = false
+  const { ctx } = createFakeContext()
+  ctx.tools.register = () => () => {
+    disposed = true
+  }
+  const result = plugin.registerWinboxTool(ctx, { createTool: () => ({ name: 'mt_winbox_exec' }) })
+  assert.equal(result.status, 'registered')
+  assert.equal(result.name, 'mt_winbox_exec')
+  result.dispose()
+  assert.equal(disposed, true)
 })
 
 test('skill body never leaks the upstream 80-document wording', () => {

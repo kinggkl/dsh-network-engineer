@@ -95,6 +95,7 @@ test('preset row declares the 网络工程师助手 preset with a full tool chai
   assert.equal(config.name, '网络工程师助手')
   assert.equal(typeof config.order, 'number')
   assert.match(config.description, /12 厂商/)
+  assert.match(config.description, /mt_winbox_exec/)
   assert.ok(Array.isArray(config.plugins))
 
   const ids = config.plugins.map((row) => row.id)
@@ -129,6 +130,9 @@ test('persona covers all 12 vendors and only registered template variables', ski
   assert.match(persona, /network-command-kb/)
   assert.match(persona, /VyOS 是 configure/)
   assert.match(persona, /RouterOS v7 与 v6/)
+  assert.match(persona, /mt_winbox_exec/)
+  assert.match(persona, /winbox\.json/)
+  assert.match(persona, /LEGACY_AUTH_UNSUPPORTED/)
   // {{cwd}} was never a registered persona variable; keep it out.
   assert.doesNotMatch(persona, /\{\{cwd\}\}/)
   for (const variable of persona.match(/\{\{[^}]+\}\}/g) ?? []) {

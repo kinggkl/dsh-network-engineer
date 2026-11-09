@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Network Engineer Assistant (network-command-kb)",
-    "description": "Three-in-one: a switch/router/firewall command knowledge base with 12 vendors and 96 documents (Huawei, H3C, Ruijie, DPtech, Cisco IOS/NX-OS, Juniper Junos, Arista EOS, Fortinet FortiOS, ZTE ZXR10, VyOS, MikroTik RouterOS), a loadable network-command-kb skill, and the 网络工程师助手 agent preset."
+    "description": "A DeepSeek Harness plugin: a switch/router/firewall command knowledge base with 12 vendors and 96 documents (Huawei, H3C, Ruijie, DPtech, Cisco IOS/NX-OS, Juniper Junos, Arista EOS, Fortinet FortiOS, ZTE ZXR10, VyOS, MikroTik RouterOS), a loadable network-command-kb skill, the 网络工程师助手 agent preset, and a native MikroTik WinBox terminal tool (mt_winbox_exec, read-only by default)."
   }
 }
