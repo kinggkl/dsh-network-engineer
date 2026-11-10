@@ -4,7 +4,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 
-import { read, VENDORS } from './_helpers.mjs'
+import { read, VENDORS, topicsFor } from './_helpers.mjs'
 
 const require = createRequire(import.meta.url)
 let yaml
@@ -52,7 +52,7 @@ test('README priority table keeps the verified cross-vendor literals', () => {
   const readme = read('README.md')
   for (const row of README_TABLE_ROWS) assert.ok(readme.includes(row), `README is missing row: ${row}`)
   assert.ok(readme.includes('不能直接比大小'))
-  assert.ok(readme.includes('98 篇'))
+  assert.ok(readme.includes('130 篇'))
 })
 
 test('persona repeats the same multi-system routing constants', () => {
@@ -79,13 +79,14 @@ test('vendor list is identical across README, SKILL.md and package keywords', ()
   const skill = read('skills/network-command-kb/SKILL.md')
   const keywordText = packageJson.keywords.join(' ')
   for (const vendor of VENDORS) {
-    assert.ok(read(`kb/${vendor}/${vendor}-01-system.md`).length > 0)
+    const firstTopic = Object.entries(topicsFor(vendor))[0]
+    assert.ok(read(`kb/${vendor}/${vendor}-${firstTopic[0]}-${firstTopic[1]}.md`).length > 0)
     const keywordNeedle = vendor.startsWith('cisco-') ? 'cisco' : vendor
     assert.ok(keywordText.includes(keywordNeedle), `package.json keywords lack ${vendor}`)
-    assert.ok(readme.includes(`${vendor}/`), `README lists no ${vendor}/`)
+    assert.ok(readme.includes(`├── ${vendor}/`), `README knowledge-base tree lists no ${vendor}/`)
     assert.ok(skill.includes(`kb/${vendor}/`), `SKILL.md lists no kb/${vendor}/`)
   }
-  assert.match(packageJson.description, /98 篇/)
-  assert.match(readme, /13 厂商/)
-  assert.match(skill, /98 篇/)
+  assert.match(packageJson.description, /130 篇/)
+  assert.match(readme, /17 平台/)
+  assert.match(skill, /130 篇/)
 })

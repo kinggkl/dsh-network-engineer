@@ -22,6 +22,10 @@ export const VENDORS = [
   'vyos',
   'mikrotik',
   'proxmox',
+  'ubuntu',
+  'debian',
+  'centos',
+  'rosz',
 ]
 
 /** The eight fixed topics shared by the twelve network vendors. */
@@ -40,16 +44,46 @@ export const TOPICS = {
 export const SECTIONS = ['## 命令速查', '## 典型示例', '## 陷阱与版本差异', '## 高危操作', '## 参考来源']
 
 /**
- * Proxmox VE is not a network vendor: it is the host virtualisation supplement,
- * so it declares its own (currently two-topic) scheme instead of the 8 fixed topics.
+ * Linux operation platforms (Ubuntu / Debian / CentOS Stream-Rocky) share one
+ * eight-topic operation scheme, deliberately different from the network topics.
  */
+export const LINUX_TOPICS = {
+  '01': 'system',
+  '02': 'network',
+  '03': 'storage',
+  '04': 'services',
+  '05': 'users-ssh',
+  '06': 'firewall',
+  '07': 'containers',
+  '08': 'diagnostics',
+}
+
+/** Proxmox VE extends the host-virtualisation supplement from 2 topics to 8. */
 export const HOST_TOPICS = {
   '01': 'system',
   '02': 'backup',
+  '03': 'cluster',
+  '04': 'storage',
+  '05': 'vm',
+  '06': 'lxc',
+  '07': 'network',
+  '08': 'ha-diagnostics',
+}
+
+/** RosZ MCP management platform: platform model + read-only diagnostics workflow. */
+export const ROSZ_TOPICS = {
+  '01': 'platform',
+  '02': 'diagnostics',
 }
 
 /** Vendors that deviate from TOPICS; every other vendor keeps the eight fixed topics. */
-export const VENDOR_TOPICS = { proxmox: HOST_TOPICS }
+export const VENDOR_TOPICS = {
+  ubuntu: LINUX_TOPICS,
+  debian: LINUX_TOPICS,
+  centos: LINUX_TOPICS,
+  proxmox: HOST_TOPICS,
+  rosz: ROSZ_TOPICS,
+}
 
 /** Topic map of one vendor: its override when declared, TOPICS otherwise. */
 export function topicsFor(vendor) {

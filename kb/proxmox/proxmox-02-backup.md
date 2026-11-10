@@ -7,7 +7,7 @@ keywords: [vzdump, 备份, 恢复, mode snapshot, zstd, pct restore, qmrestore, 
 sources:
   - https://pve.proxmox.com/pve-docs/chapter-vzdump.html
   - https://pve.proxmox.com/wiki/Backup_and_Restore
-  - https://pve.proxmox.com/pve-docs/chapter-storage.html
+  - https://pve.proxmox.com/pve-docs/chapter-pvesm.html
 verified: high
 updated: 2026-11-11
 ---

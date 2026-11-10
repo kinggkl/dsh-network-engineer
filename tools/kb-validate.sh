@@ -2,14 +2,15 @@
 # kb-validate v2 — 命令知识库文档校验器
 #
 # 用法:
-#   bash findings/kb-validate-v2.sh <目录或文件>
-#   bash findings/kb-validate-v2.sh plugins/dsh-network-engineer/kb/vyos
-#   bash findings/kb-validate-v2.sh plugins/dsh-network-engineer/kb      # 全部厂商
+#   bash tools/kb-validate.sh <目录或文件>
+#   bash tools/kb-validate.sh plugins/dsh-network-engineer/kb/vyos
+#   bash tools/kb-validate.sh plugins/dsh-network-engineer/kb      # 全部厂商
 #
-# 校验项（对照 findings/kb-authoring-spec.md 与 v2）：
-#   1. 文件名 `<前缀>-<01..08>-<主题>.md`，前缀与目录名一致，8 个主题齐全且不重复
+# 校验项（对照 findings/kb-authoring-spec-v3.md）：
+#   1. 文件名 `<前缀>-<两位序号>-<主题>.md`，前缀与目录名一致，按目录声明主题齐全且不重复
+#      （网络设备 / Ubuntu / Debian / CentOS / Proxmox 各 8 篇，RosZ 2 篇）
 #   2. frontmatter 以 --- 开头/闭合，含 vendor/os/topic/devices/keywords/sources/verified/updated 8 字段
-#   3. verified ∈ {high, medium}；updated 为受支持日期；keywords 6–12 个（新文档按 v2 规范 6–10）
+#   3. verified ∈ {high, medium}；updated 为受支持日期；keywords 6–12 个
 #   4. sources ≥2 条 http(s) URL
 #   5. 5 个固定二级标题按固定顺序出现：命令速查 → 典型示例 → 陷阱与版本差异 → 高危操作 ⚠️ → 参考来源
 #   6. 命令速查表数据行 ≥8，且表格各行列数一致
@@ -24,14 +25,63 @@
 
 set -uo pipefail
 
-TOPIC_RE='system|vlan-l2|interface|link-aggregation|static-route|ospf|acl|remote-diagnostics|backup'
+TOPIC_RE='system|vlan-l2|interface|link-aggregation|static-route|ospf|acl|remote-diagnostics|backup|network|storage|services|users-ssh|firewall|containers|diagnostics|cluster|vm|lxc|ha-diagnostics|ha|platform'
 UPDATED_RE='^(2026-10-15|2026-10-30|2026-10-31|2026-11-04|2026-11-11)$'
 
-# 每个厂商应有的主题集合：12 家网络设备为 8 篇，proxmox（宿主虚拟化补充）2 篇
+# 每个厂商应有的主题集合：网络设备/操作系统/虚拟化宿主均 8 篇，RosZ MCP 平台 2 篇
 expected_topics_for() {
   case "$1" in
-    proxmox) printf '%s\n' 01 02 ;;
+    rosz) printf '%s\n' 01 02 ;;
     *) printf '%s\n' 01 02 03 04 05 06 07 08 ;;
+  esac
+}
+
+# 每篇 frontmatter topic 必须命中的主题词（按厂商体系区分）
+topic_token_for() {
+  local dir="$1" seq="$2"
+  case "$dir" in
+    ubuntu | debian | centos)
+      case "$seq" in
+        01) echo '系统|管理|包' ;;
+        02) echo '网络' ;;
+        03) echo '磁盘|存储|LVM|文件系统' ;;
+        04) echo '服务|systemd|日志' ;;
+        05) echo '用户|SSH|权限' ;;
+        06) echo '防火墙' ;;
+        07) echo '容器|虚拟化' ;;
+        08) echo '排障|诊断|性能' ;;
+      esac
+      ;;
+    proxmox)
+      case "$seq" in
+        01) echo '系统|升级|管理' ;;
+        02) echo '备份|恢复|存储' ;;
+        03) echo '集群|节点' ;;
+        04) echo '存储' ;;
+        05) echo '虚拟机|VM|qm' ;;
+        06) echo '容器|LXC|pct' ;;
+        07) echo '网络' ;;
+        08) echo '高可用|HA|排障|诊断' ;;
+      esac
+      ;;
+    rosz)
+      case "$seq" in
+        01) echo '平台|MCP|接入|概览' ;;
+        02) echo '运维|排障|诊断|只读' ;;
+      esac
+      ;;
+    *)
+      case "$seq" in
+        01) echo '系统|管理' ;;
+        02) echo 'VLAN|二层' ;;
+        03) echo '接口' ;;
+        04) echo '聚合' ;;
+        05) echo '静态路由|路由' ;;
+        06) echo 'OSPF' ;;
+        07) echo 'ACL|访问控制|防火墙|过滤' ;;
+        08) echo '远程|诊断' ;;
+      esac
+      ;;
   esac
 }
 fail=0
@@ -41,7 +91,7 @@ total=0
 SECTIONS=('## 命令速查' '## 典型示例' '## 陷阱与版本差异' '## 高危操作' '## 参考来源')
 
 # 预期厂商目录集合（R1：kb 根目录缺整个厂商目录也必须报错）
-EXPECTED_VENDORS=(huawei h3c ruijie dptech cisco-ios cisco-nxos juniper arista fortinet zte vyos mikrotik proxmox)
+EXPECTED_VENDORS=(huawei h3c ruijie dptech cisco-ios cisco-nxos juniper arista fortinet zte vyos mikrotik proxmox ubuntu debian centos rosz)
 
 check_file() {
   local f="$1" base dir prefix fseq topic err=() lines
@@ -107,6 +157,10 @@ check_file() {
     vyos) domain_re='docs\.vyos\.io|vyos\.io' ;;
     mikrotik) domain_re='help\.mikrotik\.com|wiki\.mikrotik\.com' ;;
     proxmox) domain_re='pve\.proxmox\.com|proxmox\.com' ;;
+    ubuntu) domain_re='ubuntu\.com|documentation\.ubuntu\.com|help\.ubuntu\.com' ;;
+    debian) domain_re='debian\.org|wiki\.debian\.org|manpages\.debian\.org' ;;
+    centos) domain_re='centos\.org|docs\.centos\.org|rockylinux\.org|docs\.rockylinux\.org' ;;
+    rosz) domain_re='rosz\.cn' ;;
   esac
   if [[ "${verified:-}" == "high" && -n "${domain_re:-}" ]]; then
     grep -Eq "$domain_re" <<<"$src_urls" || err+=("verified: high 但 sources 无官方域名来源")
@@ -132,21 +186,12 @@ check_file() {
     vyos) vtoken='VyOS' ;;
     mikrotik) vtoken='MikroTik' ;;
     proxmox) vtoken='Proxmox' ;;
+    ubuntu) vtoken='Ubuntu' ;;
+    debian) vtoken='Debian' ;;
+    centos) vtoken='CentOS|Rocky' ;;
+    rosz) vtoken='RosZ' ;;
   esac
-  case "$fseq" in
-    01) ttopic='系统|管理' ;;
-    02) ttopic='VLAN|二层' ;;
-    03) ttopic='接口' ;;
-    04) ttopic='聚合' ;;
-    05) ttopic='静态路由|路由' ;;
-    06) ttopic='OSPF' ;;
-    07) ttopic='ACL|访问控制|防火墙|过滤' ;;
-    08) ttopic='远程|诊断' ;;
-  esac
-  # proxmox 的 02 是备份恢复，不套用网络设备的 VLAN 主题
-  case "${dir}:${fseq}" in
-    proxmox:02) ttopic='备份|存储' ;;
-  esac
+  ttopic="$(topic_token_for "$dir" "$fseq")"
   vfield="$(sed -n 's/^vendor:[[:space:]]*//p' <<<"$head_block" | head -1)"
   tfield="$(sed -n 's/^topic:[[:space:]]*//p' <<<"$head_block" | head -1)"
   if [[ -n "${vtoken:-}" ]] && ! grep -q "$vtoken" <<<"$vfield"; then

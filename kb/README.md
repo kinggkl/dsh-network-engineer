@@ -1,9 +1,10 @@
 # 网络工程师知识库（随 @kinggkl/dsh-network-engineer 插件分发）
 
-供「网络工程师助手」Agent 及各类 RAG 平台使用的**十三厂商**交换机/路由器/防火墙/虚拟化宿主命令知识库。
-资料来源为各厂商官方手册与高可信社区页面（每篇文档末尾附来源链接）：首批 4 厂商整理于 2026-10-15，
+供「网络工程师助手」Agent 及各类 RAG 平台使用的**十七平台**命令与运维知识库。
+资料来源为各厂商/项目官方手册与高可信社区页面（每篇文档末尾附来源链接）：首批 4 厂商整理于 2026-10-15，
 Cisco IOS/IOS-XE、Cisco NX-OS、Juniper Junos、Arista EOS、Fortinet FortiOS、中兴 ZXR10 于 2026-10-30 补全，
-VyOS 与 MikroTik RouterOS 于 2026-10-31 补全；Proxmox VE 宿主于 2026-11-11 补 2 篇，合计 **13 厂商 / 98 篇**；
+VyOS 与 MikroTik RouterOS 于 2026-10-31 补全；Proxmox VE 宿主于 2026-11-11 补 2 篇，v0.1.5 扩至 8 篇，
+并新增 Ubuntu 24.04、Debian 12、CentOS Stream 9 / Rocky 9 各 8 篇与 RosZ MCP 平台 2 篇，合计 **17 平台 / 130 篇**；
 2026-11-04（v0.1.2）起华为 8 篇均含「平台差异（交换机 vs 路由器）」节，区分 S/CE 交换机与 AR/NE 路由器。
 
 ## 目录结构
@@ -22,11 +23,15 @@ kb/
 ├── zte/        中兴（ZXR10 ROSNG / ZROS，verified: medium）
 ├── vyos/       VyOS（1.4 LTS / 1.5 rolling，Debian + FRR）
 ├── mikrotik/   MikroTik（RouterOS v7）
-├── proxmox/    Proxmox VE（8/9 宿主，2 篇）
+├── ubuntu/     Ubuntu 24.04 LTS（noble）
+├── debian/     Debian 12 bookworm（对照 13 trixie）
+├── centos/     CentOS Stream 9 / Rocky Linux 9（同源 dnf 生态）
+├── proxmox/    Proxmox VE 8/9 宿主（8 篇）
+├── rosz/       RosZ MCP 平台（2 篇，平台侧只读查询）
 └── README.md
 ```
 
-| 目录 | 厂商 | OS | 篇数 | `verified` | 说明 |
+| 目录 | 平台 | OS / 版本 | 篇数 | `verified` | 说明 |
 |---|---|---|---|---|---|
 | `huawei/` | 华为 | VRP | 8 | high | S/CE 系列交换机、AR/NE 路由器（平台差异见下方矩阵） |
 | `h3c/` | 新华三 | Comware V5/V7 | 8 | high | S/CR 系列 |
@@ -40,9 +45,15 @@ kb/
 | `zte/` | 中兴 | ZXR10 ROSNG / ZROS | 8 | medium | 官方手册获取受限处已逐条标注 |
 | `vyos/` | VyOS | 1.4 LTS / 1.5 rolling | 8 | high | configure/set/commit/save 模型；FRR 承载路由 |
 | `mikrotik/` | MikroTik | RouterOS v7 | 8 | high | 菜单/路径式 CLI；v6/v7 命令树差异已标注 |
-| `proxmox/` | Proxmox VE | 8.x / 9.x | 2 | high | 宿主虚拟化补充：01 系统升级（`pve8to9`）、02 备份恢复（`vzdump`）；主题编号不与网络设备 8 篇对齐 |
+| `ubuntu/` | Ubuntu | 24.04 LTS（noble） | 8 | high | 系统与包管理、netplan、LVM、systemd、ufw、容器、排障 |
+| `debian/` | Debian | 12 bookworm | 8 | high | apt、interfaces/NetworkManager、nftables、systemd、LVM、排障 |
+| `centos/` | CentOS Stream / Rocky | Stream 9 / Rocky 9 | 8 | high | dnf、NetworkManager、firewalld、SELinux、Podman、排障 |
+| `proxmox/` | Proxmox VE | 8.x / 9.x | 8 | high | 01 系统升级、02 备份恢复、03 集群、04 存储、05 VM、06 LXC、07 宿主网络、08 HA 与排障 |
+| `rosz/` | RosZ MCP 平台 | 平台侧只读接口 | 2 | high | 01 平台与只读 MCP 接入、02 只读运维与排障；设备命令仍查 `mikrotik/` |
 
-网络设备厂商每厂商 8 篇，按主题编号（`proxmox/` 只有 01、02 两篇，其 02 为备份恢复而非 VLAN）：
+## 主题编号
+
+### 网络设备（12 家厂商 × 8 篇）
 
 | 编号 | 文件后缀 | 主题 |
 |---|---|---|
@@ -55,8 +66,41 @@ kb/
 | 07 | -acl | ACL / 防火墙规则（与 NAT，视厂商） |
 | 08 | -remote-diagnostics | 远程管理与诊断（Telnet/SSH、show/display/tool 排障） |
 
-完整文件名格式：`<厂商>-<两位序号>-<主题>.md`，如 `kb/huawei/huawei-06-ospf.md`、
-`kb/cisco-nxos/cisco-nxos-06-ospf.md`、`kb/vyos/vyos-05-static-route.md`、`kb/mikrotik/mikrotik-07-acl.md`。
+### Linux 服务器（Ubuntu / Debian / CentOS 各 8 篇）
+
+| 编号 | 文件后缀 | 主题 |
+|---|---|---|
+| 01 | -system | 系统与包管理（发行版/仓库、apt 与 dnf、升级与回滚） |
+| 02 | -network | 网络配置（netplan、NetworkManager、interfaces、路由、DNS、bond/VLAN） |
+| 03 | -storage | 磁盘与 LVM（分区、LVM、ext4/xfs、扩容、fstab） |
+| 04 | -services | systemd 服务（unit、日志 journald、定时器、启动排障） |
+| 05 | -users-ssh | 用户与 SSH（用户/组、sudoers、SSH 加固、密钥） |
+| 06 | -firewall | 防火墙（ufw、nftables、firewalld、端口放行与排错） |
+| 07 | -containers | 容器与虚拟化（Docker、Podman、LXD/KVM 要点） |
+| 08 | -diagnostics | 排障诊断（负载、内存、IO、网络、dmesg/journalctl） |
+
+### Proxmox VE（8 篇）
+
+| 编号 | 文件后缀 | 主题 |
+|---|---|---|
+| 01 | -system | 系统升级与版本管理（`pve8to9` 预检、Debian 12→13、网卡改名、回退） |
+| 02 | -backup | 备份恢复与存储（`vzdump`、恢复演练、`/etc/pve` 备份） |
+| 03 | -cluster | 集群与节点（`pvecm`、quorum、节点加入/隔离） |
+| 04 | -storage | 存储管理（`pvesm`、content 类型、LVM-thin/ZFS/Ceph） |
+| 05 | -vm | 虚拟机 QM（创建、迁移、快照、cloud-init） |
+| 06 | -lxc | LXC 容器（模板、unprivileged、`pct` 生命周期） |
+| 07 | -network | 宿主网络（`vmbr`、bond、VLAN-aware、SDN） |
+| 08 | -ha-diagnostics | 高可用与排障（HA/CRM/LRM、锁、日志定位） |
+
+### RosZ MCP 平台（2 篇）
+
+| 编号 | 文件后缀 | 主题 |
+|---|---|---|
+| 01 | -platform | RosZ 平台与 MCP 接入（只读密钥、工具清单、权限档） |
+| 02 | -diagnostics | 只读运维与排障（设备/指标/备份/组网/日志查询流程） |
+
+完整文件名格式：`<平台>-<两位序号>-<主题>.md`，如 `kb/huawei/huawei-06-ospf.md`、
+`kb/ubuntu/ubuntu-02-network.md`、`kb/proxmox/proxmox-08-ha-diagnostics.md`、`kb/rosz/rosz-02-diagnostics.md`。
 
 ## 华为平台差异速查（S/CE 交换机 vs AR/NE 路由器）
 
@@ -92,14 +136,52 @@ kb/
 
 > 华为/新华三的 preference 与 Cisco 系 AD 是两套数值体系，不能直接比大小；跨厂商迁移时先换算再讨论“谁更优”。
 
+## Linux 三系差异速查
+
+| 项目 | Ubuntu 24.04 LTS | Debian 12 bookworm | CentOS Stream 9 / Rocky 9 |
+|---|---|---|---|
+| 包管理 | `apt`（main/universe/restricted 组件） | `apt`（main/contrib/non-free） | `dnf`（+ EPEL、CRB） |
+| 网络后端 | netplan YAML → systemd-networkd 或 NetworkManager | `/etc/network/interfaces` 或 NetworkManager | NetworkManager（`nmcli`） |
+| 防火墙 | `ufw`（前端），底层 nftables | `nftables`/`iptables`（无强制前端） | `firewalld`（zone 模型） |
+| 安全模块 | AppArmor | AppArmor | SELinux（默认 enforcing） |
+| 服务管理 | systemd + journald | systemd + journald | systemd + journald |
+| 容器/虚拟化 | Docker、Podman、LXD、KVM | Docker、Podman、KVM | Podman（首选）、Docker、KVM |
+| 典型陷阱 | netplan 缩进/YAML 空格、云镜像 `50-cloud-init.yaml` 覆盖；改网络前先确认 SSH 链路 | 手改 `interfaces` 与 NetworkManager 并存冲突；`/etc/resolv.conf` 被覆写 | `firewalld` zone/`--add-port` 与 SELinux 布尔值；`nmcli` 连接配置与 `ifcfg` 并存 |
+
+## Proxmox VE 与 Debian 宿主对照
+
+- 底座：PVE 8.x = Debian 12 bookworm，PVE 9.x = Debian 13 trixie；升级前先 `pve8to9 --full` 预检。
+- 集群配置：`/etc/pve` 是 pmxcfs 集群文件系统，节点间共享；不要当成普通目录手改。
+- 工具分工：`qm` 管 VM、`pct` 管 LXC、`pvesm` 管存储、`pvecm` 管集群、`vzdump`/PBS 管备份。
+- 网络：`vmbr` 网桥、bond、VLAN-aware bridge、SDN；改宿主网络可能导致管理面/迁移网络失联。
+- 备份：`vzdump`（快照/暂停/停止模式）、备份作业、Proxmox Backup Server；恢复演练优于“有备份文件”。
+- 排障：`pvecm status`、`pvesm status`、`qm status`、`pct status`、`journalctl -u pve*`、`/var/log/pveproxy`。
+
+## RosZ MCP 平台要点（只读）
+
+| 场景 | 要点 |
+|---|---|
+| 密钥与权限 | 当前为只读密钥：28 个只读工具可用，7 个写工具（下发命令、节点脚本、IP 规则、踢线、备份等）被 blocked；需读写要在控制台改权限档 |
+| 列表结果 | `total` 是本次返回条数，`matched` 才是命中总数；被截断时调大 `limit` 或缩小关键词 |
+| 离线设备 | `online=false` 时展示的是最后一次上报快照，`last_post` 是快照时间，不能当实时值 |
+| 指标曲线 | `get_device_metrics` 已降采样（最多约 120 点），判断峰值看 `max`；磁盘占用无历史曲线 |
+| 流量分析 | `get_netflow_stats` 只保留最近一轮采样快照（无历史、无时间范围参数）；未启用采样时为空不代表无流量 |
+| 日志/NAT | `search_device_log`、`search_nat_log` 必须给时间窗口（`hours` ≤168）；日志 `keyword` 少于 3 字符会退化全表扫描；NAT 查询必须带 IP |
+| 云指令 | `run_command` 结果只保留 24h 且服务端内存保存；`超时` ≠ 取消，设备下次心跳仍可能执行 |
+| NodeZ 节点 | 节点脚本与设备云指令是两套东西，id 不通用；节点心跳 30s，执行记录持久化 |
+| 智能组网 | 通道状态 5s 上报，180s 未更新强制判「断开」；「未知」通常表示服务刚重启还没收到上报 |
+| 账号/计费 | RADIUS 账号列表不返回密码；在线会话查询建议按 `account`/`device_id` 缩小范围 |
+| 备份/配置 | `backups` 是 `.backup` 整机备份，`configs` 是 `.rsc` 文本配置；`get_config_diff` 显示 `+`/`-` 行，敏感值已遮蔽 |
+| 安全 | 不把 Bearer token、账号口令、设备敏感信息写进命令/回答/日志；设备侧配置命令仍查 `kb/mikrotik/` |
+
 ## 文档格式
 
 每篇文档含 YAML frontmatter，供 RAG 检索与元数据过滤：
 
 | 字段 | 说明 |
 |---|---|
-| `vendor` / `os` | 厂商与操作系统，检索时可做过滤条件 |
-| `topic` / `devices` | 主题与适用设备系列 |
+| `vendor` / `os` | 厂商/平台与操作系统，检索时可做过滤条件 |
+| `topic` / `devices` | 主题与适用设备/平台 |
 | `keywords` | 检索关键词（中文为主，含易混词） |
 | `sources` | 整理时实际抓取/核对的参考来源 URL |
 | `verified` | `high` = 有官方手册来源佐证；`medium` = 公开资料有限，仅作方向参考（dptech/ 全部、zte/ 全部、cisco-ios-03） |
@@ -118,6 +200,12 @@ kb/
   VLAN 用 `vif`/`vif-s`/`vif-c`；防火墙 1.4+ 为 `set firewall ipv4 name/forward filter`（1.3 旧语法不同）。
 - **MikroTik RouterOS**：菜单/路径式命令；v7 的 OSPF 走 `/routing ospf instance` + `area` + `interface-template`
   （v6 的 `/routing ospf network` 已不存在）；路由结果汇总在 `/routing route`。
+- **Linux 三系**：Ubuntu 用 netplan + ufw + apt；Debian 用 interfaces/NetworkManager + nftables + apt；
+  CentOS Stream 9 / Rocky 9 用 NetworkManager + firewalld + dnf + SELinux（enforcing）；三系命令不要互换。
+- **Proxmox VE**：宿主是 Debian；集群配置在 `/etc/pve`（pmxcfs）；VM/LXC 用 `qm`/`pct`；网络用 `vmbr`/bond/
+  VLAN-aware；备份用 `vzdump`/PBS；升级走 `pve8to9` 预检，改动前先备份 guest 与 `/etc/pve`。
+- **RosZ 平台**：MCP 是平台侧只读查询接口，与设备侧配置命令是两层；注意 `total` vs `matched`、离线快照、
+  指标降采样、日志/NAT 时间窗口、云指令 24h 保留与超时语义；不泄露任何凭据。
 
 ## 导入 RAG 平台
 
@@ -129,22 +217,31 @@ kb/
 
 ## 检索与使用建议
 
-1. Agent 回答前先按「厂商 + 主题」定位文件，再按关键词跨文件检索。
-2. 跨厂商对照类问题，同时召回 2–4 篇同名主题文档（如 `huawei-05`/`ruijie-05`/`cisco-ios-05`/`juniper-05`/`vyos-05`）。
+1. Agent 回答前先按「平台 + 主题」定位文件，再按关键词跨文件检索。
+2. 跨平台对照类问题，同时召回 2–4 篇同名主题文档（如 `huawei-05`/`ruijie-05`/`cisco-ios-05`/`juniper-05`/`vyos-05`；
+   Linux 三系的 02/06 篇；PVE 与 Debian 的对应主题）。
 3. `verified: medium` 的文档（dptech/ 全部、zte/ 全部、cisco-ios-03）仅作参考方向，关键配置务必引导用户以官方手册为准。
 4. 同一厂商存在多 CLI 体系时先确认平台：Cisco IOS-XE 与 NX-OS、Juniper EX（交换）与 MX/SRX（路由/安全）、
-   VyOS 1.3 与 1.4+（firewall 语法分水岭）、RouterOS v6 与 v7（路由菜单重构）差异都写在对应篇目的「陷阱与版本差异」里。
+   VyOS 1.3 与 1.4+（firewall 语法分水岭）、RouterOS v6 与 v7（路由菜单重构）、Ubuntu/Debian/CentOS 三系、
+   PVE 8.x 与 9.x（Debian 底座与网卡命名）差异都写在对应篇目的「陷阱与版本差异」里。
+5. 设备只开放 WinBox（TCP 8291）时用插件原生工具 `mt_winbox_exec` 只读取证；平台侧查询用 RosZ MCP 只读工具，
+   两者都禁止把凭据写进命令/日志/回答。
 
 ## 校验与维护
 
-- 结构校验：`plugins/dsh-network-engineer/tools/kb-validate.sh`（12 厂商 / 96 篇：frontmatter、固定五节、
+- 结构校验：`plugins/dsh-network-engineer/tools/kb-validate.sh`（17 平台 / 130 篇：frontmatter、固定五节、
   速查表行数与列数、高危 ⚠️ 条目、来源链接、篇幅、主题齐全性）。
-- 插件测试：`cd plugins/dsh-network-engineer && npm test`（含知识库结构、跨厂商一致性、预设组合、打包清单）。
-- 新增主题：按 `<厂商>-<两位序号>-<主题>.md` 命名并在本 README 补充索引；修订文档后更新 `updated` 字段。
-- 新增厂商：先建目录骨架与 8 个主题文件，再补 frontmatter 与来源链接，最后在本 README 的厂商表里登记。
+- 插件测试：`cd plugins/dsh-network-engineer && npm test`（含知识库结构、跨平台一致性、预设组合、打包清单）。
+- 新增主题：按 `<平台>-<两位序号>-<主题>.md` 命名并在本 README 补充索引；修订文档后更新 `updated` 字段。
+- 新增平台：先建目录骨架与主题文件，再补 frontmatter 与来源链接，最后在本 README 的平台表里登记，
+  并同步校验器 `EXPECTED_VENDORS`、测试 `VENDORS`/`VENDOR_TOPICS`、`SKILL.md` 与 persona。
 
 ## 已知限制
 
 - 迪普、中兴公开资料有限：dptech/、zte/ 各篇不确定处均标注「以官方手册/售后确认」，`verified` 恒为 medium。
 - 各厂商不同型号/版本存在命令差异（如 NX-OS 的 `feature` 集合、Junos EX 与 MX 的二层语法、FortiOS 6.x/7.x、
   VyOS 1.3/1.4、RouterOS v6/v7），文档已标注主要差异点，但无法覆盖全部型号。
+- Linux 三系以 Ubuntu 24.04、Debian 12、CentOS Stream 9 / Rocky 9 为基线；更老/更新版本（22.04、Debian 13、
+  Rocky 10 等）的差异以各项目官方文档为准。
+- Proxmox VE 内容按 8.x/9.x 官方文档整理；集群/存储/HA 的实际行为受硬件与网络环境影响，变更前仍需备份与演练。
+- RosZ 2 篇按 MCP 服务器（只读密钥）语义整理；平台接口、权限档与返回字段以 RosZ 控制台/官方说明为准。

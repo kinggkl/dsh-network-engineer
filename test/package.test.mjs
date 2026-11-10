@@ -12,11 +12,11 @@ const pkg = JSON.parse(read('package.json'))
 
 test('package identity and version', () => {
   assert.equal(pkg.name, '@kinggkl/dsh-network-engineer')
-  assert.equal(pkg.version, '0.1.4')
+  assert.equal(pkg.version, '0.1.5')
   assert.equal(pkg.type, 'module')
   assert.equal(pkg.license, 'MIT')
-  assert.match(pkg.description, /98 篇/)
-  assert.match(pkg.description, /13 厂商/)
+  assert.match(pkg.description, /130 篇/)
+  assert.match(pkg.description, /17 平台/)
   assert.match(pkg.description, /WinBox/)
 })
 
@@ -42,6 +42,11 @@ test('files whitelist covers every runtime asset', () => {
     'kb/huawei/huawei-01-system.md',
     'kb/vyos/vyos-01-system.md',
     'kb/mikrotik/mikrotik-08-remote-diagnostics.md',
+    'kb/ubuntu/ubuntu-01-system.md',
+    'kb/debian/debian-08-diagnostics.md',
+    'kb/centos/centos-02-network.md',
+    'kb/proxmox/proxmox-08-ha-diagnostics.md',
+    'kb/rosz/rosz-01-platform.md',
   ]
   const globs = pkg.files
   const covered = (path) =>
@@ -64,8 +69,8 @@ test('locale resources carry display title and description', () => {
     const doc = JSON.parse(read(`locale/${locale}.json`))
     assert.ok(typeof doc.meta.title === 'string' && doc.meta.title.length >= 3, `${locale} title`)
     assert.ok(typeof doc.meta.description === 'string' && doc.meta.description.length >= 10, `${locale} description`)
-    assert.match(doc.meta.description, /98/)
-    assert.match(doc.meta.description, /13/)
+    assert.match(doc.meta.description, /130/)
+    assert.match(doc.meta.description, /17/)
   }
   assert.match(JSON.parse(read('locale/zh.json')).meta.description, /VyOS/)
   assert.match(JSON.parse(read('locale/zh.json')).meta.description, /MikroTik/)
@@ -130,6 +135,11 @@ test('npm pack tarball contains every runtime asset and no test/dev files', () =
     'kb/zte/zte-01-system.md',
     'kb/vyos/vyos-05-static-route.md',
     'kb/mikrotik/mikrotik-07-acl.md',
+    'kb/ubuntu/ubuntu-01-system.md',
+    'kb/debian/debian-08-diagnostics.md',
+    'kb/centos/centos-02-network.md',
+    'kb/proxmox/proxmox-08-ha-diagnostics.md',
+    'kb/rosz/rosz-01-platform.md',
     'kb/README.md',
     'locale/en.json',
     'locale/zh.json',
@@ -140,7 +150,7 @@ test('npm pack tarball contains every runtime asset and no test/dev files', () =
     'LICENSE',
   ]
   for (const path of required) assert.ok(files.includes(path), `npm pack is missing ${path}`)
-  assert.equal(files.filter((path) => path.startsWith('kb/') && path.endsWith('.md')).length, 99, 'kb/ should ship 98 docs + README')
+  assert.equal(files.filter((path) => path.startsWith('kb/') && path.endsWith('.md')).length, 131, 'kb/ should ship 130 docs + README')
   for (const path of files) {
     assert.ok(!path.startsWith('test/'), `test files must not be packed: ${path}`)
     assert.ok(!path.startsWith('node_modules/'), `node_modules must not be packed: ${path}`)

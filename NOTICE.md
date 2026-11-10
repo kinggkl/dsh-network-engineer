@@ -1,6 +1,6 @@
 # NOTICE · 来源与致谢
 
-本仓库是社区延续版本（v0.1.3），基于 **sososilencing/dsh-network-engineer 0.1.0**（MIT）重构而来。
+本仓库是社区延续版本（v0.1.5），基于 **sososilencing/dsh-network-engineer 0.1.0**（MIT）重构而来。
 原作者的插件骨架、预设与 persona 提示词、以及首批 4 厂商 32 篇命令知识库是这条工作的基础，
 在此明确引用出处并向原作者及所有原始贡献者致谢。
 
@@ -15,10 +15,11 @@
 ## 本仓库（kinggkl/dsh-network-engineer）
 
 - 维护者：kinggkl（GitHub：https://github.com/kinggkl）
-- 版本：0.1.3（2026-11-09）
+- 版本：0.1.5（2026-11-11）
 - 新增知识库：`kb/cisco-ios/`、`kb/cisco-nxos/`、`kb/juniper/`、`kb/arista/`、
-  `kb/fortinet/`、`kb/zte/`、`kb/vyos/`、`kb/mikrotik/` 八个目录共 64 篇；
-  知识库合计 **12 厂商 / 96 篇**。
+  `kb/fortinet/`、`kb/zte/`、`kb/vyos/`、`kb/mikrotik/` 八个目录共 64 篇；v0.1.4 起 `kb/proxmox/`
+  （Proxmox VE）增至 8 篇，v0.1.5 新增 `kb/ubuntu/`、`kb/debian/`、`kb/centos/` 各 8 篇与
+  `kb/rosz/` 2 篇；知识库合计 **17 平台 / 130 篇**。
 - 修复上游 issue #3：
   1. `index.js` 的 `resourceBase` 由 `skills/network-command-kb/` 改为包根，与 `kb/` 实际位置一致；
   2. 预设在原有工具集基础上补挂 `tool-skill`、`skill-filesystem`、`tool-fs-search`、
@@ -49,10 +50,11 @@
 每篇命令文档的 frontmatter `sources` 字段列出整理时实际抓取/核对的官方文档或高可信来源 URL；
 正文末尾「参考来源」节同样列出。`verified: high` 表示主干命令有官方手册佐证，
 `verified: medium` 表示公开资料有限、仅作方向参考（回答时须提示以官方手册为准）。
+Ubuntu/Debian/CentOS/Proxmox VE 篇目以各项目官方文档为来源；`kb/rosz/` 按 RosZ MCP 服务器说明与只读工具实测语义整理，不包含任何平台凭据或第三方代码。
 
 ## 商标
 
-华为、新华三、锐捷、迪普、思科、瞻博、Arista、飞塔、中兴、VyOS、MikroTik 等
+华为、新华三、锐捷、迪普、思科、瞻博、Arista、飞塔、中兴、VyOS、MikroTik、Ubuntu、Debian、CentOS、Rocky Linux、Proxmox、RosZ 等
 名称与商标归各自权利人所有；本项目仅作命令语法整理与教学参考，与各厂商无隶属关系。
 
 ## 许可

@@ -2,6 +2,29 @@
 
 本项目遵循语义化版本；上游基线为 `dsh-network-engineer 0.1.0`。
 
+## 0.1.5 — 2026-11-11
+
+### Added
+
+- **Linux 服务器运维知识库 `kb/ubuntu/`、`kb/debian/`、`kb/centos/` 各 8 篇（24 篇）**：Ubuntu 24.04 LTS、
+  Debian 12 bookworm、CentOS Stream 9 / Rocky Linux 9，覆盖系统与包管理、网络配置、磁盘与 LVM、systemd 服务、
+  用户与 SSH、防火墙、容器、排障诊断；命令附官方文档来源与发行版差异提示。
+- **Proxmox VE 知识库扩到 8 篇**：保留 `proxmox-01-system.md`、`proxmox-02-backup.md`，新增集群与节点、存储、
+  虚拟机、LXC、宿主网络、HA 与排障 6 篇，并与既有两篇明确分工、不重复。
+- **RosZ 平台知识库 `kb/rosz/` 2 篇**：按 RosZ MCP 服务器（只读密钥）语义整理平台与 MCP 接入模型、只读运维
+  与排障流程（total/matched、离线快照、指标降采样、NAT/日志时间窗口、云指令 24h 保留与超时语义等），
+  不含任何凭据或第三方代码。
+- 知识库从 13 厂商 / 98 篇扩展到 **17 平台 / 130 篇**。
+
+### Changed
+
+- 校验器 `tools/kb-validate.sh` 与测试支持 17 平台：`EXPECTED_VENDORS`、按目录声明主题集合（网络设备 / Linux /
+  Proxmox 8 篇、RosZ 2 篇）、各平台 topic 主题词与官方域名门禁（ubuntu.com、debian.org、centos.org /
+  rockylinux.org、pve.proxmox.com、rosz.cn）；新增受支持日期 `2026-11-11`。
+- `package.json` / `package-lock.json` / `cordis.patch.yml` / `locale/{en,zh}.json` / `README.md` / `kb/README.md` /
+  `SKILL.md` / `NOTICE.md` 的厂商与篇数口径统一为 **17 平台 / 130 篇**；persona 增补 Linux、Proxmox VE、RosZ
+  平台规则（含 RosZ 只读 MCP 使用约定与凭据安全要求）。
+- `keywords` 增加 `ubuntu`、`debian`、`centos`、`rocky`、`linux`、`rosz`。
 ## 0.1.4 — 2026-11-11
 
 ### Added
