@@ -52,7 +52,7 @@ test('README priority table keeps the verified cross-vendor literals', () => {
   const readme = read('README.md')
   for (const row of README_TABLE_ROWS) assert.ok(readme.includes(row), `README is missing row: ${row}`)
   assert.ok(readme.includes('不能直接比大小'))
-  assert.ok(readme.includes('96 篇'))
+  assert.ok(readme.includes('98 篇'))
 })
 
 test('persona repeats the same multi-system routing constants', () => {
@@ -85,7 +85,7 @@ test('vendor list is identical across README, SKILL.md and package keywords', ()
     assert.ok(readme.includes(`${vendor}/`), `README lists no ${vendor}/`)
     assert.ok(skill.includes(`kb/${vendor}/`), `SKILL.md lists no kb/${vendor}/`)
   }
-  assert.match(packageJson.description, /96 篇/)
-  assert.match(readme, /12 厂商/)
-  assert.match(skill, /96 篇/)
+  assert.match(packageJson.description, /98 篇/)
+  assert.match(readme, /13 厂商/)
+  assert.match(skill, /98 篇/)
 })

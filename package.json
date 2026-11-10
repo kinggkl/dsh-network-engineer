@@ -1,7 +1,7 @@
 {
   "name": "@kinggkl/dsh-network-engineer",
-  "version": "0.1.3",
-  "description": "网络工程师助手 for DeepSeek Harness：12 厂商（华为/新华三/锐捷/迪普/思科 IOS·NX-OS/Junos/Arista EOS/FortiOS/中兴/VyOS/MikroTik）交换机、路由器、防火墙命令知识库（96 篇）+ 可切换预设 Agent + 原生 MikroTik WinBox 终端工具（mt_winbox_exec，仅 EC-SRP5、默认只读），支持跨厂商对照、截图识别与联网查手册",
+  "version": "0.1.4",
+  "description": "网络工程师助手 for DeepSeek Harness：13 厂商（华为/新华三/锐捷/迪普/思科 IOS·NX-OS/Junos/Arista EOS/FortiOS/中兴/VyOS/MikroTik + Proxmox VE 宿主）交换机、路由器、防火墙与虚拟化宿主命令知识库（98 篇）+ 可切换预设 Agent + 原生 MikroTik WinBox 终端工具（mt_winbox_exec，仅 EC-SRP5、默认只读），支持跨厂商对照、截图识别与联网查手册",
   "type": "module",
   "main": "index.js",
   "exports": {
@@ -42,6 +42,8 @@
     "vyos",
     "mikrotik",
     "routeros",
+    "proxmox",
+    "pve",
     "winbox"
   ],
   "scripts": {

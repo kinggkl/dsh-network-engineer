@@ -1,16 +1,16 @@
 # dsh-network-engineer · 网络工程师助手（network-command-kb）
 
 **English** — A DeepSeek Harness plugin that ships a standalone "网络工程师助手" (Network Engineer Assistant)
-agent preset plus a **12-vendor / 96-document** command knowledge base: Huawei VRP, H3C Comware, Ruijie RGOS,
+agent preset plus a **13-vendor / 98-document** command knowledge base: Huawei VRP, H3C Comware, Ruijie RGOS,
 DPtech CLI, Cisco IOS/IOS-XE and NX-OS, Juniper Junos, Arista EOS, Fortinet FortiOS, ZTE ZXR10, VyOS and
-MikroTik RouterOS. It covers vendor command reference, cross-vendor translation, routing-priority analysis,
+MikroTik RouterOS, plus Proxmox VE as a host-virtualisation supplement. It covers vendor command reference, cross-vendor translation, routing-priority analysis,
 screenshot reading and online manual lookup, and only answers networking topics. v0.1.3 also adds a native
 `mt_winbox_exec` tool (MikroTik WinBox terminal protocol over TCP 8291, read-only by default) for RouterOS
 devices whose CLI is reachable only through WinBox.
 
 > **社区延续版本 v0.1.3。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
 > 0.1.0（MIT）重构：修复上游 issue #3 的 skill 注册路径与预设工具链缺陷，新增 8 个厂商 64 篇文档，
-> 把知识库扩展到 12 厂商 / 96 篇，并在 v0.1.3 增加原生 MikroTik WinBox 终端工具。原作者的插件骨架、
+> 把知识库扩展到 12 厂商 / 96 篇，v0.1.3 增加原生 MikroTik WinBox 终端工具，v0.1.4 起补 Proxmox VE 宿主两篇（13 厂商 / 98 篇）。原作者的插件骨架、
 > 预设思路与首批 4 厂商 32 篇文档是这条工作的基础，来源与致谢见 [NOTICE.md](NOTICE.md)。
 > WinBox 协议移植自 [subixonfire/winbox-terminal-protocol](https://github.com/subixonfire/winbox-terminal-protocol)（MIT）。
 
@@ -23,14 +23,14 @@ devices whose CLI is reachable only through WinBox.
 | 组成 | 说明 |
 |---|---|
 | **插件模块** | `index.js` 在 `ctx.skills` 注册 `network-command-kb` 技能（resource base 指向包根，`kb/` 随插件分发），并在 `ctx.tools` 注册全局工具 `mt_winbox_exec` |
-| **技能 `network-command-kb`** | 12 厂商 × 8 主题 = 96 篇命令参考，Agent 加载技能后按「厂商 + 主题」检索 |
+| **技能 `network-command-kb`** | 13 厂商 / 98 篇命令参考（12 家网络设备厂商 × 8 主题 + Proxmox VE 宿主 2 篇），Agent 加载技能后按「厂商 + 主题」检索 |
 | **预设「网络工程师助手」** | DSH 预设切换器里独立出现；带完整工具链（skill / grep / glob / read_image / bash / web），只答网络工程主题 |
 | **工具 `mt_winbox_exec`** | 原生 MikroTik WinBox 终端（TCP 8291、EC-SRP5、AES-128-CBC）：只开 WinBox、没有 SSH 的 RouterOS 设备也能只读排障；默认只读，写操作需显式开启 |
 
 ## 功能
 
 - **预设 Agent「网络工程师助手」**：安装后出现在桌面端 / Web 的预设切换器中，选中即用；只回答网络工程主题，其他话题礼貌拒答。
-- **内置知识库（96 篇 / 十二厂商）**：每厂商 8 主题（01 系统管理、02 VLAN 与二层、03 接口、04 链路聚合、05 静态路由、06 OSPF、07 ACL、08 远程管理与诊断），以技能形式随插件分发。
+- **内置知识库（98 篇 / 十三厂商）**：12 家网络设备厂商各 8 主题（01 系统管理、02 VLAN 与二层、03 接口、04 链路聚合、05 静态路由、06 OSPF、07 ACL、08 远程管理与诊断），另加 Proxmox VE 宿主 2 篇（01 系统升级、02 备份恢复），以技能形式随插件分发。
 - **跨厂商命令对照 + 选路数值差异**：华为/新华三 preference、Cisco 系 AD、Junos preference、FortiOS distance 等分属不同数值体系，文档与 persona 都明确提醒不能直接比大小。
 - **联网查手册**：知识库未覆盖的型号/版本差异自动联网检索官方文档并注明来源；禁止编造命令与参数。
 - **风险标注**：`reboot` / `format` / `erase` / `factoryreset` / `reset-configuration` 等高危命令自动附 ⚠️ 风险提示、备份建议与维护窗口提醒。
@@ -169,6 +169,7 @@ kb/
 ├── zte/        中兴 ZXR10 ROSNG / ZROS（8 篇，verified: medium）
 ├── vyos/       VyOS 1.4 LTS / 1.5 rolling（8 篇）
 ├── mikrotik/   MikroTik RouterOS v7（8 篇）
+├── proxmox/    Proxmox VE 8/9 宿主（2 篇：系统升级、备份恢复）
 └── README.md   总览、厂商索引、跨厂商选路数值对照与 RAG 导入指南
 ```
 
@@ -202,6 +203,8 @@ kb/
 4. **新增工程质量设施**：`tools/kb-validate.sh` 校验器、`test/` 测试套件、`locale/`、`icon.svg`、`NOTICE.md`。
 5. **新增 WinBox 终端工具**（v0.1.3）：`mt_winbox_exec` 原生工具 + `lib/winbox/` 协议移植，用于只开
    8291 端口的 MikroTik 设备；默认只读、凭据文件化、密码脱敏。
+6. **知识库 96 篇 → 98 篇**（v0.1.4）：新增宿主虚拟化补充 `kb/proxmox/` 两篇（`pve8to9` 升级预检、
+   `vzdump` 备份恢复演练）；校验器与测试支持「厂商声明自己的主题集合」，不再要求所有厂商都是 8 篇。
 
 ## 目录结构
 
@@ -214,7 +217,7 @@ dsh-network-engineer/
 │   ├── mikrotik-tool.mjs  # raw DSH ToolDefinition：参数/凭据/只读门禁/文本渲染
 │   └── winbox/            # WinBox 终端协议（crypto/m2/client）+ 上游 MIT 许可
 ├── skills/network-command-kb/SKILL.md
-├── kb/                    # 12 厂商 × 8 主题 = 96 篇命令知识库 + README
+├── kb/                    # 13 厂商 / 98 篇命令知识库 + README
 ├── locale/{en,zh}.json    # 插件管理器显示名称与说明
 ├── icon.svg               # 原创图标
 ├── tools/kb-validate.sh   # 知识库结构校验器
@@ -228,7 +231,7 @@ dsh-network-engineer/
 cd dsh-network-engineer
 npm install            # 安装 devDependency（js-yaml，仅测试用）
 npm test               # 插件单元 + 打包 + 预设组合 + 知识库结构 + 跨厂商一致性
-npm run validate       # 12 厂商 96 篇文档结构校验
+npm run validate       # 13 厂商 98 篇文档结构校验
 ```
 
 测试范围：
@@ -237,8 +240,8 @@ npm run validate       # 12 厂商 96 篇文档结构校验
 |---|---|
 | `test/plugin.test.mjs` | `apply()` 注册的 skill 形状与 `mt_winbox_exec` 工具形状、resourceBase 指向包根、SKILL.md 缺失/非法/知识库缺失降级、tools 缺失/构建失败/注册失败降级、重复 apply |
 | `test/package.test.mjs` | package.json/exports/files（含 `lib/**`）、dsh.bundle.patch、locale 元数据、icon 合法性、真实 `npm pack` 清单、来源与 WinBox 致谢存在性 |
-| `test/patch.test.mjs` | cordis.patch.yml 可解析、插件行/预设行结构、预设必备工具齐备、persona 无未注册变量、12 厂商均在 persona 中 |
-| `test/kb.test.mjs` | 12 厂商 × 8 主题齐全、frontmatter 8 字段与 vendor/topic 交叉一致、五节唯一且非空、速查表行数/列数、高危 ⚠️、官方来源、篇幅 |
+| `test/patch.test.mjs` | cordis.patch.yml 可解析、插件行/预设行结构、预设必备工具齐备、persona 无未注册变量、13 厂商均在 persona 中 |
+| `test/kb.test.mjs` | 13 厂商各自主题齐全（网络设备 8 篇 / proxmox 2 篇）、frontmatter 8 字段与 vendor/topic 交叉一致、五节唯一且非空、速查表行数/列数、高危 ⚠️、官方来源、篇幅 |
 | `test/consistency.test.mjs` | README/SKILL/persona/package.json 的厂商与篇数一致、跨厂商选路数值与文档一致 |
 | `test/winbox-proto.test.mjs` | WinBox 协议移植：M2 TLV 编解码、EC-SRP5 中间值/stream keys/AES、分页与 ANSI 剥离，对齐 Python 参考实现生成的 golden vectors |
 | `test/winbox-tool.test.mjs` | 工具层：参数校验、凭据解析与脱敏、只读门禁、超时/截断、错误码映射（用 fake client，不联网） |

@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import * as plugin from '../index.js'
-import { packageRoot, read, VENDORS } from './_helpers.mjs'
+import { packageRoot, read, VENDORS, topicsFor } from './_helpers.mjs'
 
 function createFakeContext() {
   const registrations = []
@@ -75,8 +75,8 @@ test('apply() registers the bundled network-command-kb skill', () => {
   assert.equal(registrations.length, 1)
   const skill = registrations[0]
   assert.equal(skill.name, 'network-command-kb')
-  assert.match(skill.description, /96 篇/)
-  assert.match(skill.description, /12 厂商/)
+  assert.match(skill.description, /98 篇/)
+  assert.match(skill.description, /13 厂商/)
   assert.equal(skill.source, 'bundled')
   assert.match(skill.content, /网络命令知识库使用说明/)
   assert.equal(skill.path, join(packageRoot, 'skills', 'network-command-kb', 'SKILL.md'))
@@ -114,7 +114,11 @@ test('resourceBase points at the package root, not the skill directory (upstream
   assert.equal(base.path, packageRoot)
   // SKILL.md resolves `kb/...` against the resource base, so the KB has to be there.
   assert.ok(existsSync(join(base.path, 'kb')))
-  for (const vendor of VENDORS) assert.ok(existsSync(join(base.path, 'kb', vendor, `${vendor}-06-ospf.md`)), vendor)
+  // 网络设备厂商按 06 号文档验在包根；proxmox 只有 01/02 两篇，按 01 验。
+  for (const vendor of VENDORS) {
+    const probe = topicsFor(vendor)['06'] === undefined ? `${vendor}-01-${topicsFor(vendor)['01']}.md` : `${vendor}-06-ospf.md`
+    assert.ok(existsSync(join(base.path, 'kb', vendor, probe)), vendor)
+  }
   assert.match(read('skills/network-command-kb/SKILL.md'), /resource base 是插件包根目录/)
 })
 

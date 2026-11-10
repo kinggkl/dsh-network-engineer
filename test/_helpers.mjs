@@ -21,9 +21,10 @@ export const VENDORS = [
   'zte',
   'vyos',
   'mikrotik',
+  'proxmox',
 ]
 
-/** The eight fixed topics. */
+/** The eight fixed topics shared by the twelve network vendors. */
 export const TOPICS = {
   '01': 'system',
   '02': 'vlan-l2',
@@ -37,6 +38,23 @@ export const TOPICS = {
 
 /** Fixed section headings, in order. The high-risk one additionally carries ⚠️. */
 export const SECTIONS = ['## 命令速查', '## 典型示例', '## 陷阱与版本差异', '## 高危操作', '## 参考来源']
+
+/**
+ * Proxmox VE is not a network vendor: it is the host virtualisation supplement,
+ * so it declares its own (currently two-topic) scheme instead of the 8 fixed topics.
+ */
+export const HOST_TOPICS = {
+  '01': 'system',
+  '02': 'backup',
+}
+
+/** Vendors that deviate from TOPICS; every other vendor keeps the eight fixed topics. */
+export const VENDOR_TOPICS = { proxmox: HOST_TOPICS }
+
+/** Topic map of one vendor: its override when declared, TOPICS otherwise. */
+export function topicsFor(vendor) {
+  return VENDOR_TOPICS[vendor] ?? TOPICS
+}
 
 /** Read a UTF-8 file under the package root. */
 export function read(relativePath) {

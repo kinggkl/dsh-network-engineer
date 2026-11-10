@@ -2,6 +2,28 @@
 
 本项目遵循语义化版本；上游基线为 `dsh-network-engineer 0.1.0`。
 
+## 0.1.4 — 2026-11-11
+
+### Added
+
+- **宿主虚拟化补充 `kb/proxmox/`（2 篇）**：`proxmox-01-system.md` 系统升级与版本管理
+  （`pve8to9 --full` 预检判读、Debian 12→13 半升级混合态识别、UEFI+LVM 的 `grub-efi-amd64`、
+  6.14 内核对网卡名的改名风险、GRUB 旧内核/`/etc/pve` 两档回退）、`proxmox-02-backup.md`
+  备份恢复与存储（`vzdump` 快照模式与 `zstd`、`--mailnotification` 枚举限制、恢复演练流程、
+  `sha256sum` 清单校验、`/etc/pve/jobs.cfg` 才是定时备份的判据）。内容来自 2026-11-11 一次
+  真实 PVE 8.4.16 巡检与升级预检（`pve8to9` 41 项检查 0 FAIL、8 台 guest 全量备份与恢复演练）。
+- 知识库从 12 厂商 / 96 篇扩展到 **13 厂商 / 98 篇**，位于 `kb/proxmox/`。
+
+### Changed
+
+- **校验器与测试支持「按厂商声明主题集合」**：`tools/kb-validate.sh` 新增
+  `expected_topics_for()`，`test/_helpers.mjs` 新增 `VENDOR_TOPICS` / `topicsFor()`；
+  12 家网络设备厂商仍强制 8 个固定主题，`proxmox` 只声明 01、02 两篇（02 为备份恢复，
+  覆盖 `topic` 关键字的 VLAN 校验）。新增受支持日期 `2026-11-11`。
+- `package.json` / `cordis.patch.yml` / `locale/{en,zh}.json` / `README.md` / `kb/README.md` /
+  `SKILL.md` 的厂商与篇数口径统一为 13 厂商 / 98 篇；persona 增补「也熟悉 Proxmox VE 宿主的
+  网络、备份与升级」，并说明 `kb/proxmox/` 不套用 8 主题编号。
+
 ## 0.1.3 — 2026-11-09
 
 ### Added

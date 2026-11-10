@@ -32,7 +32,7 @@ const REQUIRED_PRESET_PLUGINS = [
   'tool-web',
 ]
 
-const VENDOR_LABELS = ['华为', '新华三', '锐捷', '迪普', '思科', '瞻博', 'Arista', '飞塔', '中兴', 'VyOS', 'MikroTik']
+const VENDOR_LABELS = ['华为', '新华三', '锐捷', '迪普', '思科', '瞻博', 'Arista', '飞塔', '中兴', 'VyOS', 'MikroTik', 'Proxmox']
 
 // js-yaml is a declared devDependency; a missing install must fail, not silently skip.
 const skipWithoutYaml = {}
@@ -94,7 +94,7 @@ test('preset row declares the 网络工程师助手 preset with a full tool chai
   assert.equal(config.id, 'network-engineer-kb')
   assert.equal(config.name, '网络工程师助手')
   assert.equal(typeof config.order, 'number')
-  assert.match(config.description, /12 厂商/)
+  assert.match(config.description, /13 厂商/)
   assert.match(config.description, /mt_winbox_exec/)
   assert.ok(Array.isArray(config.plugins))
 
@@ -126,7 +126,7 @@ test('persona covers all 12 vendors and only registered template variables', ski
   const persona = preset.plugins.find((row) => row.id === 'persona').config.prefix
 
   for (const label of VENDOR_LABELS) assert.ok(persona.includes(label), `persona is missing ${label}`)
-  assert.match(persona, /96 篇/)
+  assert.match(persona, /98 篇/)
   assert.match(persona, /network-command-kb/)
   assert.match(persona, /VyOS 是 configure/)
   assert.match(persona, /RouterOS v7 与 v6/)

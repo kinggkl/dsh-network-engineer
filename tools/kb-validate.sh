@@ -24,8 +24,16 @@
 
 set -uo pipefail
 
-TOPIC_RE='system|vlan-l2|interface|link-aggregation|static-route|ospf|acl|remote-diagnostics'
-UPDATED_RE='^(2026-10-15|2026-10-30|2026-10-31|2026-11-04)$'
+TOPIC_RE='system|vlan-l2|interface|link-aggregation|static-route|ospf|acl|remote-diagnostics|backup'
+UPDATED_RE='^(2026-10-15|2026-10-30|2026-10-31|2026-11-04|2026-11-11)$'
+
+# 每个厂商应有的主题集合：12 家网络设备为 8 篇，proxmox（宿主虚拟化补充）2 篇
+expected_topics_for() {
+  case "$1" in
+    proxmox) printf '%s\n' 01 02 ;;
+    *) printf '%s\n' 01 02 03 04 05 06 07 08 ;;
+  esac
+}
 fail=0
 total=0
 
@@ -33,7 +41,7 @@ total=0
 SECTIONS=('## 命令速查' '## 典型示例' '## 陷阱与版本差异' '## 高危操作' '## 参考来源')
 
 # 预期厂商目录集合（R1：kb 根目录缺整个厂商目录也必须报错）
-EXPECTED_VENDORS=(huawei h3c ruijie dptech cisco-ios cisco-nxos juniper arista fortinet zte vyos mikrotik)
+EXPECTED_VENDORS=(huawei h3c ruijie dptech cisco-ios cisco-nxos juniper arista fortinet zte vyos mikrotik proxmox)
 
 check_file() {
   local f="$1" base dir prefix fseq topic err=() lines
@@ -98,6 +106,7 @@ check_file() {
     zte) domain_re='csl\.zte\.com\.cn|zte\.com\.cn' ;;
     vyos) domain_re='docs\.vyos\.io|vyos\.io' ;;
     mikrotik) domain_re='help\.mikrotik\.com|wiki\.mikrotik\.com' ;;
+    proxmox) domain_re='pve\.proxmox\.com|proxmox\.com' ;;
   esac
   if [[ "${verified:-}" == "high" && -n "${domain_re:-}" ]]; then
     grep -Eq "$domain_re" <<<"$src_urls" || err+=("verified: high 但 sources 无官方域名来源")
@@ -122,6 +131,7 @@ check_file() {
     zte) vtoken='中兴' ;;
     vyos) vtoken='VyOS' ;;
     mikrotik) vtoken='MikroTik' ;;
+    proxmox) vtoken='Proxmox' ;;
   esac
   case "$fseq" in
     01) ttopic='系统|管理' ;;
@@ -132,6 +142,10 @@ check_file() {
     06) ttopic='OSPF' ;;
     07) ttopic='ACL|访问控制|防火墙|过滤' ;;
     08) ttopic='远程|诊断' ;;
+  esac
+  # proxmox 的 02 是备份恢复，不套用网络设备的 VLAN 主题
+  case "${dir}:${fseq}" in
+    proxmox:02) ttopic='备份|存储' ;;
   esac
   vfield="$(sed -n 's/^vendor:[[:space:]]*//p' <<<"$head_block" | head -1)"
   tfield="$(sed -n 's/^topic:[[:space:]]*//p' <<<"$head_block" | head -1)"
@@ -265,11 +279,11 @@ check_dir_topics() {
     basename "$f" | sed -n 's/^.*-\(0[1-8]\)-[a-z0-9-]*\.md$/\1/p'
   done | sort >"$topics_file"
   local expected actual
-  expected="$(printf '%s\n' 01 02 03 04 05 06 07 08)"
+  expected="$(expected_topics_for "$prefix")"
   actual="$(cat "$topics_file")"
   if [[ "$expected" != "$actual" ]]; then
     fail=$((fail + 1))
-    printf '✗ 目录 %s 的 8 个主题文件不齐全或重复\n' "$d"
+    printf '✗ 目录 %s 的主题文件不齐全或重复\n' "$d"
     diff <(echo "$expected") <(echo "$actual") | sed 's/^/    /' || true
   fi
   rm -f "$topics_file"

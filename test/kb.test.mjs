@@ -4,14 +4,15 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readdirSync, statSync } from 'node:fs'
 
-import { pathOf, read, parseFrontmatter, sections, tableStats, SECTIONS, TOPICS, VENDORS } from './_helpers.mjs'
+import { pathOf, read, parseFrontmatter, sections, tableStats, SECTIONS, TOPICS, VENDORS, topicsFor } from './_helpers.mjs'
 
-const UPDATED_DATES = new Set(['2026-10-15', '2026-10-30', '2026-10-31', '2026-11-04'])
+const UPDATED_DATES = new Set(['2026-10-15', '2026-10-30', '2026-10-31', '2026-11-04', '2026-11-11'])
 const TOPIC_CODES = Object.keys(TOPICS)
 const DOCS = []
 for (const vendor of VENDORS) {
-  for (const code of TOPIC_CODES) {
-    DOCS.push({ vendor, code, topic: TOPICS[code], file: `kb/${vendor}/${vendor}-${code}-${TOPICS[code]}.md` })
+  const topics = topicsFor(vendor)
+  for (const [code, topic] of Object.entries(topics)) {
+    DOCS.push({ vendor, code, topic, file: `kb/${vendor}/${vendor}-${code}-${topic}.md` })
   }
 }
 
@@ -27,9 +28,10 @@ const OFFICIAL_DOMAINS = {
   zte: ['csl.zte.com.cn', 'zte.com.cn'],
   vyos: ['docs.vyos.io', 'vyos.io'],
   mikrotik: ['help.mikrotik.com', 'wiki.mikrotik.com'],
+  proxmox: ['pve.proxmox.com', 'proxmox.com'],
 }
 
-test('knowledge base contains all 12 vendors', () => {
+test('knowledge base contains all 13 vendors', () => {
   const dirs = readdirSync(pathOf('kb'), { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
@@ -37,12 +39,14 @@ test('knowledge base contains all 12 vendors', () => {
   assert.deepEqual(dirs, [...VENDORS].sort())
 })
 
-test('each vendor directory holds exactly the 8 fixed topics', () => {
+test('each vendor directory holds exactly its declared topics', () => {
   for (const vendor of VENDORS) {
     const files = readdirSync(pathOf(`kb/${vendor}`))
       .filter((name) => name.endsWith('.md'))
       .sort()
-    const expected = TOPIC_CODES.map((code) => `${vendor}-${code}-${TOPICS[code]}.md`)
+    const expected = Object.entries(topicsFor(vendor))
+      .map(([code, topic]) => `${vendor}-${code}-${topic}.md`)
+      .sort()
     assert.deepEqual(files, expected, `${vendor} topic files`)
   }
 })
@@ -88,6 +92,8 @@ for (const doc of DOCS) {
       '07': /ACL|访问控制|防火墙|过滤/,
       '08': /远程|诊断/,
     }
+    // Proxmox VE's 02 is backup/restore, not VLAN — override the shared token.
+    const TOPIC_TOKENS_BY_VENDOR = { 'proxmox:02': /备份|存储/ }
     const VENDOR_TOKENS = {
       huawei: /华为/,
       h3c: /新华三/,
@@ -101,9 +107,11 @@ for (const doc of DOCS) {
       zte: /中兴/,
       vyos: /VyOS/,
       mikrotik: /MikroTik/,
+      proxmox: /Proxmox/,
     }
     assert.match(fields.vendor, VENDOR_TOKENS[doc.vendor], `${doc.file}: vendor field disagrees with its directory`)
-    assert.match(fields.topic, TOPIC_TOKENS[doc.code], `${doc.file}: topic field disagrees with its filename topic`)
+    const topicToken = TOPIC_TOKENS_BY_VENDOR[`${doc.vendor}:${doc.code}`] ?? TOPIC_TOKENS[doc.code]
+    assert.match(fields.topic, topicToken, `${doc.file}: topic field disagrees with its filename topic`)
 
     const lines = text.split('\n').length - 1
     assert.ok(lines >= 60 && lines <= 130, `line count ${lines} outside 60–130`)
@@ -163,20 +171,20 @@ for (const doc of DOCS) {
   })
 }
 
-test('kb/README.md indexes all vendors and totals 96 documents', () => {
+test('kb/README.md indexes all vendors and totals 98 documents', () => {
   const readme = read('kb/README.md')
   for (const vendor of VENDORS) assert.ok(readme.includes(`kb/${vendor}/`) || readme.includes(`\`${vendor}/\``) || readme.includes(vendor), `README lacks ${vendor}`)
-  assert.match(readme, /96/)
-  assert.match(readme, /12 厂商|十二厂商/)
+  assert.match(readme, /98/)
+  assert.match(readme, /13 厂商|十三厂商/)
 })
 
-test('SKILL.md and locale metadata describe the 96-document knowledge base', () => {
+test('SKILL.md and locale metadata describe the 98-document knowledge base', () => {
   const skill = read('skills/network-command-kb/SKILL.md')
-  assert.match(skill, /96 篇/)
-  assert.match(skill, /12 厂商/)
+  assert.match(skill, /98 篇/)
+  assert.match(skill, /13 厂商/)
   for (const vendor of VENDORS) assert.ok(skill.includes(`kb/${vendor}/`), `SKILL.md lacks kb/${vendor}/`)
   for (const locale of ['en', 'zh']) {
-    assert.match(JSON.parse(read(`locale/${locale}.json`)).meta.description, /96/)
+    assert.match(JSON.parse(read(`locale/${locale}.json`)).meta.description, /98/)
   }
   assert.ok(statSync(pathOf('tools/kb-validate.sh')).size > 1000)
 })

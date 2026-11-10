@@ -1,9 +1,9 @@
 # 网络工程师知识库（随 @kinggkl/dsh-network-engineer 插件分发）
 
-供「网络工程师助手」Agent 及各类 RAG 平台使用的**十二厂商**交换机/路由器/防火墙命令知识库。
+供「网络工程师助手」Agent 及各类 RAG 平台使用的**十三厂商**交换机/路由器/防火墙/虚拟化宿主命令知识库。
 资料来源为各厂商官方手册与高可信社区页面（每篇文档末尾附来源链接）：首批 4 厂商整理于 2026-10-15，
 Cisco IOS/IOS-XE、Cisco NX-OS、Juniper Junos、Arista EOS、Fortinet FortiOS、中兴 ZXR10 于 2026-10-30 补全，
-VyOS 与 MikroTik RouterOS 于 2026-10-31 补全，合计 **12 厂商 / 96 篇**；
+VyOS 与 MikroTik RouterOS 于 2026-10-31 补全；Proxmox VE 宿主于 2026-11-11 补 2 篇，合计 **13 厂商 / 98 篇**；
 2026-11-04（v0.1.2）起华为 8 篇均含「平台差异（交换机 vs 路由器）」节，区分 S/CE 交换机与 AR/NE 路由器。
 
 ## 目录结构
@@ -22,6 +22,7 @@ kb/
 ├── zte/        中兴（ZXR10 ROSNG / ZROS，verified: medium）
 ├── vyos/       VyOS（1.4 LTS / 1.5 rolling，Debian + FRR）
 ├── mikrotik/   MikroTik（RouterOS v7）
+├── proxmox/    Proxmox VE（8/9 宿主，2 篇）
 └── README.md
 ```
 
@@ -39,8 +40,9 @@ kb/
 | `zte/` | 中兴 | ZXR10 ROSNG / ZROS | 8 | medium | 官方手册获取受限处已逐条标注 |
 | `vyos/` | VyOS | 1.4 LTS / 1.5 rolling | 8 | high | configure/set/commit/save 模型；FRR 承载路由 |
 | `mikrotik/` | MikroTik | RouterOS v7 | 8 | high | 菜单/路径式 CLI；v6/v7 命令树差异已标注 |
+| `proxmox/` | Proxmox VE | 8.x / 9.x | 2 | high | 宿主虚拟化补充：01 系统升级（`pve8to9`）、02 备份恢复（`vzdump`）；主题编号不与网络设备 8 篇对齐 |
 
-每厂商 8 篇，按主题编号：
+网络设备厂商每厂商 8 篇，按主题编号（`proxmox/` 只有 01、02 两篇，其 02 为备份恢复而非 VLAN）：
 
 | 编号 | 文件后缀 | 主题 |
 |---|---|---|
