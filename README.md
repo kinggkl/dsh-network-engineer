@@ -1,14 +1,14 @@
 # dsh-network-engineer · 网络工程师助手（network-command-kb）
 
 **English** — A DeepSeek Harness plugin that ships a standalone "网络工程师助手" (Network Engineer Assistant)
-agent preset plus a **17-platform / 130-document** operations-and-command knowledge base: 12 network vendors (Huawei VRP, H3C Comware, Ruijie RGOS, DPtech CLI, Cisco IOS/IOS-XE and NX-OS, Juniper Junos, Arista EOS, Fortinet FortiOS, ZTE ZXR10, VyOS, MikroTik RouterOS), three Linux distributions (Ubuntu 24.04, Debian 12, CentOS Stream 9 / Rocky Linux 9) and two platform guides (Proxmox VE 8/9 host virtualisation, RosZ MCP platform). It covers vendor command reference, cross-vendor translation, routing-priority analysis,
+agent preset plus a **18-platform / 138-document** operations-and-command knowledge base: 12 network vendors (Huawei VRP, H3C Comware, Ruijie RGOS, DPtech CLI, Cisco IOS/IOS-XE and NX-OS, Juniper Junos, Arista EOS, Fortinet FortiOS, ZTE ZXR10, VyOS, MikroTik RouterOS), three Linux distributions (Ubuntu 24.04, Debian 12, CentOS Stream 9 / Rocky Linux 9) and three platform guides (Proxmox VE 8/9 host virtualisation, RosZ MCP platform, Tailscale tailnet). It covers vendor command reference, cross-vendor translation, routing-priority analysis,
 screenshot reading and online manual lookup, and only answers networking topics. v0.1.3 also adds a native
 `mt_winbox_exec` tool (MikroTik WinBox terminal protocol over TCP 8291, read-only by default) for RouterOS
 devices whose CLI is reachable only through WinBox.
 
-> **社区延续版本 v0.1.5。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
+> **社区延续版本 v0.1.6。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
 > 0.1.0（MIT）重构：修复上游 issue #3 的 skill 注册路径与预设工具链缺陷，新增 8 个厂商 64 篇文档，
-> 把知识库扩展到 12 厂商 / 96 篇，v0.1.3 增加原生 MikroTik WinBox 终端工具，v0.1.4 补 Proxmox VE 宿主两篇，v0.1.5 扩到 17 平台 / 130 篇（Linux 三系、Proxmox VE 8 篇、RosZ 平台 2 篇）。原作者的插件骨架、
+> 把知识库扩展到 12 厂商 / 96 篇，v0.1.3 增加原生 MikroTik WinBox 终端工具，v0.1.4 补 Proxmox VE 宿主两篇，v0.1.5 扩到 17 平台 / 130 篇（Linux 三系、Proxmox VE 8 篇、RosZ 平台 2 篇），v0.1.6 扩到 18 平台 / 138 篇（新增 Tailscale 8 篇）。原作者的插件骨架、
 > 预设思路与首批 4 厂商 32 篇文档是这条工作的基础，来源与致谢见 [NOTICE.md](NOTICE.md)。
 > WinBox 协议移植自 [subixonfire/winbox-terminal-protocol](https://github.com/subixonfire/winbox-terminal-protocol)（MIT）。
 
@@ -21,15 +21,15 @@ devices whose CLI is reachable only through WinBox.
 | 组成 | 说明 |
 |---|---|
 | **插件模块** | `index.js` 在 `ctx.skills` 注册 `network-command-kb` 技能（resource base 指向包根，`kb/` 随插件分发），并在 `ctx.tools` 注册全局工具 `mt_winbox_exec` |
-| **技能 `network-command-kb`** | 17 平台 / 130 篇运维与命令参考（12 家网络设备厂商 × 8 主题 + Ubuntu/Debian/CentOS 各 8 篇 + Proxmox VE 8 篇 + RosZ 平台 2 篇），Agent 加载技能后按「平台 + 主题」检索 |
+| **技能 `network-command-kb`** | 18 平台 / 138 篇运维与命令参考（12 家网络设备厂商 × 8 主题 + Ubuntu/Debian/CentOS 各 8 篇 + Proxmox VE 8 篇 + RosZ 平台 2 篇 + Tailscale 8 篇），Agent 加载技能后按「平台 + 主题」检索 |
 | **预设「网络工程师助手」** | DSH 预设切换器里独立出现；带完整工具链（skill / grep / glob / read_image / bash / web），只答网络工程主题 |
 | **工具 `mt_winbox_exec`** | 原生 MikroTik WinBox 终端（TCP 8291、EC-SRP5、AES-128-CBC）：只开 WinBox、没有 SSH 的 RouterOS 设备也能只读排障；默认只读，写操作需显式开启 |
 
 ## 功能
 
 - **预设 Agent「网络工程师助手」**：安装后出现在桌面端 / Web 的预设切换器中，选中即用；只回答网络工程主题，其他话题礼貌拒答。
-- **内置知识库（130 篇 / 十七平台）**：12 家网络设备厂商各 8 主题（01 系统管理…08 远程管理与诊断），Linux 三系（Ubuntu 24.04 / Debian 12 / CentOS Stream 9·Rocky 9）各 8 主题（系统与包管理、网络、磁盘与 LVM、systemd、用户与 SSH、防火墙、容器、排障），Proxmox VE 8 篇（系统升级、备份恢复、集群、存储、VM、LXC、宿主网络、HA 与排障），RosZ 平台 2 篇（平台与只读 MCP 接入、只读运维与排障），以技能形式随插件分发。
-- **Linux / 虚拟化 / 平台运维**：Ubuntu、Debian、CentOS Stream/Rocky 的系统与网络配置、LVM、systemd、防火墙、容器；Proxmox VE 集群/存储/VM/LXC/网络/HA；RosZ MCP 只读查询（设备概览、指标、备份差异、组网、日志），均带平台差异与安全提醒。
+- **内置知识库（138 篇 / 十八平台）**：12 家网络设备厂商各 8 主题（01 系统管理…08 远程管理与诊断），Linux 三系（Ubuntu 24.04 / Debian 12 / CentOS Stream 9·Rocky 9）各 8 主题（系统与包管理、网络、磁盘与 LVM、systemd、用户与 SSH、防火墙、容器、排障），Proxmox VE 8 篇（系统升级、备份恢复、集群、存储、VM、LXC、宿主网络、HA 与排障），RosZ 平台 2 篇（平台与 MCP 接入模型、运维排障与攻击源研判），Tailscale 平台 8 篇（安装与认证、子网路由与出口节点、App Connector 与分流、ACL 策略、Tailscale SSH、Serve 与 Funnel、排障），以技能形式随插件分发。
+- **Linux / 虚拟化 / 平台运维**：Ubuntu、Debian、CentOS Stream/Rocky 的系统与网络配置、LVM、systemd、防火墙、容器；Proxmox VE 集群/存储/VM/LXC/网络/HA；RosZ MCP 查询与受控下发（设备概览、指标、备份差异、组网、日志、攻击源研判与黑名单维护），均带平台差异与安全提醒。
 - **跨厂商命令对照 + 选路数值差异**：华为/新华三 preference、Cisco 系 AD、Junos preference、FortiOS distance 等分属不同数值体系，文档与 persona 都明确提醒不能直接比大小。
 - **联网查手册**：知识库未覆盖的型号/版本差异自动联网检索官方文档并注明来源；禁止编造命令与参数。
 - **风险标注**：`reboot` / `format` / `erase` / `factoryreset` / `reset-configuration` 等高危命令自动附 ⚠️ 风险提示、备份建议与维护窗口提醒。
@@ -175,7 +175,8 @@ kb/
 ├── debian/     Debian 12 bookworm（8 篇，同主题）
 ├── centos/     CentOS Stream 9 / Rocky Linux 9（8 篇，同主题）
 ├── proxmox/    Proxmox VE 8/9 宿主（8 篇：升级、备份、集群、存储、VM、LXC、网络、HA 排障）
-├── rosz/       RosZ MCP 平台（2 篇：平台与只读接入、只读运维排障）
+├── rosz/       RosZ MCP 平台（2 篇：平台与接入模型、运维排障与攻击源研判）
+├── tailscale/  Tailscale tailnet 平台（8 篇：安装认证、子网路由/出口、App Connector、ACL、SSH、Serve/Funnel、排障）
 └── README.md   总览、厂商索引、跨厂商选路数值对照与 RAG 导入指南
 ```
 
@@ -225,7 +226,7 @@ dsh-network-engineer/
 │   ├── mikrotik-tool.mjs  # raw DSH ToolDefinition：参数/凭据/只读门禁/文本渲染
 │   └── winbox/            # WinBox 终端协议（crypto/m2/client）+ 上游 MIT 许可
 ├── skills/network-command-kb/SKILL.md
-├── kb/                    # 17 平台 / 130 篇命令与运维知识库 + README
+├── kb/                    # 18 平台 / 138 篇命令与运维知识库 + README
 ├── locale/{en,zh}.json    # 插件管理器显示名称与说明
 ├── icon.svg               # 原创图标
 ├── tools/kb-validate.sh   # 知识库结构校验器
@@ -239,7 +240,7 @@ dsh-network-engineer/
 cd dsh-network-engineer
 npm install            # 安装 devDependency（js-yaml，仅测试用）
 npm test               # 插件单元 + 打包 + 预设组合 + 知识库结构 + 跨厂商一致性
-npm run validate       # 17 平台 130 篇文档结构校验
+npm run validate       # 18 平台 138 篇文档结构校验
 ```
 
 测试范围：
@@ -248,8 +249,8 @@ npm run validate       # 17 平台 130 篇文档结构校验
 |---|---|
 | `test/plugin.test.mjs` | `apply()` 注册的 skill 形状与 `mt_winbox_exec` 工具形状、resourceBase 指向包根、SKILL.md 缺失/非法/知识库缺失降级、tools 缺失/构建失败/注册失败降级、重复 apply |
 | `test/package.test.mjs` | package.json/exports/files（含 `lib/**`）、dsh.bundle.patch、locale 元数据、icon 合法性、真实 `npm pack` 清单、来源与 WinBox 致谢存在性 |
-| `test/patch.test.mjs` | cordis.patch.yml 可解析、插件行/预设行结构、预设必备工具齐备、persona 无未注册变量、17 平台均在 persona 中 |
-| `test/kb.test.mjs` | 17 平台各自主题齐全（网络设备/Linux/Proxmox 8 篇、RosZ 2 篇）、frontmatter 8 字段与 vendor/topic 交叉一致、五节唯一且非空、速查表行数/列数、高危 ⚠️、官方来源、篇幅 |
+| `test/patch.test.mjs` | cordis.patch.yml 可解析、插件行/预设行结构、预设必备工具齐备、persona 无未注册变量、18 平台均在 persona 中 |
+| `test/kb.test.mjs` | 18 平台各自主题齐全（网络设备/Linux/Proxmox/Tailscale 8 篇、RosZ 2 篇）、frontmatter 8 字段与 vendor/topic 交叉一致、五节唯一且非空、速查表行数/列数、高危 ⚠️、官方来源、篇幅 |
 | `test/consistency.test.mjs` | README/SKILL/persona/package.json 的厂商与篇数一致、跨厂商选路数值与文档一致 |
 | `test/winbox-proto.test.mjs` | WinBox 协议移植：M2 TLV 编解码、EC-SRP5 中间值/stream keys/AES、分页与 ANSI 剥离，对齐 Python 参考实现生成的 golden vectors |
 | `test/winbox-tool.test.mjs` | 工具层：参数校验、凭据解析与脱敏、只读门禁、超时/截断、错误码映射（用 fake client，不联网） |
@@ -277,7 +278,8 @@ npm run validate       # 17 平台 130 篇文档结构校验
   回显格式 `[distance/metric]` 与 `[priority/weight]` 的表述），文档已双向标注、以设备回显/官方 CLI Reference 为准。
 - **型号/版本差异**无法穷尽（NX-OS `feature` 集合、Junos EX 与 MX、FortiOS 6.x/7.x、VyOS 1.3/1.4、RouterOS v6/v7），
   各篇「陷阱与版本差异」已列主要差异点，落地前仍应核对对应版本官方手册。
-- **Linux / PVE / RosZ 新增内容**：Linux 三系命令以 Ubuntu 24.04、Debian 12、CentOS Stream 9 / Rocky 9 官方文档为准；Proxmox VE 内容按 8.x/9.x 官方文档整理；RosZ 2 篇按 MCP 服务器（只读密钥）语义整理，平台侧接口与权限以 RosZ 控制台/官方说明为准。
+- **Tailscale 新增内容**：命令与策略按 tailscale.com 官方文档（CLI 参考、Access control、Subnet routers、Exit nodes、App connectors、Serve/Funnel）整理；策略字段以官方 policy-file 语法为准，客户端分流能力边界（Android 按 App、iOS 仅 VPN On Demand/MDM）单独标注。
+- **Linux / PVE / RosZ 新增内容**：Linux 三系命令以 Ubuntu 24.04、Debian 12、CentOS Stream 9 / Rocky 9 官方文档为准；Proxmox VE 内容按 8.x/9.x 官方文档整理；RosZ 2 篇按 MCP 服务器（只读档/读写档）实测语义整理，平台侧接口与权限以 RosZ 控制台/官方说明为准。
 - **WinBox 工具限制**：只支持 EC-SRP5（RouterOS ≥ 6.43），旧设备返回 `LEGACY_AUTH_UNSUPPORTED`；
   需要 TCP 8291 可达（不绕过防火墙/NAT）；只实现终端（CLI）协议，不含 WinBox GUI 的文件传输、
   GUI 会话等能力；单会话串行执行；`/export` 等命令可能输出敏感信息，回答时不会整段外发。
