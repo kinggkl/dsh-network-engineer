@@ -1,6 +1,6 @@
 # NOTICE · 来源与致谢
 
-本仓库是社区延续版本（v0.1.5），基于 **sososilencing/dsh-network-engineer 0.1.0**（MIT）重构而来。
+本仓库是社区延续版本（v0.1.7），基于 **sososilencing/dsh-network-engineer 0.1.0**（MIT）重构而来。
 原作者的插件骨架、预设与 persona 提示词、以及首批 4 厂商 32 篇命令知识库是这条工作的基础，
 在此明确引用出处并向原作者及所有原始贡献者致谢。
 
@@ -15,11 +15,13 @@
 ## 本仓库（kinggkl/dsh-network-engineer）
 
 - 维护者：kinggkl（GitHub：https://github.com/kinggkl）
-- 版本：0.1.5（2026-11-11）
+- 版本：0.1.7（2026-11-17）
 - 新增知识库：`kb/cisco-ios/`、`kb/cisco-nxos/`、`kb/juniper/`、`kb/arista/`、
   `kb/fortinet/`、`kb/zte/`、`kb/vyos/`、`kb/mikrotik/` 八个目录共 64 篇；v0.1.4 起 `kb/proxmox/`
   （Proxmox VE）增至 8 篇，v0.1.5 新增 `kb/ubuntu/`、`kb/debian/`、`kb/centos/` 各 8 篇与
-  `kb/rosz/` 2 篇；知识库合计 **17 平台 / 130 篇**。
+  `kb/rosz/` 2 篇，v0.1.6 新增 `kb/tailscale/` 8 篇；知识库合计 **18 平台 / 138 篇**。
+- v0.1.7 新增只读检索工具 `kb_lookup`（`lib/kb-lookup.mjs`）与 FortiOS 配置裁剪工具
+  `tools/forti-trim.py` / `tools/forti-trim.sh`。
 - 修复上游 issue #3：
   1. `index.js` 的 `resourceBase` 由 `skills/network-command-kb/` 改为包根，与 `kb/` 实际位置一致；
   2. 预设在原有工具集基础上补挂 `tool-skill`、`skill-filesystem`、`tool-fs-search`、

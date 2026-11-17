@@ -4,9 +4,10 @@
 agent preset plus a **18-platform / 138-document** operations-and-command knowledge base: 12 network vendors (Huawei VRP, H3C Comware, Ruijie RGOS, DPtech CLI, Cisco IOS/IOS-XE and NX-OS, Juniper Junos, Arista EOS, Fortinet FortiOS, ZTE ZXR10, VyOS, MikroTik RouterOS), three Linux distributions (Ubuntu 24.04, Debian 12, CentOS Stream 9 / Rocky Linux 9) and three platform guides (Proxmox VE 8/9 host virtualisation, RosZ MCP platform, Tailscale tailnet). It covers vendor command reference, cross-vendor translation, routing-priority analysis,
 screenshot reading and online manual lookup, and only answers networking topics. v0.1.3 also adds a native
 `mt_winbox_exec` tool (MikroTik WinBox terminal protocol over TCP 8291, read-only by default) for RouterOS
-devices whose CLI is reachable only through WinBox.
+devices whose CLI is reachable only through WinBox. v0.1.7 adds a read-only `kb_lookup` tool for
+index-first knowledge-base navigation and a FortiOS configuration trimming helper (`tools/forti-trim.py`).
 
-> **社区延续版本 v0.1.6。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
+> **社区延续版本 v0.1.7。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
 > 0.1.0（MIT）重构：修复上游 issue #3 的 skill 注册路径与预设工具链缺陷，新增 8 个厂商 64 篇文档，
 > 把知识库扩展到 12 厂商 / 96 篇，v0.1.3 增加原生 MikroTik WinBox 终端工具，v0.1.4 补 Proxmox VE 宿主两篇，v0.1.5 扩到 17 平台 / 130 篇（Linux 三系、Proxmox VE 8 篇、RosZ 平台 2 篇），v0.1.6 扩到 18 平台 / 138 篇（新增 Tailscale 8 篇）。原作者的插件骨架、
 > 预设思路与首批 4 厂商 32 篇文档是这条工作的基础，来源与致谢见 [NOTICE.md](NOTICE.md)。
@@ -38,7 +39,7 @@ devices whose CLI is reachable only through WinBox.
 
 ## 安装
 
-**方式一（发布后）**：npm 安装 scoped 包，或经 [dshmarket](https://dshmarket.com) / awesome-dsh-plugin 目录安装。
+**方式一（发布后 / 市场）**：经 [dshmarket](https://dshmarket.com) / [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 目录安装；或从 [GitHub Releases](https://github.com/kinggkl/dsh-network-engineer/releases) 克隆仓库后按方式二安装。本项目不通过 npm 分发。
 
 **方式二（本仓库开发版）**：用 Harness 的 Plugin Manager 安装本地目录：
 
@@ -257,11 +258,18 @@ npm run validate       # 18 平台 138 篇文档结构校验
 
 ## 发布（维护者）
 
-1. `npm publish --access public`（scoped 包 `@kinggkl/dsh-network-engineer`；如需换名，改 `package.json.name`
-   并在 `cordis.patch.yml` 的插件行同步）。
-2. 推送到 GitHub 仓库并打 tag：`git tag v0.1.5 && git push origin v0.1.5`。
+发布渠道为 GitHub Release（不通过 npm 分发）：
+
+1. 确认 `npm test` 与 `npm run validate` 全绿后提交，并在 `main` 上打 tag：
+   `git tag v0.1.7 && git push origin main v0.1.7`。
+2. `gh release create v0.1.7 --title "v0.1.7 — …" --notes-file <notes>` 创建 Release
+   （附变更摘要、校验值与升级说明）。
 3. 向 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 目录提交一条条目；
    [dshmarket](https://dshmarket.com) 通常随后自动收录（详见 `NOTICE.md` 与仓库 Issues）。
+
+用户安装：克隆仓库后用 Plugin Manager 安装本地目录
+（`plugin_manager: { action: "install_bundle", target: "/绝对路径/dsh-network-engineer" }`），
+或在桌面端 Plugins > Add plugin 选择该目录。
 
 ## 兼容性
 

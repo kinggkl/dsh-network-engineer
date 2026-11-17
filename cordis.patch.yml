@@ -1,4 +1,4 @@
-# @kinggkl/dsh-network-engineer bundle patch（v0.1.5）
+# @kinggkl/dsh-network-engineer bundle patch（v0.1.7）
 #
 # 两个 insert 行，落在 global 层：
 # 1. `network-engineer-kb` —— 本包的插件模块（index.js）。它在 ctx.skills 上
