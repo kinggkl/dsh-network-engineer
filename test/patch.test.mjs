@@ -94,7 +94,7 @@ test('preset row declares the 网络工程师助手 preset with a full tool chai
   assert.equal(config.id, 'network-engineer-kb')
   assert.equal(config.name, '网络工程师助手')
   assert.equal(typeof config.order, 'number')
-  assert.match(config.description, /17 平台/)
+  assert.match(config.description, /18 平台/)
   assert.match(config.description, /mt_winbox_exec/)
   assert.ok(Array.isArray(config.plugins))
 
@@ -119,14 +119,14 @@ test('preset row declares the 网络工程师助手 preset with a full tool chai
   assert.match(pwsh.disabled.__jsExpr, /win32/)
 })
 
-test('persona covers all 17 platforms and only registered template variables', skipWithoutYaml, () => {
+test('persona covers all 18 platforms and only registered template variables', skipWithoutYaml, () => {
   const patch = loadPatch()
   const rows = patch.flatMap((entry) => entry.insert ?? [])
   const preset = rows.find((row) => row.id === 'preset-network-engineer-kb').config
   const persona = preset.plugins.find((row) => row.id === 'persona').config.prefix
 
   for (const label of VENDOR_LABELS) assert.ok(persona.includes(label), `persona is missing ${label}`)
-  assert.match(persona, /130 篇/)
+  assert.match(persona, /138 篇/)
   assert.match(persona, /network-command-kb/)
   assert.match(persona, /VyOS 是 configure/)
   assert.match(persona, /RouterOS v7 与 v6/)
@@ -135,6 +135,9 @@ test('persona covers all 17 platforms and only registered template variables', s
   assert.match(persona, /LEGACY_AUTH_UNSUPPORTED/)
   // {{cwd}} was never a registered persona variable; keep it out.
   assert.doesNotMatch(persona, /\{\{cwd\}\}/)
+  // 迪普设备命名是 sysname，persona 不得套用 Cisco 的 hostname（与 kb/dptech/dptech-01-system.md 冲突）。
+  assert.doesNotMatch(persona, /迪普[^\n]*hostname/)
+  assert.match(persona, /迪普 CLI 是自有风格[^\n]*sysname/)
   for (const variable of persona.match(/\{\{[^}]+\}\}/g) ?? []) {
     assert.ok(['{{model}}'].includes(variable), `unexpected persona variable ${variable}`)
   }

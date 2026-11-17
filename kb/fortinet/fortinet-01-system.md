@@ -11,7 +11,7 @@ sources:
   - https://support.fortinet.com.cn/system_mgmt/firmware_and_config/config_mgmt/backup_restore
   - https://support.fortinet.com.cn/system_mgmt/firmware_and_config/config_mgmt/factory_reset
 verified: high
-updated: 2026-10-30
+updated: 2026-11-16
 ---
 
 # 飞塔（Fortinet）· 系统管理与 CLI 层级
@@ -70,6 +70,25 @@ FortiGate # get system status                              // 型号/版本/运�
 FortiGate # execute backup config tftp FGT-HQ-20261030.conf 10.1.1.100
 FortiGate # execute restore config tftp FGT-HQ-20261030.conf 10.1.1.100  // 恢复后自动重启
 ```
+
+## 巡检输出裁剪（AI 审计用）
+
+`show full-configuration` 实测单机 46,840 行（FortiWiFi-80F-2R，FortiOS 7.6.7），整段塞给 AI 既贵又容易漏读，固定按"原始回显落盘 → 裁剪 → 只读裁剪版"走。裁剪只允许三件事，名单外一律原样保留（fail-open：宁可费 token，不许静默丢）：
+
+| 处置 | 对象 | 规则 |
+|---|---|---|
+| 删除 | `set uuid` / `set snmp-index` / `set color` | 自动生成噪声行；父对象的 `edit` 行必须保留 |
+| 掩码 | `set … ENC <密文>`、PEM 证书/私钥 | 键名与 `ENC` 关键字保留，值换 `***`；PEM 折成一行占位 |
+| 折叠 | `system replacemsg` / `vpn certificate` / `ips sensor` / `application list` | 只保留块名骨架 + 行数/对象数统计 |
+
+严禁动的四类证据（删了会把"没配"误判成"安全"）：接口 `set allowaccess`、VAP 的 `set security` 与 `set pmf`、`router static` 的 `set distance`、策略的 `set action` 与 `set utm-status`。
+
+```bash
+ssh admin@<fw> "show full-configuration" > logs/raw/fortinet/<host>-$(date +%Y%m%d-%H%M%S).txt
+tools/forti-trim.sh --host <fw> --raw-archive logs/raw/fortinet < raw.txt > audit.txt   # 报告走 stderr
+```
+
+量化口径：行数用 `show full-configuration | grep -c "^"` 数（FortiOS 没有 `wc` 管道）；数 uuid 用 `grep -c "set uuid"`，**不能加 `^` 锚**——`set` 行在 full-configuration 里带缩进。实测该机噪声仅 526 行、可折叠子树 16,273 行（34.7%），按红线剩余约 30,000 行不可动，裁剪版仍在 1 MB 量级：**20 KB 预算要按审计点分开 `show` 才可能达到**（清单见 `kb/fortinet/fortinet-08-remote-diagnostics.md`）。
 
 ## 陷阱与版本差异
 

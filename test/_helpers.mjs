@@ -26,6 +26,7 @@ export const VENDORS = [
   'debian',
   'centos',
   'rosz',
+  'tailscale',
 ]
 
 /** The eight fixed topics shared by the twelve network vendors. */
@@ -70,6 +71,18 @@ export const HOST_TOPICS = {
   '08': 'ha-diagnostics',
 }
 
+/** Tailscale tailnet platform: install/auth, routing, app connectors, policy, SSH, serve/funnel, diagnostics. */
+export const TAILSCALE_TOPICS = {
+  '01': 'system',
+  '02': 'access-auth',
+  '03': 'subnet-exit',
+  '04': 'app-connector',
+  '05': 'acl-policy',
+  '06': 'tailscale-ssh',
+  '07': 'serve-funnel',
+  '08': 'diagnostics',
+}
+
 /** RosZ MCP management platform: platform model + read-only diagnostics workflow. */
 export const ROSZ_TOPICS = {
   '01': 'platform',
@@ -83,6 +96,7 @@ export const VENDOR_TOPICS = {
   centos: LINUX_TOPICS,
   proxmox: HOST_TOPICS,
   rosz: ROSZ_TOPICS,
+  tailscale: TAILSCALE_TOPICS,
 }
 
 /** Topic map of one vendor: its override when declared, TOPICS otherwise. */

@@ -6,7 +6,7 @@ import { readdirSync, statSync } from 'node:fs'
 
 import { pathOf, read, parseFrontmatter, sections, tableStats, SECTIONS, TOPICS, VENDORS, topicsFor } from './_helpers.mjs'
 
-const UPDATED_DATES = new Set(['2026-10-15', '2026-10-30', '2026-10-31', '2026-11-04', '2026-11-11'])
+const UPDATED_DATES = new Set(['2026-10-15', '2026-10-30', '2026-10-31', '2026-11-04', '2026-11-11', '2026-11-16', '2026-11-17'])
 const TOPIC_CODES = Object.keys(TOPICS)
 const DOCS = []
 for (const vendor of VENDORS) {
@@ -33,9 +33,10 @@ const OFFICIAL_DOMAINS = {
   debian: ['debian.org', 'wiki.debian.org', 'manpages.debian.org'],
   centos: ['centos.org', 'docs.centos.org', 'rockylinux.org', 'docs.rockylinux.org'],
   rosz: ['rosz.cn'],
+  tailscale: ['tailscale.com'],
 }
 
-test('knowledge base contains all 17 platforms', () => {
+test('knowledge base contains all 18 platforms', () => {
   const dirs = readdirSync(pathOf('kb'), { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
@@ -116,6 +117,16 @@ for (const doc of DOCS) {
       '07': /网络/,
       '08': /高可用|HA|排障|诊断/,
     }
+    const TAILSCALE_TOPIC_TOKENS = {
+      '01': /系统|管理|安装/,
+      '02': /接入|认证|密钥/,
+      '03': /路由|出口|子网/,
+      '04': /分流|连接器|Connector/,
+      '05': /ACL|策略/,
+      '06': /SSH/,
+      '07': /Serve|Funnel|HTTPS/,
+      '08': /排障|诊断/,
+    }
     const ROSZ_TOPIC_TOKENS = {
       '01': /平台|MCP|接入|概览/,
       '02': /运维|排障|诊断|只读/,
@@ -126,6 +137,7 @@ for (const doc of DOCS) {
       centos: LINUX_TOPIC_TOKENS,
       proxmox: PROXMOX_TOPIC_TOKENS,
       rosz: ROSZ_TOPIC_TOKENS,
+      tailscale: TAILSCALE_TOPIC_TOKENS,
     }
     const VENDOR_TOKENS = {
       huawei: /华为/,
@@ -145,6 +157,7 @@ for (const doc of DOCS) {
       debian: /Debian/,
       centos: /CentOS|Rocky/,
       rosz: /RosZ/,
+      tailscale: /Tailscale/,
     }
     assert.match(fields.vendor, VENDOR_TOKENS[doc.vendor], `${doc.file}: vendor field disagrees with its directory`)
     const topicTokens = TOPIC_TOKENS_BY_VENDOR[doc.vendor] ?? NETWORK_TOPIC_TOKENS
@@ -209,23 +222,23 @@ for (const doc of DOCS) {
   })
 }
 
-test('kb/README.md indexes all platforms and totals 130 documents', () => {
+test('kb/README.md indexes all platforms and totals 138 documents', () => {
   const readme = read('kb/README.md')
   for (const vendor of VENDORS) {
     const rowPattern = new RegExp(`^\\| \`${vendor}/\` \\|`, 'm')
     assert.ok(rowPattern.test(readme), `kb/README.md platform index table lacks a ${vendor}/ row`)
   }
-  assert.match(readme, /130/)
-  assert.match(readme, /17 平台|十七平台/)
+  assert.match(readme, /138/)
+  assert.match(readme, /18 平台|十八平台/)
 })
 
-test('SKILL.md and locale metadata describe the 130-document knowledge base', () => {
+test('SKILL.md and locale metadata describe the 138-document knowledge base', () => {
   const skill = read('skills/network-command-kb/SKILL.md')
-  assert.match(skill, /130 篇/)
-  assert.match(skill, /17 平台/)
+  assert.match(skill, /138 篇/)
+  assert.match(skill, /18 平台/)
   for (const vendor of VENDORS) assert.ok(skill.includes(`kb/${vendor}/`), `SKILL.md lacks kb/${vendor}/`)
   for (const locale of ['en', 'zh']) {
-    assert.match(JSON.parse(read(`locale/${locale}.json`)).meta.description, /130/)
+    assert.match(JSON.parse(read(`locale/${locale}.json`)).meta.description, /138/)
   }
   assert.ok(statSync(pathOf('tools/kb-validate.sh')).size > 1000)
 })

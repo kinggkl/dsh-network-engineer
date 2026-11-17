@@ -8,7 +8,7 @@
 #
 # 校验项（对照 findings/kb-authoring-spec-v3.md）：
 #   1. 文件名 `<前缀>-<两位序号>-<主题>.md`，前缀与目录名一致，按目录声明主题齐全且不重复
-#      （网络设备 / Ubuntu / Debian / CentOS / Proxmox 各 8 篇，RosZ 2 篇）
+#      （网络设备 / Ubuntu / Debian / CentOS / Proxmox / Tailscale 各 8 篇，RosZ 2 篇）
 #   2. frontmatter 以 --- 开头/闭合，含 vendor/os/topic/devices/keywords/sources/verified/updated 8 字段
 #   3. verified ∈ {high, medium}；updated 为受支持日期；keywords 6–12 个
 #   4. sources ≥2 条 http(s) URL
@@ -25,8 +25,8 @@
 
 set -uo pipefail
 
-TOPIC_RE='system|vlan-l2|interface|link-aggregation|static-route|ospf|acl|remote-diagnostics|backup|network|storage|services|users-ssh|firewall|containers|diagnostics|cluster|vm|lxc|ha-diagnostics|ha|platform'
-UPDATED_RE='^(2026-10-15|2026-10-30|2026-10-31|2026-11-04|2026-11-11)$'
+TOPIC_RE='system|vlan-l2|interface|link-aggregation|static-route|ospf|acl|remote-diagnostics|backup|network|storage|services|users-ssh|firewall|containers|diagnostics|cluster|vm|lxc|ha-diagnostics|ha|platform|access-auth|subnet-exit|app-connector|acl-policy|tailscale-ssh|serve-funnel'
+UPDATED_RE='^(2026-10-15|2026-10-30|2026-10-31|2026-11-04|2026-11-11|2026-11-16|2026-11-17)$'
 
 # 每个厂商应有的主题集合：网络设备/操作系统/虚拟化宿主均 8 篇，RosZ MCP 平台 2 篇
 expected_topics_for() {
@@ -70,6 +70,18 @@ topic_token_for() {
         02) echo '运维|排障|诊断|只读' ;;
       esac
       ;;
+    tailscale)
+      case "$seq" in
+        01) echo '系统|管理|安装' ;;
+        02) echo '接入|认证|密钥' ;;
+        03) echo '路由|出口|子网' ;;
+        04) echo '分流|连接器|Connector' ;;
+        05) echo 'ACL|策略' ;;
+        06) echo 'SSH' ;;
+        07) echo 'Serve|Funnel|HTTPS' ;;
+        08) echo '排障|诊断' ;;
+      esac
+      ;;
     *)
       case "$seq" in
         01) echo '系统|管理' ;;
@@ -91,7 +103,7 @@ total=0
 SECTIONS=('## 命令速查' '## 典型示例' '## 陷阱与版本差异' '## 高危操作' '## 参考来源')
 
 # 预期厂商目录集合（R1：kb 根目录缺整个厂商目录也必须报错）
-EXPECTED_VENDORS=(huawei h3c ruijie dptech cisco-ios cisco-nxos juniper arista fortinet zte vyos mikrotik proxmox ubuntu debian centos rosz)
+EXPECTED_VENDORS=(huawei h3c ruijie dptech cisco-ios cisco-nxos juniper arista fortinet zte vyos mikrotik proxmox ubuntu debian centos rosz tailscale)
 
 check_file() {
   local f="$1" base dir prefix fseq topic err=() lines
@@ -126,7 +138,7 @@ check_file() {
   [[ "$verified" == "high" || "$verified" == "medium" ]] || err+=("verified 取值 '${verified}' 不是 high/medium")
 
   updated="$(sed -n 's/^updated:[[:space:]]*//p' <<<"$head_block" | head -1 | tr -d '"'"'")"
-  [[ "$updated" =~ $UPDATED_RE ]] || err+=("updated '${updated}' 不在受支持日期 (2026-10-15/30/31、2026-11-04)")
+  [[ "$updated" =~ $UPDATED_RE ]] || err+=("updated '${updated}' 不在受支持日期 (2026-10-15/30/31、2026-11-04、2026-11-11、2026-11-16、2026-11-17)")
 
   # keywords 数量（支持 [a, b, c] 与逐行 - 两种写法）
   local kw_count
@@ -161,6 +173,7 @@ check_file() {
     debian) domain_re='debian\.org|wiki\.debian\.org|manpages\.debian\.org' ;;
     centos) domain_re='centos\.org|docs\.centos\.org|rockylinux\.org|docs\.rockylinux\.org' ;;
     rosz) domain_re='rosz\.cn' ;;
+    tailscale) domain_re='tailscale\.com' ;;
   esac
   if [[ "${verified:-}" == "high" && -n "${domain_re:-}" ]]; then
     grep -Eq "$domain_re" <<<"$src_urls" || err+=("verified: high 但 sources 无官方域名来源")
@@ -190,6 +203,7 @@ check_file() {
     debian) vtoken='Debian' ;;
     centos) vtoken='CentOS|Rocky' ;;
     rosz) vtoken='RosZ' ;;
+    tailscale) vtoken='Tailscale' ;;
   esac
   ttopic="$(topic_token_for "$dir" "$fseq")"
   vfield="$(sed -n 's/^vendor:[[:space:]]*//p' <<<"$head_block" | head -1)"

@@ -3,13 +3,13 @@ vendor: MikroTik
 os: RouterOS v7（v6 差异在文中标注）
 topic: ACL / 防火墙与 NAT
 devices: CCR/CRS/RB 系列、CHR（RouterOS v7 全平台）
-keywords: [firewall filter, chain input, forward, connection-state, dst-port, place-before, nat, masquerade, src-nat, dst-nat]
+keywords: [firewall filter, chain input, forward, connection-state, dst-port, place-before, address-list, src-address-list, 黑名单, nat, masquerade]
 sources:
   - https://help.mikrotik.com/docs/spaces/ROS/pages/250708066/Firewall
   - https://help.mikrotik.com/docs/spaces/ROS/pages/3211299/NAT
   - https://help.mikrotik.com/docs/spaces/ROS/pages/250708064/Common+Firewall+Matchers+and+Actions
 verified: high
-updated: 2026-10-31
+updated: 2026-11-17
 ---
 
 # MikroTik · 防火墙与 NAT
@@ -38,6 +38,8 @@ updated: 2026-10-31
 | 按接口列表匹配 | `/ip firewall filter add chain=input in-interface-list=WAN action=drop` | `[admin@MikroTik] >` | 接口列表在 `/interface list` 维护 |
 | 自定义链加规则 | `/ip firewall filter add chain=mychain protocol=tcp dst-port=22 action=accept` | `[admin@MikroTik] >` | 自定义链供 jump 复用 |
 | 查看地址列表 | `/ip firewall address-list print` | `[admin@MikroTik] >` | 核对 list 名称与条目 |
+| 只查某个列表 | `/ip firewall address-list print where list=blocked` | `[admin@MikroTik] >` | 核对平台同步下来的黑名单条目 |
+| 查谁引用了列表 | `/ip firewall filter print where src-address-list=blocked` | `[admin@MikroTik] >` | 有列表无规则=白拉黑；老版本不支持该 matcher 时退回 `print stats` 逐条看 |
 | NAT 跳转链 | `/ip firewall nat add chain=srcnat action=jump jump-target=clients` | `[admin@MikroTik] >` | 多客户 NAT 分组复用 |
 
 ## 典型示例
@@ -60,6 +62,8 @@ updated: 2026-10-31
 
 ## 陷阱与版本差异
 
+- **地址列表里有 IP ≠ 有防护**：`address-list` 只是一张数据表，**必须存在引用它的 filter 规则**（如 `chain=input src-address-list=blocked action=drop`）才真正丢包。平台侧（如 RosZ 安全组 black1）只负责把条目同步到设备，规则是否存在要自己在设备上确认——缺规则时列表里堆多少条都白搭。
+- **黑名单默认不掐断已建连接，顺序还经常写反**：规则只对新包生效；若 `connection-state=established,related accept` 排在黑名单 drop 之前，黑名单对该 IP 的既有会话彻底失效。黑名单 drop 要用 `place-before=0` 放到 established 放行之前，已建会话另需等超时或手工清理（如 `/ppp active remove`）。
 - **filter 链缺省 accept**：官方 Firewall 页明确"若包未匹配链内任何规则则被接受"，所以默认拒绝必须显式写 `action=drop`；规则顺序敏感，新增默认追加到末尾，用 `place-before=` 插到前面。
 - **NAT 只匹配连接首包**：后续包由 connection tracking 复用动作；官方明确修改/新增 NAT 规则后应清连接跟踪表，否则旧连接会继续按旧行为直到条目过期。`masquerade` 在断线/改 IP 时还会自动清相关 conntrack 条目。
 - **masquerade 与 src-nat 不能混用场景**：动态公网 IP（DHCP/PPPoE）用 `action=masquerade`；固定公网 IP 用 `action=src-nat to-addresses=...`，链路故障后现有连接可继续。

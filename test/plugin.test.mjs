@@ -75,8 +75,8 @@ test('apply() registers the bundled network-command-kb skill', () => {
   assert.equal(registrations.length, 1)
   const skill = registrations[0]
   assert.equal(skill.name, 'network-command-kb')
-  assert.match(skill.description, /130 篇/)
-  assert.match(skill.description, /17 平台/)
+  assert.match(skill.description, /138 篇/)
+  assert.match(skill.description, /18 平台/)
   assert.equal(skill.source, 'bundled')
   assert.match(skill.content, /网络命令知识库使用说明/)
   assert.equal(skill.path, join(packageRoot, 'skills', 'network-command-kb', 'SKILL.md'))
@@ -86,7 +86,11 @@ test('apply() registers the global mt_winbox_exec tool', () => {
   const { ctx, toolRegistrations } = createFakeContext()
   plugin.apply(ctx)
 
-  assert.equal(toolRegistrations.length, 1)
+  assert.equal(toolRegistrations.length, 2)
+  assert.deepEqual(
+    toolRegistrations.map((registered) => registered.name),
+    ['mt_winbox_exec', 'kb_lookup'],
+  )
   const tool = toolRegistrations[0]
   assert.equal(tool.name, 'mt_winbox_exec')
   assert.match(tool.description, /WinBox/)
@@ -133,10 +137,10 @@ test('apply() registers exactly one skill and one tool per call and is re-entran
     registrations.map((skill) => skill.name),
     ['network-command-kb', 'network-command-kb'],
   )
-  assert.equal(toolRegistrations.length, 2)
+  assert.equal(toolRegistrations.length, 4)
   assert.deepEqual(
     toolRegistrations.map((tool) => tool.name),
-    ['mt_winbox_exec', 'mt_winbox_exec'],
+    ['mt_winbox_exec', 'kb_lookup', 'mt_winbox_exec', 'kb_lookup'],
   )
 })
 

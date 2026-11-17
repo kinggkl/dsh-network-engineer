@@ -1,21 +1,21 @@
 ---
 vendor: RosZ
-os: RosZ 云路由（MCP 只读密钥，Ver 5.x；纳管 RouterOS 6.43+）
-topic: RosZ 只读运维与排障流程
+os: RosZ 云路由（MCP 权限档由 list_capabilities 自检，Ver 5.x；纳管 RouterOS 6.43+）
+topic: RosZ 运维与排障流程（含攻击源研判）
 devices: MikroTik RouterOS 设备（经 RosZ 云平台）、NodeZ 边缘节点、MCP 客户端（DSH、Claude Code/Desktop、Cursor 等）
-keywords: [只读排障, MCP 工具, 排障链路, last_post, 降采样, 云指令结果, NAT 日志, 设备日志, 配置差异, 智能组网]
+keywords: [排障链路, MCP 工具, 攻击源研判, 字典爆破, 误封红线, 弱口令账号, 暴露面, last_post, 降采样, NAT 日志, 设备日志, 配置差异]
 sources:
   - https://rosz.cn/
   - https://blog.rosz.cn/?p=1437
   - https://manual.mikrotik.com/docs/introduction/
   - https://modelcontextprotocol.io/docs/getting-started/intro
 verified: high
-updated: 2026-11-11
+updated: 2026-11-17
 ---
 
-# RosZ · 只读运维与排障流程
+# RosZ · 运维与排障流程（含攻击源研判）
 
-> 排障链固定为 `list_capabilities → get_system_overview / list_alerts → list_devices → get_device / get_device_metrics / get_interface_traffic → search_device_log / search_nat_log → list_backups / get_config_diff`；全程只读、不下发写操作，数据新鲜度看 `last_post`，曲线看 `max` 而不是形状。
+> 排障链固定为 `list_capabilities → get_system_overview / list_alerts → list_devices → get_device / get_device_metrics / get_interface_traffic → search_device_log / search_nat_log → list_backups / get_config_diff`；这一段全是查询工具、不依赖写权限；写操作另走 `rosz-01` 的写操作闭环，且动手前先用 `list_capabilities` 确认有写工具。数据新鲜度看 `last_post`，曲线看 `max` 而不是形状；日志查攻击源时看形态不看全量。
 
 ## 命令速查
 
@@ -81,8 +81,26 @@ search_device_log(hours=1) → matched=13341, total=3
   ⇒ 命中很多但只回 3 条：缩小 hours、加 level/keyword，不要指望一次拉全量
 ```
 
+## 攻击源研判与拉黑闭环
+
+取证式（2026-11-17 实战，7 天窗口）：`search_device_log(hours=168, keyword="<IP>")`——IP 天然 ≥3 字符，走索引。看形态不看全量：`matched` 给数量、抽 20–100 条给形态，别为凑满反复调 `limit`（上限 200）。
+
+判定三要素，缺一条都不够：
+
+- **失败密度**：秒级间隔 + 用户名轮换（admin/noc/ppfadmin/MikroTikSystem/Qest…）= 字典爆破；固定 7 秒单用户名 = 定向试探。
+- **有没有成功**：通篇只有 `login failure` → 纯扫描，拉黑零风险；出现 `logged in` → 先看它登录后干了什么再决定，不要先拉黑后取证。
+- **成功之后干了什么**：命令带业务语义（`routing-table=Japan_vrf`、`comment="TEST …"`、指向已知出口的 netwatch/sniffer）几乎一定是自家运维联调，**禁止自动拉黑，必须问人**——误封自己人比漏封一次贵得多。周期性 `logged in / logged out` 同理：弱口令账号被当隧道滥用，与客户端重连/keepalive 配错，日志形态几乎一样，只有间隔是否极稳（15–18 秒）、logout 是否带字节计数、账号名是否 `test`/`admin`、源 IP 是否境外、分配地址是否反复轮换这些线索，**都不足以替代问人**。
+
+处置优先级（IP 黑名单排最后）：
+
+1. **账号/服务**：弱口令账号删或改密（`/ppp secret remove [find name="test"]`），否则换个 IP 就回来。
+2. **暴露面**：`/ip service print` 看 winbox/ssh 的 `address` 是否为空——空即全网可连，黑名单只是事后补丁。
+3. **IP 黑名单**：走 `rosz-01` 的写操作闭环，`comment` 写清判读结论，`device_comment` 短标签。
+
 ## 陷阱与版本差异
 
+- **命中范围决定严重度**：同一源横跨 12+ 台（含核心 IDC）= 扫段；单台 45 次更像定向。别把设备噪声算进攻击量——ppp `Encryption got out of sync - disabling`、ovpn `duplicate packet, dropping` 都是常态。
+- **拉黑不掐断已建会话**：地址列表只在规则匹配新包时生效，已建立的 PPTP/GRE 隧道要等超时或手工清理，别向用户承诺"已立即阻断"。
 - **`total` ≠ 命中总数**：`total` 是本次返回条数，`matched` 是命中总数；`truncated: true` 说明被截断，要调大 `limit`（上限 200）或加过滤条件，未返回的设备/记录不能当不存在。
 - **离线设备返回的是最后快照**：`get_device` 在设备离线时展示最后一次上报值，必须结合 `last_post` 判断新鲜度；`get_interface_traffic` 的当前快照来自内存缓存，设备离线一段时间后会返回空列表而不是报错。
 - **metrics 是降采样后的平均值**：原始采样最高约 10 秒一点，返回压到最多 120 点、每点为该时段平均；峰值看每条曲线的 `max`/`min`/`avg`，不要拿曲线形状判断打满；离线时段的 0 是「没有数据」。
@@ -94,7 +112,7 @@ search_device_log(hours=1) → matched=13341, total=3
 
 ## 高危操作 ⚠️
 
-- ⚠️ 用只读密钥硬试写工具（`run_command`、`run_node_script`、`add_ip_rule`、`delete_ip_rule`、`kick_radius_account`、`run_backup`）：全部被 blocked，重试不会通过；需要变更时让用户在网页端操作或改密钥档位，不要绕过。
+- ⚠️ 不先自检就硬试写工具（`run_command`、`run_node_script`、`add_ip_rule`、`delete_ip_rule`、`kick_radius_account`、`run_backup`）：只读档下 `require_readwrite: true` 的工具会被服务端拒绝，重试不会通过；先 `list_capabilities` 看能不能写，不能就让用户在网页端改档或操作，不要绕过。
 - ⚠️ 把云指令当「即时操作」：异步下发，通常 10–40 秒才出结果、最长可拖到设备下次心跳；若命令含删除/重启，设备可能在你没观察时失联，必须让用户确认并先做 `/export` 备份。
 - ⚠️ 不带 IP 或时间窗查 NAT 日志：千万行级全表扫描会拖慢甚至超时，影响同账号其他查询；必须给 `ip` + 尽量小的 `hours`。
 - ⚠️ 对离线设备排入云指令/备份任务：离线设备收不到，队列或标记会在设备回连时生效（超时≠取消、标记一分钟失效但指令仍可能执行）；先确认 `online` 与 `last_post`，并在维护窗口操作。

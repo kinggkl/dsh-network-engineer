@@ -1,13 +1,13 @@
 ---
 name: network-command-kb
-description: 17 平台交换机/路由器/防火墙/Linux/虚拟化命令与运维知识库（华为/新华三/锐捷/迪普/思科 IOS·NX-OS/Junos/Arista EOS/FortiOS/中兴/VyOS/MikroTik，加 Ubuntu 24.04、Debian 12、CentOS Stream 9·Rocky 9、Proxmox VE、RosZ MCP 平台，共 130 篇）。回答配置命令、跨平台语法对照、Linux/PVE 排障前必须先检索本知识库；也用于核对命令语法、默认值与版本差异。
+description: 18 平台交换机/路由器/防火墙/Linux/虚拟化命令与运维知识库（华为/新华三/锐捷/迪普/思科 IOS·NX-OS/Junos/Arista EOS/FortiOS/中兴/VyOS/MikroTik，加 Ubuntu 24.04、Debian 12、CentOS Stream 9·Rocky 9、Proxmox VE、RosZ MCP 平台、Tailscale，共 138 篇）。回答配置命令、跨平台语法对照、Linux/PVE 排障前必须先检索本知识库；也用于核对命令语法、默认值与版本差异。
 ---
 
 # 网络命令知识库使用说明
 
 本技能的 resource base 是插件包根目录，包根下的 `kb/` 子目录是随 `dsh-network-engineer` 分发的
-**17 平台 / 130 篇**命令与运维知识库：12 家网络设备厂商各 8 篇（8 个固定主题）、
-Ubuntu / Debian / CentOS 各 8 篇、Proxmox VE 8 篇、RosZ MCP 平台 2 篇。每篇文档头部 frontmatter 含
+**18 平台 / 138 篇**命令与运维知识库：12 家网络设备厂商各 8 篇（8 个固定主题）、
+Ubuntu / Debian / CentOS 各 8 篇、Proxmox VE 8 篇、RosZ MCP 平台 2 篇、Tailscale 平台 8 篇。每篇文档头部 frontmatter 含
 `vendor/os/topic/devices/keywords/sources/verified/updated` 元数据。
 
 ## 目录结构
@@ -21,22 +21,27 @@ Ubuntu / Debian / CentOS 各 8 篇、Proxmox VE 8 篇、RosZ MCP 平台 2 篇。
   04 systemd 服务、05 用户与 SSH、06 防火墙、07 容器、08 排障诊断
 - 宿主虚拟化：`kb/proxmox/`（Proxmox VE 8/9，8 篇）：01 系统升级、02 备份恢复、03 集群与节点、
   04 存储、05 虚拟机、06 LXC、07 宿主网络、08 高可用与排障
-- 平台管理：`kb/rosz/`（RosZ MCP 平台，2 篇）：01 平台与只读 MCP 接入、02 只读运维与排障
+- 接入平台：`kb/tailscale/`（Tailscale tailnet，8 篇）：01 系统管理与安装、02 接入与认证、03 子网路由与出口节点、04 App Connector 与流量分流、05 ACL 与访问策略、06 Tailscale SSH、07 Serve 与 Funnel、08 排障与诊断
+- 平台管理：`kb/rosz/`（RosZ MCP 平台，2 篇）：01 平台与 MCP 接入模型（含 `list_capabilities` 权限自检、35 工具清单、写操作闭环）、02 运维排障与攻击源研判
 - 文件名：`<平台>-<两位序号>-<主题>.md`；网络设备序号 01 系统管理、02 VLAN 与二层、03 接口、
   04 链路聚合、05 静态路由、06 OSPF、07 ACL、08 远程管理与诊断
 - `kb/README.md` 为总览、平台索引、跨平台差异对照与 RAG 导入指南
 
 ## 检索方法（read / glob / grep 工具）
 
-1. 按「平台 + 主题」定位文件。例：华为 OSPF → `kb/huawei/huawei-06-ospf.md`；
+1. **优先用只读工具 `kb_lookup`**：只给 `vendor`（如 `huawei`）列出该平台的全部篇目；`vendor` + `topic`
+   （两位序号 `05` 或主题词 `static-route`）返回该篇的 `##` 目录；再加 `section`（标题子串、不区分大小写，
+   如 `命令速查`）只读这一节，单节上限 6000 字符。`read` / `glob` / `grep` 是回退手段，仅在
+   `kb_lookup` 覆盖不到时使用（跨目录关键字检索、非知识库文件、需要整篇原文）。
+2. 按「平台 + 主题」定位文件。例：华为 OSPF → `kb/huawei/huawei-06-ospf.md`；
    NX-OS 的 OSPF → `kb/cisco-nxos/cisco-nxos-06-ospf.md`；VyOS 静态路由 →
    `kb/vyos/vyos-05-static-route.md`；Ubuntu 网络配置 → `kb/ubuntu/ubuntu-02-network.md`；
-   PVE 备份 → `kb/proxmox/proxmox-02-backup.md`；RosZ 只读查询 → `kb/rosz/rosz-02-diagnostics.md`。
-2. 跨平台对照问题同时读多家同名主题文档（如 05 静态路由的 12 篇网络设备文档，
+   PVE 备份 → `kb/proxmox/proxmox-02-backup.md`；RosZ 平台侧查询 → `kb/rosz/rosz-02-diagnostics.md`；Tailscale 出口节点 → `kb/tailscale/tailscale-03-subnet-exit.md`。
+3. 跨平台对照问题同时读多家同名主题文档（如 05 静态路由的 12 篇网络设备文档，
    或 Linux 三系的 02 网络配置、06 防火墙），用表格对照、不分段重复。
-3. 序号主题之外的细节用 grep 按命令关键字跨目录检索（如 `grep -rn "port trunk" kb/`、
+4. 序号主题之外的细节用 grep 按命令关键字跨目录检索（如 `grep -rn "port trunk" kb/`、
    `grep -rn "netplan\|firewalld" kb/`）。
-4. 先确认平台再答：Cisco IOS-XE 与 NX-OS 是两套文档；Junos 的 EX（交换）与 MX/SRX（路由/安全）语法不同；
+5. 先确认平台再答：Cisco IOS-XE 与 NX-OS 是两套文档；Junos 的 EX（交换）与 MX/SRX（路由/安全）语法不同；
    **华为**的 S/CE 系列是交换机、AR/NE 是路由器（见各篇「平台差异」节）；FortiGate 是防火墙视角；
    VyOS 是 configure/set/commit/save 模型；RouterOS v7 与 v6 命令树差异大；
    **Linux 三系**的包管理（apt/dnf）、网络后端（netplan/NetworkManager/interfaces）与防火墙
@@ -55,6 +60,8 @@ Ubuntu / Debian / CentOS 各 8 篇、Proxmox VE 8 篇、RosZ MCP 平台 2 篇。
   VyOS reload、RouterOS /system reset-configuration、`pve8to9` 升级、LVM/存储删除、
   `qm destroy`/`pct destroy` 等）在回答中出现时必须附带风险提示。
 - 配置变更类回答固定三件套：变更前备份、变更后验证、回退方法；先查现状 → 备份 → 变更 → 验证 → 备好回退。
-- RosZ MCP 为只读密钥：写工具被 blocked；查询注意 total 与 matched、离线设备 `last_post` 是快照、
-  metrics 曲线看 max、NAT/syslog 必须给时间窗口、云指令结果只保留 24h 且超时≠取消；
+- RosZ MCP 能做什么**先自检再断言**：每会话先调 `list_capabilities`，按 `mode`/`require_readwrite`/`destructive`/`blocked` 决定边界（只读档 28 工具、读写档 35 工具是常见两档）；改档后必须重载 MCP 会话，
+  否则手上仍是旧工具表；查询注意 total 与 matched、离线设备 `last_post` 是快照、metrics 曲线看 max、
+  NAT/syslog 必须给时间窗口、云指令结果只保留 24h 且超时≠取消；写操作（run_command / add_ip_rule /
+  delete_ip_rule 等）先备份、逐条确认、下发后回读核对，规则入库≠生效；
   不把 Bearer token、账号口令或设备敏感信息写进回答/命令/日志。

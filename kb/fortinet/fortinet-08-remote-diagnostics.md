@@ -11,7 +11,7 @@ sources:
   - https://support.fortinet.com.cn/troubleshooting/sniffer_tool/sniffer_intro
   - https://support.fortinet.com.cn/troubleshooting/debug_flow_tool/debug_flow_intro
 verified: high
-updated: 2026-10-30
+updated: 2026-11-16
 ---
 
 # 飞塔（Fortinet）· 远程管理与诊断
@@ -42,6 +42,29 @@ updated: 2026-10-30
 | HA 状态 | `get system ha status` / `diagnose sys ha status` | 操作模式 | 主备角色、同步状态 |
 | 一键收集 | `execute tac report` | 操作模式 | 开 TAC 工单用；耗时且占资源 |
 | 命令树 | `tree diagnose` / `tree execute` | 操作模式 | 不确定子命令时先看树 |
+
+## 巡检命令清单（14 条，输出先落盘再裁剪）
+
+巡检固定跑这 14 条，一条一个 `show` 便于单独裁剪、需要细节时回原文 grep；`show` 只列非默认值，凡要核对"默认值有没有被改过"的必须用 `show full-configuration`（见 `kb/fortinet/fortinet-01-system.md`）。
+
+| # | 巡检点 | 命令 | 口径 |
+|---|---|---|---|
+| 1 | 接口与管理面暴露 | `show system interface` | full-configuration |
+| 2 | 策略动作、日志、UTM | `show firewall policy` | full-configuration |
+| 3 | 地址对象与死对象 | `show firewall address` | full-configuration |
+| 4 | VIP／端口映射 | `show firewall vip` | show |
+| 5 | 静态路由与 distance | `show router static` | full-configuration |
+| 6 | DHCP 池与保留地址 | `show system dhcp server` | full-configuration |
+| 7 | SD-WAN zone 与成员 | `show system sdwan` | show |
+| 8 | SSL/SSH 检查模式 | `show firewall ssl-ssh-profile` | full-configuration |
+| 9 | 无线 SSID 与安全 | `show wireless-controller vap` | full-configuration |
+| 10 | 管理员与来源限制 | `show system admin` | full-configuration |
+| 11 | SNMP 团体字 | `show system snmp community` | full-configuration |
+| 12 | DNS 服务器 | `show system dns` | show |
+| 13 | NTP 与时间源 | `show system ntp` | show |
+| 14 | 全局开关 | `show system global` | full-configuration |
+
+先 `show full-configuration` 原始回显落盘到 `logs/raw/fortinet/<host>-<ts>.txt`（红线 2：裁剪不可逆），再 `tools/forti-trim.sh --host <host> --raw-archive logs/raw/fortinet < raw.txt > audit.txt` 产出审计版；行数用 `show full-configuration | grep -c "^"` 量，FortiOS 没有 `wc` 管道。
 
 ## 典型示例
 

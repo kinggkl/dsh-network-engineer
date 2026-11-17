@@ -14,6 +14,8 @@
  *    expose the CLI only through WinBox. Read-only commands are enforced by
  *    default; write commands require `allowWrite: true` and are documented as
  *    high-risk.
+ * 3. The global `kb_lookup` tool on `ctx.tools`: read-only, section-level
+ *    access to the same knowledge base (vendor → outline → one section).
  *
  * The companion "网络工程师助手" agent preset is declared in
  * `cordis.patch.yml` as a `@deepseek-ai/dsh-agent-preset` row and needs no
@@ -32,6 +34,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { createWinboxTool } from './lib/mikrotik-tool.mjs'
+import { createKbLookupTool, KB_LOOKUP_TOOL_NAME } from './lib/kb-lookup.mjs'
 
 /** Cordis plugin name used by loader diagnostics. */
 export const name = 'network-engineer-kb'
@@ -178,10 +181,50 @@ export function registerWinboxTool(ctx, options = {}) {
 }
 
 /**
- * Register the bundled knowledge-base skill and the WinBox terminal tool.
+ * Register the read-only `kb_lookup` tool on `ctx.tools`.
+ *
+ * Best-effort in the same way as {@link registerWinboxTool}: a missing or
+ * failing tools registry only costs this tool, never the skill or WinBox.
+ *
+ * @param ctx - plugin context.
+ * @param options - `createTool` override for tests (receives no arguments).
+ * @returns `registered` plus the tool name, or `skipped` plus the reason.
+ */
+export function registerKbLookupTool(ctx, options = {}) {
+  const createTool = options.createTool ?? (() => createKbLookupTool({ kbRoot: defaultRoots().kbDir }))
+  const tools = ctx?.tools
+  if (tools?.register === undefined) {
+    ctx.logger?.warn?.('network-engineer: tools registry unavailable; kb_lookup not registered')
+    return { status: 'skipped', reason: 'tools-unavailable' }
+  }
+
+  let tool
+  try {
+    tool = createTool()
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    ctx.logger?.warn?.(`network-engineer: cannot build ${KB_LOOKUP_TOOL_NAME}: ${reason}`)
+    return { status: 'skipped', reason: 'tool-build-failed' }
+  }
+
+  try {
+    const dispose = tools.register(tool)
+    ctx.logger?.info?.(`network-engineer: registered global tool "${tool.name ?? KB_LOOKUP_TOOL_NAME}" (read-only knowledge base lookup)`)
+    return { status: 'registered', name: tool.name ?? KB_LOOKUP_TOOL_NAME, dispose }
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    ctx.logger?.warn?.(`network-engineer: cannot register ${KB_LOOKUP_TOOL_NAME}: ${reason}`)
+    return { status: 'skipped', reason: 'tool-registration-failed' }
+  }
+}
+
+/**
+ * Register the bundled knowledge-base skill, the WinBox terminal tool and the
+ * kb_lookup tool.
  * @param ctx - plugin context; registrations are disposed with it.
  */
 export function apply(ctx) {
   registerBundledSkill(ctx, defaultRoots())
   registerWinboxTool(ctx)
+  registerKbLookupTool(ctx)
 }

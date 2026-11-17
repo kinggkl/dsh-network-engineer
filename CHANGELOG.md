@@ -2,6 +2,67 @@
 
 本项目遵循语义化版本；上游基线为 `dsh-network-engineer 0.1.0`。
 
+## Unreleased
+
+### Added
+
+- RosZ 权限改为**自检式**：`kb/rosz/rosz-01-platform.md` 新增「能力自检（每个会话第一步）」节——`list_capabilities`
+  返回字段解读（`mode`/`available[].require_readwrite`/`destructive`/`blocked[]`）、5 条判定规则、35 个工具按
+  「查询 28 / 写非破坏 3 / 写且破坏 4」分类表，并明确自检结果才是边界、文档不预设档位。
+- `kb/tailscale/`：把 2026-11 HIG app connector 实战踩过的坑写回文档——`tailscale-04-app-connector.md` 补
+  「官方四件套」（tagOwners / autoApprovers.routes / grants 放行 member→internet / **每个 connector tag 单独开
+  tcp+udp:53** 供 PeerAPI DoH 域名发现）与「新增 tag 要同步所有引用位置」、设备 API 必须 `?fields=all`；
+  `tailscale-03-subnet-exit.md` 补 `--advertise-routes` 覆盖式写入、宣告无出口地址族会造成黑洞；
+  `tailscale-08-diagnostics.md` 补固定排查顺序（设备→控制面 API→客户端路由表→真实出口 IP）与「UI 告警不等于不通」；
+  `tailscale-01-system.md` 补 unprivileged LXC 的 `/dev/net/tun` 两行必须写在主配置段。
+- `kb/rosz/rosz-01-platform.md`：补 `run_command`/`get_command_result`/`run_backup`/`run_node_script`/
+  `update_device`/`add_ip_rule`/`delete_ip_rule`/`kick_radius_account` 八个写工具速查（含真实入参名），
+  新增「写操作闭环（读写档）」节：查能力 → 去重 → 写 → 回读取 `rule_id` → 设备侧核验 → 回退。
+- `kb/rosz/rosz-02-diagnostics.md`：新增「攻击源研判与拉黑闭环」节——按 IP 检索的取证式、判定三要素
+  （失败密度 / 有无成功登录 / 成功后干了什么）、误封红线、处置优先级（账号 → 暴露面 → IP 黑名单）。
+- `kb/mikrotik/mikrotik-07-acl.md`：补地址列表核验命令与两条陷阱（有列表无规则、黑名单被 established 放行抢先）。
+- 新增只读工具 `kb_lookup`（`lib/kb-lookup.mjs`）：按 `vendor` 列出篇目、`vendor` + `topic` 返回 `##` 目录、
+  再加 `section` 只读单节（标题子串不区分大小写，单节上限 6000 字符）；输入输出 schema 无 minimum/maximum，
+  路径只来自目录扫描，越界与非法参数一律返回 `{ ok: false, error }` 而不抛异常。
+- `index.js` 以 best-effort 方式注册 `kb_lookup`（`registerKbLookupTool`）：tools 注册表缺失或注册失败时
+  只告警并降级，不影响技能与 `mt_winbox_exec`。
+
+### Changed
+
+- RosZ 权限表述全面去掉「固定只读」的武断断言：`cordis.patch.yml` 预设提示、`AGENTS.md`（工作区）、
+  `skills/network-command-kb/SKILL.md`、`kb/README.md`、`kb/rosz/` 两篇统一改为「先调 `list_capabilities` 自检
+  `mode` 与 `blocked`，再决定能读还是能写」；`kb/rosz/rosz-02-diagnostics.md` 标题与 `os` 字段同步去掉「只读」限定，
+  陷阱「只读档是密钥属性」改写为「档位是运行时状态，不是密钥的固定身份」。
+- RosZ 密钥档位表述由「固定只读」改为「只读档 28 工具 / 读写档 35 工具，改档后须重载 MCP 会话」
+  （`cordis.patch.yml` 预设提示、`skills/network-command-kb/SKILL.md` 一并更新），
+  与 2026-11-17 实测的读写档行为一致。
+- `skills/network-command-kb/SKILL.md` 的「检索方法」新增第一步：优先用 `kb_lookup` 定位与摘读，
+  `read` / `glob` / `grep` 改为回退手段。
+
+### Tests
+
+- 新增 `test/kb-lookup.test.mjs`：临时知识库夹具覆盖索引扫描、围栏代码块内的 `##` 不计数、大小写不敏感
+  章节匹配、越界路径/非字符串参数拒绝、6000 字符截断、工具契约与 `registerKbLookupTool` 的四条降级路径，
+  并对真实 `kb/` 断言 18 平台 / 138 篇与 `huawei` 05 的 7 节目录。
+
+本次改动未修改任何版本号（`package.json` 等仍为 0.1.6）。
+
+## 0.1.6 — 2026-11-16
+
+### Added
+
+- **Tailscale 接入平台知识库 `kb/tailscale/` 8 篇**：01 系统管理与安装、02 接入与认证、03 子网路由与出口节点、
+  04 App Connector 与流量分流、05 ACL 与访问策略、06 Tailscale SSH、07 Serve 与 Funnel、08 排障与诊断；
+  每篇按官方文档整理命令、视图与版本差异，写清公网 IP/端口转发、tag 与 policy 权限等硬性前提，
+  并标注客户端分流能力边界（Android 按 App 分流、iOS 仅 VPN On Demand/MDM）。
+- 知识库从 17 平台 / 130 篇扩展到 **18 平台 / 138 篇**。
+
+### Changed
+
+- 校验器 `tools/kb-validate.sh` 的 `EXPECTED_VENDORS`、`TOPIC_RE`、主题集合与官方域名白名单支持 `tailscale`。
+- `test/_helpers.mjs`、`test/kb.test.mjs` 及各一致性测试的篇数/平台口径同步为 18 平台 / 138 篇；
+  persona、`SKILL.md`、`README.md`、locale 描述与 `kb/README.md` 索引补 Tailscale。
+
 ## 0.1.5 — 2026-11-11
 
 ### Added

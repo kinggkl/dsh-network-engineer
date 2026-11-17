@@ -1,10 +1,10 @@
 # 网络工程师知识库（随 @kinggkl/dsh-network-engineer 插件分发）
 
-供「网络工程师助手」Agent 及各类 RAG 平台使用的**十七平台**命令与运维知识库。
+供「网络工程师助手」Agent 及各类 RAG 平台使用的**十八平台**命令与运维知识库。
 资料来源为各厂商/项目官方手册与高可信社区页面（每篇文档末尾附来源链接）：首批 4 厂商整理于 2026-10-15，
 Cisco IOS/IOS-XE、Cisco NX-OS、Juniper Junos、Arista EOS、Fortinet FortiOS、中兴 ZXR10 于 2026-10-30 补全，
 VyOS 与 MikroTik RouterOS 于 2026-10-31 补全；Proxmox VE 宿主于 2026-11-11 补 2 篇，v0.1.5 扩至 8 篇，
-并新增 Ubuntu 24.04、Debian 12、CentOS Stream 9 / Rocky 9 各 8 篇与 RosZ MCP 平台 2 篇，合计 **17 平台 / 130 篇**；
+并新增 Ubuntu 24.04、Debian 12、CentOS Stream 9 / Rocky 9 各 8 篇与 RosZ MCP 平台 2 篇，合计 **17 平台 / 130 篇**；Tailscale tailnet 平台 8 篇于 2026-11-16（v0.1.6）补入，现为 **18 平台 / 138 篇**；
 2026-11-04（v0.1.2）起华为 8 篇均含「平台差异（交换机 vs 路由器）」节，区分 S/CE 交换机与 AR/NE 路由器。
 
 ## 目录结构
@@ -27,7 +27,8 @@ kb/
 ├── debian/     Debian 12 bookworm（对照 13 trixie）
 ├── centos/     CentOS Stream 9 / Rocky Linux 9（同源 dnf 生态）
 ├── proxmox/    Proxmox VE 8/9 宿主（8 篇）
-├── rosz/       RosZ MCP 平台（2 篇，平台侧只读查询）
+├── rosz/       RosZ MCP 平台（2 篇，权限自检 + 查询与写操作闭环）
+├── tailscale/  Tailscale tailnet 平台（8 篇：安装认证、子网路由/出口、App Connector、ACL、SSH、Serve/Funnel、排障）
 └── README.md
 ```
 
@@ -49,7 +50,8 @@ kb/
 | `debian/` | Debian | 12 bookworm | 8 | high | apt、interfaces/NetworkManager、nftables、systemd、LVM、排障 |
 | `centos/` | CentOS Stream / Rocky | Stream 9 / Rocky 9 | 8 | high | dnf、NetworkManager、firewalld、SELinux、Podman、排障 |
 | `proxmox/` | Proxmox VE | 8.x / 9.x | 8 | high | 01 系统升级、02 备份恢复、03 集群、04 存储、05 VM、06 LXC、07 宿主网络、08 HA 与排障 |
-| `rosz/` | RosZ MCP 平台 | 平台侧只读接口 | 2 | high | 01 平台与只读 MCP 接入、02 只读运维与排障；设备命令仍查 `mikrotik/` |
+| `rosz/` | RosZ MCP 平台 | 平台侧 MCP 接口（权限档自检） | 2 | high | 01 平台与 MCP 接入模型、02 运维排障与攻击源研判；设备命令仍查 `mikrotik/` |
+| `tailscale/` | Tailscale | tailnet（客户端 1.104） | 8 | high | 安装认证、子网路由/出口、App Connector 与分流、ACL 策略、Tailscale SSH、Serve/Funnel、排障 |
 
 ## 主题编号
 
@@ -96,8 +98,8 @@ kb/
 
 | 编号 | 文件后缀 | 主题 |
 |---|---|---|
-| 01 | -platform | RosZ 平台与 MCP 接入（只读密钥、工具清单、权限档） |
-| 02 | -diagnostics | 只读运维与排障（设备/指标/备份/组网/日志查询流程） |
+| 01 | -platform | RosZ 平台与 MCP 接入（权限自检、35 工具清单、写操作闭环） |
+| 02 | -diagnostics | 运维排障与攻击源研判（设备/指标/备份/组网/日志查询流程） |
 
 完整文件名格式：`<平台>-<两位序号>-<主题>.md`，如 `kb/huawei/huawei-06-ospf.md`、
 `kb/ubuntu/ubuntu-02-network.md`、`kb/proxmox/proxmox-08-ha-diagnostics.md`、`kb/rosz/rosz-02-diagnostics.md`。
@@ -157,11 +159,27 @@ kb/
 - 备份：`vzdump`（快照/暂停/停止模式）、备份作业、Proxmox Backup Server；恢复演练优于“有备份文件”。
 - 排障：`pvecm status`、`pvesm status`、`qm status`、`pct status`、`journalctl -u pve*`、`/var/log/pveproxy`。
 
-## RosZ MCP 平台要点（只读）
+### Tailscale（接入平台，8 篇）
+
+| 编号 | 文件后缀 | 主题 |
+|---|---|---|
+| 01 | -system | 系统管理与安装（各平台安装、`tailscale up/down`、登录、自动更新） |
+| 02 | -access-auth | 接入与认证（auth key 类型、tag、设备授权、key expiry、OAuth/SSO） |
+| 03 | -subnet-exit | 子网路由与出口节点（`--advertise-routes`、`--exit-node`、路由批准、转发开关） |
+| 04 | -app-connector | App Connector 与流量分流（公网 IP+端口转发、tag、grants、客户端分流边界） |
+| 05 | -acl-policy | ACL 与访问策略（`grants`、`tagOwners`、`autoApprovers`、`nodeAttrs`、`tests`） |
+| 06 | -tailscale-ssh | Tailscale SSH（`--ssh`、ACL `ssh` 规则、`check` 模式与录制） |
+| 07 | -serve-funnel | Serve 与 Funnel（`tailscale serve/funnel/cert`、HTTPS 与 MagicDNS） |
+| 08 | -diagnostics | 排障与诊断（`status`/`netcheck`/`ping`/`bugreport`/`debug`、DERP、日志） |
+
+Tailscale 是 SaaS 控制平面 + 客户端 CLI：命令在客户端执行，策略在管理后台的 HuJSON 策略文件里改，
+对照时注意把「客户端命令」「管理后台操作」「策略文件字段」三类分开写。
+
+## RosZ MCP 平台要点（能力以自检为准）
 
 | 场景 | 要点 |
 |---|---|
-| 密钥与权限 | 当前为只读密钥：28 个只读工具可用，7 个写工具（下发命令、节点脚本、IP 规则、踢线、备份等）被 blocked；需读写要在控制台改权限档 |
+| 密钥与权限 | **不预设**：每会话先调 `list_capabilities`，按 `mode`、`available[].require_readwrite` 与 `destructive`、`blocked[]` 判定本轮边界；只读档 28 工具 / 读写档 35 工具是自检结果的两种常见取值，改档后须重载会话 |
 | 列表结果 | `total` 是本次返回条数，`matched` 才是命中总数；被截断时调大 `limit` 或缩小关键词 |
 | 离线设备 | `online=false` 时展示的是最后一次上报快照，`last_post` 是快照时间，不能当实时值 |
 | 指标曲线 | `get_device_metrics` 已降采样（最多约 120 点），判断峰值看 `max`；磁盘占用无历史曲线 |
@@ -204,7 +222,7 @@ kb/
   CentOS Stream 9 / Rocky 9 用 NetworkManager + firewalld + dnf + SELinux（enforcing）；三系命令不要互换。
 - **Proxmox VE**：宿主是 Debian；集群配置在 `/etc/pve`（pmxcfs）；VM/LXC 用 `qm`/`pct`；网络用 `vmbr`/bond/
   VLAN-aware；备份用 `vzdump`/PBS；升级走 `pve8to9` 预检，改动前先备份 guest 与 `/etc/pve`。
-- **RosZ 平台**：MCP 是平台侧只读查询接口，与设备侧配置命令是两层；注意 `total` vs `matched`、离线快照、
+- **RosZ 平台**：MCP 是平台侧管理接口（能读能写取决于密钥档位，先自检再断言），与设备侧配置命令是两层；注意 `total` vs `matched`、离线快照、
   指标降采样、日志/NAT 时间窗口、云指令 24h 保留与超时语义；不泄露任何凭据。
 
 ## 导入 RAG 平台
@@ -224,12 +242,12 @@ kb/
 4. 同一厂商存在多 CLI 体系时先确认平台：Cisco IOS-XE 与 NX-OS、Juniper EX（交换）与 MX/SRX（路由/安全）、
    VyOS 1.3 与 1.4+（firewall 语法分水岭）、RouterOS v6 与 v7（路由菜单重构）、Ubuntu/Debian/CentOS 三系、
    PVE 8.x 与 9.x（Debian 底座与网卡命名）差异都写在对应篇目的「陷阱与版本差异」里。
-5. 设备只开放 WinBox（TCP 8291）时用插件原生工具 `mt_winbox_exec` 只读取证；平台侧查询用 RosZ MCP 只读工具，
+5. 设备只开放 WinBox（TCP 8291）时用插件原生工具 `mt_winbox_exec` 只读取证；平台侧查询用 RosZ MCP（先自检权限档），
    两者都禁止把凭据写进命令/日志/回答。
 
 ## 校验与维护
 
-- 结构校验：`plugins/dsh-network-engineer/tools/kb-validate.sh`（17 平台 / 130 篇：frontmatter、固定五节、
+- 结构校验：`plugins/dsh-network-engineer/tools/kb-validate.sh`（18 平台 / 138 篇：frontmatter、固定五节、
   速查表行数与列数、高危 ⚠️ 条目、来源链接、篇幅、主题齐全性）。
 - 插件测试：`cd plugins/dsh-network-engineer && npm test`（含知识库结构、跨平台一致性、预设组合、打包清单）。
 - 新增主题：按 `<平台>-<两位序号>-<主题>.md` 命名并在本 README 补充索引；修订文档后更新 `updated` 字段。
@@ -244,4 +262,4 @@ kb/
 - Linux 三系以 Ubuntu 24.04、Debian 12、CentOS Stream 9 / Rocky 9 为基线；更老/更新版本（22.04、Debian 13、
   Rocky 10 等）的差异以各项目官方文档为准。
 - Proxmox VE 内容按 8.x/9.x 官方文档整理；集群/存储/HA 的实际行为受硬件与网络环境影响，变更前仍需备份与演练。
-- RosZ 2 篇按 MCP 服务器（只读密钥）语义整理；平台接口、权限档与返回字段以 RosZ 控制台/官方说明为准。
+- RosZ 2 篇按 MCP 服务器语义整理，权限档以 `list_capabilities` 实时返回为准；平台接口与返回字段以 RosZ 控制台/官方说明为准。

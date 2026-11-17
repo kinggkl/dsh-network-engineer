@@ -1,0 +1,298 @@
+# ssh admin@192.168.100.254:22 exit=0
+FWF-80F-2R # show full-configuration
+config system global
+    set hostname "FWF-80F-2R"
+    set admin-sport 55443
+    set admintimeout 5
+    set timezone "Asia/Shanghai"
+    set dns-cache-limit 0
+    set gui-theme mariner
+end
+config system interface
+    edit "lan"
+        set vlanid 0
+        set ip 192.168.100.254 255.255.255.0
+        set allowaccess ping https http snmp fabric speed-test
+        set type physical
+        set snmp-index 5
+        set uuid 0d6bd8e0-1111-51f1-aaaa-bbbbccccdddd
+        set color 32
+        config secondaryip
+            edit 1
+                set ip 192.168.100.253 255.255.255.0
+            next
+        end
+        set device-identification enable
+    next
+    edit "wifi1"
+        set vlanid 0
+        set ip 10.10.10.1 255.255.255.0
+        set allowaccess ping https ssh
+        set type physical
+        set snmp-index 12
+        set uuid 0d6bd8e0-2222-51f1-aaaa-bbbbccccdddd
+    next
+    edit "wan1"
+        set allowaccess ping
+        set type physical
+        set snmp-index 9
+        set uuid 0d6bd8e0-3333-51f1-aaaa-bbbbccccdddd
+    next
+end
+config system admin
+    edit "admin"
+        set accprofile "super_admin"
+        set trusthost1 0.0.0.0 0.0.0.0
+        set password ENC AK1jFAKEciphertextAAAA1111BBBB2222CCCC3333DDDD4444EEEE5555FFFF
+    next
+    edit "netops"
+        set accprofile "prof_admin"
+        set trusthost1 10.10.10.0 255.255.255.0
+        set password ENC AK2jFAKEciphertextGGGG6666HHHH7777IIII8888JJJJ9999KKKK0000LLLLAAAA
+    next
+end
+config system snmp community
+    edit 1
+        set name "public"
+        set query-vdom disable
+        set events cpu-high mem-low log-full
+        set hosts
+        end
+    next
+end
+config system ntp
+    set ntpsync enable
+    set type fortiguard
+    set server-mode disable
+end
+config system dns
+    set primary 223.5.5.5
+    set secondary 114.114.114.114
+    set protocol cleartext
+end
+config router static
+    edit 1
+        set gateway 192.168.100.1
+        set device "wan1"
+        set distance 1
+        set uuid 0d6bd8e0-4444-51f1-aaaa-bbbbccccdddd
+    next
+    edit 2
+        set dst 10.20.0.0 255.255.0.0
+        set gateway 192.168.100.2
+        set device "wan1"
+        set distance 1
+        set uuid 0d6bd8e0-5555-51f1-aaaa-bbbbccccdddd
+    next
+end
+config firewall policy
+    edit 1
+        set name "lan-out"
+        set uuid 0d6bd8e0-6666-51f1-aaaa-bbbbccccdddd
+        set srcintf "lan"
+        set dstintf "wan1"
+        set action accept
+        set utm-status disable
+        set logtraffic utm
+        set auto-asic-offload disable
+    next
+    edit 2
+        set name "wifi-guest-deny"
+        set uuid 0d6bd8e0-7777-51f1-aaaa-bbbbccccdddd
+        set srcintf "wifi1"
+        set dstintf "lan"
+        set action deny
+        set utm-status enable
+        set logtraffic all
+    next
+end
+config firewall address
+    edit "obj-dns"
+        set uuid 0d6bd8e0-8888-51f1-aaaa-bbbbccccdddd
+        set subnet 8.8.8.8 255.255.255.255
+        set allow-routing disable
+    next
+    edit "obj-any"
+        set uuid 0d6bd8e0-9999-51f1-aaaa-bbbbccccdddd
+        set subnet 0.0.0.0 0.0.0.0
+        set allow-routing enable
+        set color 4
+    next
+end
+config firewall vip
+    edit "SSH-221-65222"
+        set uuid 0d6bd8e0-aaaa-51f1-aaaa-bbbbccccdddd
+        set extintf "any"
+        set extport 221
+        set mappedip "192.168.100.10"
+        set mappedport 22
+    next
+end
+config firewall ssl-ssh-profile
+    edit "no-inspection"
+        set comment "DEFAULT"
+        set caname "Fortinet_CA_SSL"
+        set inspection-mode flow
+    next
+end
+config firewall internet-service-name
+    edit "Google-Other"
+        set internet-service-id 65646
+        set type default
+    next
+    edit "Apple-Other"
+        set internet-service-id 65647
+        set type default
+    next
+end
+config system sdwan
+    set status enable
+    config zone
+        edit "LocalNet"
+            set service-sla-tie-break cfg-order
+        next
+        edit "GlobalNet"
+            set service-sla-tie-break cfg-order
+        next
+    end
+    config members
+        edit 1
+            set interface "wan1"
+            set zone "LocalNet"
+        next
+    end
+end
+config system replacemsg admin "admin-login"
+    set buffer "<html><body>admin login page (default)</body></html>"
+    set header http
+    set format html
+    set msg-type 2
+end
+config system replacemsg alertmail "alertmail-lib"
+    set buffer "<html><body>fortigate alert mail</body></html>"
+    set header http
+    set format html
+    set msg-type 2
+end
+config system replacemsg-group
+    edit "default"
+        set comment "predefined replacemsg group"
+        config entries
+            edit 1
+                set msg-type 2
+                set buffer "keep me"
+            next
+        end
+    next
+end
+config ips sensor
+    edit "default"
+        set comment "predefined ips sensor"
+        set status disable
+        config entries
+            edit 1
+                set severity high
+                set status disable
+                set action block
+            next
+        end
+    next
+end
+config application list
+    edit "block-p2p"
+        set comment "block peer to peer"
+        set control-session disable
+        config entries
+            edit 1
+                set category 4
+                set action block
+            next
+        end
+    next
+end
+config vpn certificate ca
+    edit "Fortinet_CA_SSL"
+        set source built-in
+        set range global
+    next
+end
+config vpn certificate local
+    edit "Fortinet_SSL"
+        set password ENC AK3jFAKEcertpasswordZZZZ1111YYYY2222XXXX3333WWWW4444VVVV5555
+        set private-key "-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAfakefakefakefakefakefakefakefakefakefakefake01
+MIIEpAIBAAKCAQEAfakefakefakefakefakefakefakefakefakefakefake02
+MIIEpAIBAAKCAQEAfakefakefakefakefakefakefakefakefakefakefake03
+-----END RSA PRIVATE KEY-----"
+        set certificate "-----BEGIN CERTIFICATE-----
+MIIDfakecertificatefakecertificatefakecertificatefakecert01
+MIIDfakecertificatefakecertificatefakecertificatefakecert02
+-----END CERTIFICATE-----"
+        set comments ''
+        set range global
+    next
+end
+config vpn certificate setting
+    set ocsp-status disable
+    set ssl-min-proto-version TLSv1-2
+end
+config vpn ipsec phase1-interface
+    edit "vpn-hq"
+        set interface "wan1"
+        set remote-gw 203.0.113.9
+        set psksecret ENC AK4jFAKEpsksecretQQQQ6666PPPP7777OOOO8888NNNN9999MMMM0000
+        set proposal aes256-sha256
+    next
+end
+config wireless-controller vap
+    edit "wifi1"
+        set ssid "Corp-WiFi"
+        set security wpa2-only-enterprise
+        set pmf disable
+        set vlanid 0
+        set auth usergroup "wifi_user"
+    next
+    edit "wifi2"
+        set ssid "Guest"
+        set security wpa2-only-enterprise
+        set pmf disable
+        set vlanid 0
+    next
+end
+config wireless-controller wtp-profile
+    edit "default"
+        set comment "default wtp profile"
+        config platform
+            set type 80F
+        end
+    next
+end
+config switch-controller managed-switch
+    edit "S1024D-FAKE0001"
+        set fsw-wan1-admin enable
+        set is-model
+    next
+end
+config system dhcp server
+    edit 1
+        set interface "lan"
+        set ip-range 192.168.100.10 192.168.100.199
+        set netmask 255.255.255.0
+        config reserved-address
+            edit 1
+                set ip 192.168.100.200
+                set mac 00:11:22:33:44:55
+            next
+        end
+        set dns-server1 223.5.5.5
+    next
+end
+config system vne-interface
+    edit "vne1"
+        set status disable
+    next
+end
+config system replacemsg utm "utm-av"
+    set buffer "<html><body>truncated capture starts here</body></html>"
+    set header http
+    set format html
