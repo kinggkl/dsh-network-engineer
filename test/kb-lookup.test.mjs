@@ -401,36 +401,33 @@ test('output.render returns exactly one text block', (t) => {
 // Registration in index.js
 // ---------------------------------------------------------------------------
 
-test('registerKbLookupTool() skips when the tools registry is unavailable', () => {
-  const warnings = []
-  const result = registerKbLookupTool({ logger: { warn: (message) => warnings.push(message) } })
-  assert.deepEqual(result, { status: 'skipped', reason: 'tools-unavailable' })
-  assert.equal(warnings.length, 1)
-  assert.match(warnings[0], /tools registry unavailable/)
+test('registerKbLookupTool() fails loudly when the tools registry is unavailable', () => {
+  assert.throws(() => registerKbLookupTool({ logger: {} }), /tools registry unavailable; cannot register kb_lookup/)
 })
 
-test('registerKbLookupTool() skips when the tool cannot be built', () => {
-  const { ctx, warnings } = createFakeContext()
-  const result = registerKbLookupTool(ctx, {
-    createTool: () => {
-      throw new Error('boom-build')
-    },
-  })
-  assert.deepEqual(result, { status: 'skipped', reason: 'tool-build-failed' })
-  assert.equal(warnings.length, 1)
-  assert.match(warnings[0], /cannot build kb_lookup: boom-build/)
+test('registerKbLookupTool() fails loudly when the tool cannot be built', () => {
+  const { ctx } = createFakeContext()
+  assert.throws(
+    () =>
+      registerKbLookupTool(ctx, {
+        createTool: () => {
+          throw new Error('boom-build')
+        },
+      }),
+    /cannot build kb_lookup: boom-build/,
+  )
 })
 
-test('registerKbLookupTool() skips when registration throws', () => {
-  const { ctx, warnings } = createFakeContext({
+test('registerKbLookupTool() fails loudly when registration throws', () => {
+  const { ctx } = createFakeContext({
     register: () => {
       throw new Error('boom-register')
     },
   })
-  const result = registerKbLookupTool(ctx, { createTool: () => ({ name: 'kb_lookup' }) })
-  assert.deepEqual(result, { status: 'skipped', reason: 'tool-registration-failed' })
-  assert.equal(warnings.length, 1)
-  assert.match(warnings[0], /cannot register kb_lookup: boom-register/)
+  assert.throws(
+    () => registerKbLookupTool(ctx, { createTool: () => ({ name: 'kb_lookup' }) }),
+    /cannot register kb_lookup: boom-register/,
+  )
 })
 
 test('registerKbLookupTool() registers the tool and returns its disposer', (t) => {

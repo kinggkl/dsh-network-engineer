@@ -152,11 +152,15 @@ test('npm pack tarball contains every runtime asset and no test/dev files', () =
     'LICENSE',
   ]
   for (const path of required) assert.ok(files.includes(path), `npm pack is missing ${path}`)
+  for (const path of ['tools/forti-trim.sh', 'tools/forti-trim.py']) assert.ok(files.includes(path), `npm pack is missing ${path} (SKILL.md and the FortiGate playbook call it)`)
+  assert.ok(!files.includes('tools/kb-validate.sh'), 'kb-validate.sh is a dev tool and must not be packed')
   assert.equal(files.filter((path) => path.startsWith('kb/') && path.endsWith('.md')).length, 139, 'kb/ should ship 138 docs + README')
   for (const path of files) {
     assert.ok(!path.startsWith('test/'), `test files must not be packed: ${path}`)
     assert.ok(!path.startsWith('node_modules/'), `node_modules must not be packed: ${path}`)
-    assert.ok(!path.startsWith('tools/'), `dev tools must not be packed: ${path}`)
+    if (path.startsWith('tools/')) {
+      assert.ok(['tools/forti-trim.sh', 'tools/forti-trim.py'].includes(path), `only the runtime FortiOS trimmer may be packed from tools/: ${path}`)
+    }
   }
 })
 

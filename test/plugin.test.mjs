@@ -144,34 +144,71 @@ test('apply() registers exactly one skill and one tool per call and is re-entran
   )
 })
 
-test('registerWinboxTool() degrades to a warning when the tools registry is unavailable', () => {
-  const { ctx, warnings } = createFakeContext()
+test('registerWinboxTool() fails loudly when the tools registry is unavailable', () => {
+  const { ctx } = createFakeContext()
   delete ctx.tools
-  const result = plugin.registerWinboxTool(ctx)
-  assert.deepEqual(result, { status: 'skipped', reason: 'tools-unavailable' })
-  assert.equal(warnings.length, 1)
-  assert.match(warnings[0], /tools registry unavailable/)
+  assert.throws(() => plugin.registerWinboxTool(ctx), /tools registry unavailable; cannot register mt_winbox_exec/)
 })
 
-test('registerWinboxTool() degrades to a warning when the tool cannot be built or registered', () => {
+test('registerWinboxTool() fails loudly when the tool cannot be built or registered', () => {
   const broken = createFakeContext()
-  const build = plugin.registerWinboxTool(broken.ctx, {
-    createTool: () => {
-      throw new Error('boom-build')
-    },
-  })
-  assert.deepEqual(build, { status: 'skipped', reason: 'tool-build-failed' })
-  assert.match(broken.warnings[0], /cannot build mt_winbox_exec: boom-build/)
+  assert.throws(
+    () =>
+      plugin.registerWinboxTool(broken.ctx, {
+        createTool: () => {
+          throw new Error('boom-build')
+        },
+      }),
+    /cannot build mt_winbox_exec: boom-build/,
+  )
 
   const rejected = createFakeContext()
   rejected.ctx.tools.register = () => {
     throw new Error('duplicate tool')
   }
-  const registration = plugin.registerWinboxTool(rejected.ctx, {
-    createTool: () => ({ name: 'mt_winbox_exec' }),
+  assert.throws(
+    () => plugin.registerWinboxTool(rejected.ctx, { createTool: () => ({ name: 'mt_winbox_exec' }) }),
+    /cannot register mt_winbox_exec: duplicate tool/,
+  )
+})
+
+test('resolveConfig() fills defaults for missing, partial and malformed config', () => {
+  assert.deepEqual(plugin.resolveConfig(undefined), {
+    skill: { enabled: true },
+    kbLookup: { enabled: true },
+    winbox: { enabled: true, allowWrite: true },
   })
-  assert.deepEqual(registration, { status: 'skipped', reason: 'tool-registration-failed' })
-  assert.match(rejected.warnings[0], /cannot register mt_winbox_exec: duplicate tool/)
+  assert.deepEqual(plugin.resolveConfig({ winbox: { allowWrite: false } }).winbox, { enabled: true, allowWrite: false })
+  assert.deepEqual(plugin.resolveConfig({ kbLookup: null, skill: 'x' }).skill, { enabled: true })
+})
+
+test('apply() honours the per-capability enabled switches', () => {
+  const off = createFakeContext()
+  plugin.apply(off.ctx, { skill: { enabled: false }, kbLookup: { enabled: false }, winbox: { enabled: false } })
+  assert.equal(off.registrations.length, 0)
+  assert.equal(off.toolRegistrations.length, 0)
+
+  const winboxOnly = createFakeContext()
+  plugin.apply(winboxOnly.ctx, { skill: { enabled: false }, kbLookup: { enabled: false } })
+  assert.deepEqual(winboxOnly.toolRegistrations.map((tool) => tool.name), ['mt_winbox_exec'])
+})
+
+test('winbox.allowWrite=false is forwarded as a read-only deployment gate', async () => {
+  const { ctx, toolRegistrations } = createFakeContext()
+  plugin.apply(ctx, { skill: { enabled: false }, kbLookup: { enabled: false }, winbox: { allowWrite: false } })
+  const error = await toolRegistrations[0]
+    .execute({ host: '192.0.2.10', commands: ['/system reboot'], allowWrite: true }, {})
+    .then(
+      () => assert.fail('expected rejection'),
+      (e) => e,
+    )
+  assert.equal(error.code, 'READ_ONLY_BLOCKED')
+  assert.match(error.message, /winbox\.allowWrite=false/)
+})
+
+test('Config is exported and stays optional when Schemastery is not importable', () => {
+  assert.ok('Config' in plugin)
+  assert.ok(plugin.Config === undefined || typeof plugin.Config === 'object' || typeof plugin.Config === 'function')
 })
 
 test('registerWinboxTool() returns the tool registration disposer', () => {

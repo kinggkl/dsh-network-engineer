@@ -37,6 +37,22 @@ index-first knowledge-base navigation and a FortiOS configuration trimming helpe
 - **原生 WinBox 终端工具**：`mt_winbox_exec` 直接走 WinBox 终端协议（TCP 8291，EC-SRP5 认证 + AES-128-CBC），不需要设备开 SSH/Telnet；默认只读命令门禁、凭据文件解析、密码脱敏、输出截断。
 - **工程质量**：自带知识库校验器（`tools/kb-validate.sh`）与 Node 原生测试套件（`test/`），覆盖插件行为、打包清单、预设组合、知识库结构、跨厂商一致性、WinBox 协议 golden vectors 与工具层安全。
 
+## 插件配置（`cordis.yml` / profile 的 `cordis.patch.yml`）
+
+插件行导出 `Config` schema，Cordis 加载时校验并填默认值；非法值会让插件加载失败并给出明确错误。
+
+```yaml
+- id: network-engineer-kb
+  config:
+    skill:
+      enabled: true        # 注册 network-command-kb 技能
+    kbLookup:
+      enabled: true        # 注册只读 kb_lookup 工具
+    winbox:
+      enabled: true        # 注册 mt_winbox_exec
+      allowWrite: true     # 部署级写闸门：false 时即使调用带 allowWrite=true 也一律拒绝
+```
+
 ## 安装
 
 **方式一（发布后 / 市场）**：经 [dshmarket](https://dshmarket.com) / [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 目录安装；或从 [GitHub Releases](https://github.com/kinggkl/dsh-network-engineer/releases) 克隆仓库后按方式二安装。本项目不通过 npm 分发。

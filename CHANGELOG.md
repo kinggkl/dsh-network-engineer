@@ -4,17 +4,36 @@
 
 ## 0.1.9 — 2026-11-18
 
+对照官方 DSH 文档（`publish.md` / `config.md` / `adding-a-tool.md`）与 DSH 0.2.2-rc.3 实机验证后的合规修复。
+
 ### Added
 
 - **`mt_winbox_exec` 支持取消**：`execute` 读取宿主传入的 `exec.signal`。信号触发时关闭 WinBox 客户端
   （中断进行中的连接、认证或命令）并抛出 `AbortError`；调用前已取消则不创建客户端；命令循环每条命令前后都会检查。
-  取消只关闭连接，不会向设备发送撤销指令。新增 3 项测试（已取消、命令中取消、无 `exec` 时正常）。
+  取消只关闭连接，不会向设备发送撤销指令。
+- **插件 `Config` schema**：导出 Schemastery schema，Cordis 在加载时校验并填默认值。字段：
+  `skill.enabled`、`kbLookup.enabled`、`winbox.enabled`、`winbox.allowWrite`（部署级写闸门：为 `false` 时，
+  即使调用带 `allowWrite=true` 也以 `READ_ONLY_BLOCKED` 拒绝）。Schemastery 来自宿主，经可选 peer 动态导入；
+  纯 Node 单测环境下导入失败则退回 `resolveConfig` 默认值。实机验证：非法值（如 `allowWrite: 'x'`）加载失败并给出
+  `ValidationError`，合法值正常启动。
+- **`engines.dsh: ">=0.2.0-0 <0.3.0"`**：安装与启动时由 DSH 校验版本范围（`-0` 以接受 0.2.x 预发布版）。
+- 新增测试：取消 3 项，配置与写闸门 5 项。
 
 ### Changed
 
+- **注册失败不再静默跳过**：`ctx.tools` 缺失、工具构建失败或注册失败（如重名）现在直接抛错，插件整体加载失败，
+  避免半残加载；此前只打警告并返回 `skipped`。
+- **`tools/forti-trim.sh` 与 `tools/forti-trim.py` 现在随包分发**：`SKILL.md` 与 FortiGate 巡检剧本都调用它，
+  此前 `files` 未包含，安装后的用户拿到的剧本无法执行裁剪步骤。`kb-validate.sh` 仍只在开发环境。
 - `npm test` 改为 `node --test test/*.test.mjs`，修复新版 Node（v26）把 `test/` 当文件执行而失败的问题。
-- README 版本号与发布步骤同步到当前版本。
-- 废弃的 KBLoader 热插拔设计文档移至 `docs/archive/`，并标注已废弃（由 `kb_lookup` 与官方 `ctx.skills` provider 取代）。
+- README 版本号同步；`package-lock.json` 版本同步到 0.1.9。
+- 废弃的 KBLoader 热插拔设计文档移至 `docs/archive/`，并标注已废弃（由 `kb_lookup` 与官方 `ctx.skills` 取代）。
+- `index.js` 注释更正：此前称第三方插件无法解析 `@deepseek-ai/*`，实测声明 `peerDependencies` 后可导入宿主副本。
+
+### Notes
+
+- 工具仍使用原始 `ToolDefinition`（官方允许，输入校验由工具自行负责），未改用 `defineTool`：它要求把
+  `@deepseek-ai/dsh-tools` 装成 devDependency，会让离线单测依赖 npm 上另一条版本线的重型 peer 依赖。
 
 ## 0.1.8 — 2026-11-17
 

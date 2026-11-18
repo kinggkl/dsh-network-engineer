@@ -16,6 +16,8 @@
     "skills/**",
     "kb/**",
     "playbooks/**",
+    "tools/forti-trim.sh",
+    "tools/forti-trim.py",
     "locale/*.json",
     "icon.svg",
     "README.md",
@@ -60,6 +62,17 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "validate": "bash tools/kb-validate.sh kb"
+  },
+  "engines": {
+    "dsh": ">=0.2.0-0 <0.3.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": "*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "js-yaml": "^4.1.0"
