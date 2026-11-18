@@ -2,6 +2,20 @@
 
 本项目遵循语义化版本；上游基线为 `dsh-network-engineer 0.1.0`。
 
+## 0.1.9 — 2026-11-18
+
+### Added
+
+- **`mt_winbox_exec` 支持取消**：`execute` 读取宿主传入的 `exec.signal`。信号触发时关闭 WinBox 客户端
+  （中断进行中的连接、认证或命令）并抛出 `AbortError`；调用前已取消则不创建客户端；命令循环每条命令前后都会检查。
+  取消只关闭连接，不会向设备发送撤销指令。新增 3 项测试（已取消、命令中取消、无 `exec` 时正常）。
+
+### Changed
+
+- `npm test` 改为 `node --test test/*.test.mjs`，修复新版 Node（v26）把 `test/` 当文件执行而失败的问题。
+- README 版本号与发布步骤同步到当前版本。
+- 废弃的 KBLoader 热插拔设计文档移至 `docs/archive/`，并标注已废弃（由 `kb_lookup` 与官方 `ctx.skills` provider 取代）。
+
 ## 0.1.8 — 2026-11-17
 
 ### Added

@@ -12,7 +12,7 @@ const pkg = JSON.parse(read('package.json'))
 
 test('package identity and version', () => {
   assert.equal(pkg.name, '@kinggkl/dsh-network-engineer')
-  assert.equal(pkg.version, '0.1.8')
+  assert.equal(pkg.version, '0.1.9')
   assert.equal(pkg.type, 'module')
   assert.equal(pkg.license, 'MIT')
   assert.match(pkg.description, /138 篇/)
@@ -161,7 +161,7 @@ test('npm pack tarball contains every runtime asset and no test/dev files', () =
 })
 
 test('dev script and tooling entries are wired', () => {
-  assert.equal(pkg.scripts.test, 'node --test test/')
+  assert.equal(pkg.scripts.test, 'node --test test/*.test.mjs')
   assert.equal(pkg.scripts.validate, 'bash tools/kb-validate.sh kb')
   assert.ok(pkg.devDependencies['js-yaml'])
   assert.ok(statSync(pathOf('tools/kb-validate.sh')).isFile())
