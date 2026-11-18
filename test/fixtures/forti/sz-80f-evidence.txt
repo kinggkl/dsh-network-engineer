@@ -1,0 +1,452 @@
+# ── 脱敏重构夹具 ─────────────────────────────────────────────────────────────
+# 结构照 2026-11-16 深圳 FortiWiFi-80F-2R 实测回显重写，公网 IP、账号名与对象名已替换为 RFC 5737 文档地址与占位名，密钥已替换。
+# 用途：test/forti-baseline.test.mjs 的回归基准 —— 裁剪后每条检查项的证据行必须仍在。
+# 改动这里必须同步 playbooks/fortigate-audit.md 与 playbooks/fortigate-audit.checks.json。
+
+config system global
+    set admin-sport 55443
+    set hostname "FWF-AUDIT-FIXTURE"
+    set switch-controller enable
+    set timezone 46
+end
+
+config log memory setting
+    set status enable
+    set max-log-file-size 0
+end
+
+config system admin
+    edit "admin"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK1jFAKEENCadmin
+    next
+    edit "ops-admin-2"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK1jFAKEENCops2
+    next
+    edit "ops-admin-3"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK1jFAKEENCops3
+    next
+end
+
+config system interface
+    edit "wan1"
+        set vdom "root"
+        set ip 192.168.201.1 255.255.255.0
+        set allowaccess ping
+        set role wan
+        set snmp-index 2
+        set uuid 0d6bd8e0-1111-2222-3333-444455556666
+    next
+    edit "wan2"
+        set vdom "root"
+        set ip 203.0.113.10 255.255.255.192
+        set allowaccess ping
+        set role wan
+        set snmp-index 4
+    next
+    edit "lan"
+        set vdom "root"
+        set ip 192.168.100.254 255.255.255.0
+        set allowaccess ping https ssh snmp http fabric speed-test
+        set type switch
+        set color 1
+    next
+    edit "wifi1"
+        set vdom "root"
+        set ip 192.168.101.1 255.255.255.0
+        set allowaccess ping https ssh
+        set type vap-switch
+    next
+    edit "MIG-TMP"
+        set vdom "root"
+        set ip 192.168.103.1 255.255.255.0
+        set allowaccess ping https ssh
+        set type vap-switch
+        set snmp-index 12
+    next
+    edit "fortilink"
+        set vdom "root"
+        set fortilink enable
+        set ip 10.255.1.1 255.255.255.0
+        set type aggregate
+    next
+    edit "inside_server"
+        set vdom "root"
+        set fortilink enable
+        set ip 192.168.102.1 255.255.255.0
+        set vlanid 12
+    next
+    edit "wifi"
+        set vdom "root"
+        set type vap-switch
+        set status down
+    next
+    edit "internal1"
+        set vdom "root"
+    next
+end
+
+config system snmp community
+    edit 1
+        set name "public"
+        set query-v1-status enable
+        config hosts
+            edit 1
+                set source-ip 0.0.0.0 0.0.0.0
+            next
+            edit 2
+                set ip 192.168.100.119 255.255.255.255
+            next
+        end
+    next
+end
+
+config system ntp
+    set ntpsync enable
+    set type fortiguard
+    set syncinterval 60
+    set authentication disable
+end
+
+config system dns
+    set primary 192.168.100.253
+    set secondary 223.5.5.5
+    set timeout 1
+    set dns-cache-limit 0
+end
+
+config system dhcp server
+    edit 1
+        set interface "lan"
+        set dns-service local
+        config ip-range
+            edit 1
+                set start-ip 192.168.102.100
+                set end-ip 192.168.102.199
+            next
+        end
+        config reserved-address
+            edit 3
+                set ip 192.168.102.200
+                set mac d4:11:22:33:44:55
+            next
+        end
+    next
+end
+
+config firewall policy
+    edit 1
+        set name "Default Policy"
+        set srcintf "lan" "inside_server"
+        set dstintf "GlobalNet" "LocalNet"
+        set action accept
+        set utm-status enable
+        set ssl-ssh-profile "custom-deep-inspection"
+        set application-list "default"
+        set auto-asic-offload disable
+        set logtraffic all
+        set nat enable
+    next
+    edit 2
+        set name "ARMT_Office"
+        set srcintf "wifi1"
+        set dstintf "LocalNet"
+        set action accept
+        set utm-status enable
+        set auto-asic-offload disable
+    next
+    edit 14
+        set name "Drop-bad-host"
+        set srcintf "lan"
+        set dstintf "LocalNet" "lan"
+        set dstaddr "host-object-1"
+        set logtraffic all
+    next
+    edit 15
+        set name "Guest"
+        set srcintf "wifi2"
+        set dstintf "LocalNet" "lan"
+        set action accept
+        set logtraffic all
+        set nat enable
+    next
+    edit 16
+        set status disable
+        set srcintf "lan"
+        set dstintf "any"
+        set nat enable
+    next
+    edit 19
+        set srcintf "inside_server"
+        set dstintf "lan"
+        set action accept
+        set logtraffic disable
+    next
+    edit 24
+        set name "ARMT_Guest-220-230"
+        set srcintf "wifi2"
+        set dstintf "lan"
+        set dstaddr "ARMT_Net_220_230"
+        set action accept
+        set nat enable
+    next
+    edit 25
+        set srcintf "wifi1"
+        set dstintf "wifi2"
+        set action accept
+        set logtraffic disable
+    next
+end
+
+config firewall address
+    edit "host-object-1"
+        set subnet 203.0.113.20 255.255.255.255
+    next
+    edit "ipsec-to-BJ_local"
+        set subnet 10.101.64.0 255.255.255.0
+    next
+    edit "ARMT_Net_220_230"
+        set type iprange
+        set start-ip 192.168.100.220
+        set end-ip 192.168.100.230
+    next
+    edit "test"
+    next
+    edit "tradingview-main"
+        set type fqdn
+        set fqdn "www.tradingview.com"
+        set allow-routing enable
+    next
+end
+
+config firewall vip
+    edit "test_60e"
+        set extip 192.168.100.254
+        set extintf "any"
+        set portforward enable
+        set mappedip "10.60.1.1"
+        set extport 60111
+        set mappedport 443
+    next
+    edit "SSH-221-65222"
+        set extip 203.0.113.10
+        set extintf "wan2"
+        set portforward enable
+        set mappedip "192.168.100.221"
+        set extport 65222
+        set mappedport 22
+    next
+    edit "SSH-228-65322"
+        set extip 203.0.113.10
+        set extintf "any"
+        set mappedip "192.168.100.228"
+        set extport 65322
+        set mappedport 22
+        set status disable
+    next
+end
+
+config system sdwan
+    set status enable
+    config zone
+        edit "virtual-wan-link"
+        next
+        edit "GlobalNet"
+        next
+        edit "LocalNet"
+        next
+    end
+    config members
+        edit 2
+            set interface "wan1"
+            set zone "LocalNet"
+            set cost 20
+        next
+        edit 4
+            set interface "wan2"
+            set zone "LocalNet"
+            set cost 10
+            set gateway 203.0.113.1
+        next
+    end
+    config health-check
+        edit "Default_Gmail"
+            set server "gmail.com"
+            set interval 1000
+            set failtime 2
+        next
+        edit "Default_Google Search"
+            set server "www.google.com"
+        next
+        edit "Default_Office_365"
+            set server "www.office.com"
+        next
+    end
+end
+
+config router static
+    edit 2
+        set sdwan-zone "LocalNet"
+    next
+    edit 5
+        set dst 8.8.8.8 255.255.255.255
+        set gateway 192.168.201.254
+        set device "wan1"
+        set distance 1
+    next
+    edit 6
+        set dst 1.1.1.1 255.255.255.255
+        set gateway 192.168.201.254
+        set device "wan1"
+        set distance 1
+    next
+    edit 7
+        set dst 9.9.9.9 255.255.255.255
+        set gateway 192.168.201.254
+        set device "wan1"
+        set distance 1
+    next
+    edit 9
+        set dst 10.128.128.0 255.255.255.0
+        set gateway 192.168.100.252
+        set device "lan"
+    next
+    edit 11
+        set dst 198.51.100.254 255.255.255.255
+        set gateway 192.168.201.254
+        set device "wan1"
+        set distance 1
+        set status disable
+    next
+end
+
+config wireless-controller vap
+    edit "ARMT_Office"
+        set ssid "ARMT_Office"
+        set security wpa2-only-enterprise
+        set pmf disable
+        set vlanid 0
+        set auth usergroup
+        set usergroup "wifi_user"
+    next
+    edit "ARMT_Guest"
+        set ssid "ARMT_Guest"
+        set security wpa2-only-personal
+        set pmf disable
+        set passphrase ENC AK1jFAKEENCpsk
+    next
+    edit "ARMT_IOT"
+        set ssid "ARMT_IOT"
+        set security wpa2-only-personal
+        set pmf disable
+        set broadcast-ssid disable
+    next
+    edit "MIG-TMP"
+        set ssid "MIG-TMP"
+        set security wpa2-only-personal
+        set pmf disable
+        set status enable
+    next
+end
+
+config wireless-controller wtp-profile
+    edit "FWF-default"
+        set comment "default"
+        set ap-country CN
+    next
+end
+
+config user radius
+end
+
+config user group
+    edit "wifi_user"
+        set member "zhangjing" "panjiyuan" "yangming" "caoyi" "Mi" "baojunnan" "zhangxiangyan"
+    next
+end
+
+config firewall ssl-ssh-profile
+    edit "custom-deep-inspection"
+        config https
+            set ports 443
+            set status certificate-inspection
+        end
+        config quic
+            set status bypass
+        end
+        config ssh
+            set status disable
+        end
+    next
+end
+
+config application list
+    edit "default"
+        set other-application-log enable
+        set unknown-application-log enable
+        config entries
+            edit 1
+                set category 2 6 7
+                set log enable
+            next
+            edit 2
+                set category 8 12 15 23
+                set log enable
+            next
+            edit 3
+                set application 16882 16883
+                set log enable
+            next
+        end
+    next
+end
+
+config ips sensor
+    edit "default"
+        set comment "default sensor"
+        set status disable
+        config entries
+            edit 1
+                set severity high critical
+                set status disable
+            next
+            edit 2
+                set severity medium
+                set log enable
+                set status disable
+            next
+        end
+    next
+end
+
+config system replacemsg admin "admin-login"
+    set buffer "<html><head><title>Login</title><style>body{font-family:sans-serif}</style></head><body><form method=post><input name=username><input name=secret type=password></form></body></html>"
+    set header http
+end
+
+config system replacemsg admin "auth-fortitoken"
+    set buffer "<html><head><title>Two-factor</title></head><body><p>Enter your token</p><form method=post><input name=token></form></body></html>"
+    set header http
+end
+
+config system replacemsg alertmail "alertmail-lib"
+    set buffer "%%HOSTNAME%% alert %%ALERTTYPE%% at %%DATE%% %%TIME%%: %%LOGMESSAGE%%"
+    set charset utf-8
+    set format text
+    set subject "Alert from %%HOSTNAME%%"
+end
+
+config vpn certificate local
+    edit "Fortinet_SSL"
+        set private-key "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIEpAIBAAKCAQEAfakefakefake\n-----END ENCRYPTED PRIVATE KEY-----\n"
+        set certificate "-----BEGIN CERTIFICATE-----\nMIICfakecert\n-----END CERTIFICATE-----\n"
+    next
+end
+
+config vpn ipsec phase1-interface
+end

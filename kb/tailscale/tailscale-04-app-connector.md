@@ -83,6 +83,9 @@ sudo tailscale up \
 - 用 API 核对设备路由**必须带 `?fields=all`**：`GET /api/v2/device/<id>` 默认不返回 `advertisedRoutes`/`enabledRoutes`，字段缺失很容易被误读成「0 条路由」。
 - 打 tag 的设备 `keyExpiryDisabled=true`，key 不再过期，等于一台无人值守设备，ACL 要按最小权限收紧。
 - connector 会按域名的 AAAA 记录自动宣告 IPv6 路由，即使本机没有 v6 上游；没有 v6 出口时这些宣告只让客户端先失败再回退 v4，详见 `tailscale-03-subnet-exit.md`。
+- 验证端口映射是否真的生效，不要看 `netcheck`：从**另一台**节点 `tailscale ping <connector>`，第一次走 DERP、第二次起变成 `via <公网IP>:41641` 就说明入向已通；`netcheck` 报的是出向 STUN 映射端口（DNAT+SNAT 下常是随机端口），显示随机端口不代表没做转发。
+- 控制台「connector 配置不当」的判定**会受节点是否开启 IPv6 转发影响**：2026-11 HIG 实测，节点无 v6 上游但 `net.ipv6.conf.all.forwarding` 为 0 时 Apps 页持续标 Needs action、改 `/api/v2/device/<id>?fields=all` 的 `advertisedRoutes`/`clientSupports.ipv6` 均无变化；把该内核参数置 1 后控制台转绿。判定口径与实际 v6 连通性是两件事，转绿不代表 v6 可通（此例容器只有 fe80、无 v6 默认路由）。
+- 给 connector 换 DNS（例如换成过滤 AAAA 的解析）后，已宣告的 v6 路由**不会立刻消失**：appc 的 routeInfo 是带 TTL 的缓存，旧条目要等过期，控制面按节点上报逐步收敛。看 `/api/v2/device/<id>?fields=all` 的 `advertisedRoutes` 逐分钟变化，别把 `systemctl restart tailscaled` 当成立即清空的开关。
 
 ## 高危操作 ⚠️
 

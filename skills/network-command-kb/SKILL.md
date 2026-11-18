@@ -27,6 +27,18 @@ Ubuntu / Debian / CentOS 各 8 篇、Proxmox VE 8 篇、RosZ MCP 平台 2 篇、
   04 链路聚合、05 静态路由、06 OSPF、07 ACL、08 远程管理与诊断
 - `kb/README.md` 为总览、平台索引、跨平台差异对照与 RAG 导入指南
 
+## 巡检剧本（做配置审计时先读剧本，不要临场发挥）
+
+包根 `playbooks/` 下是与知识库配套的**固定巡检剧本**：
+
+- `playbooks/fortigate-audit.md`：FortiGate/FortiWiFi 配置合理性审计 v1——采集命令集（按批，一批一次登录）、
+  33 条判据（F-01…F-33，含严重度与 KB 篇目引用）、输出模板、版本注意。
+- `playbooks/fortigate-audit.checks.json`：同一批判据的机器可读版，供 `test/forti-baseline.test.mjs` 回归，
+  也用于「裁剪后结论是否还推得出来」的验收。
+
+做 FortiGate 审计时先读剧本，再按剧本的批 A–E 采集，用 `tools/forti-trim.sh` 裁剪（原文先落盘），
+最后照模板出报告。新增检查项要同时改 md、json 与夹具，三者缺一不可。
+
 ## 检索方法（read / glob / grep 工具）
 
 1. **优先用只读工具 `kb_lookup`**：只给 `vendor`（如 `huawei`）列出该平台的全部篇目；`vendor` + `topic`

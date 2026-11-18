@@ -64,6 +64,8 @@ sysctl net.ipv4.ip_forward
 - 排障顺序固定：设备侧（服务/转发/路由）→ 控制平面 API（带 `?fields=all`）→ 客户端路由表（`netstat -rn` 是否指向 utun/tailscale0）→ 真实出口 IP（`curl https://www.cloudflare.com/cdn-cgi/trace` 看 `ip=`）。出口 IP 是分流是否生效的唯一硬证据。
 - 控制面 UI 的告警文案通常很笼统（如「Needs action」「aren't configured properly」），不要据此直接改 ACL；先拿设备日志与 API 的确定性数据，再动策略。
 - 客户端已装路由但流量没进隧道时，先排除本机其它代理/虚拟网卡抢流量（`route -n get <IP>`、`scutil --proxy`、`netstat -rn` 计数），再怀疑服务端。
+- 判断 DNS 是否过滤 IPv6，只看 `dig @<dns> <域名> AAAA`：`NOERROR` 但 `ANSWER: 0` 才是过滤；`getent ahostsv6` 打印的 `::ffff:a.b.c.d` 是 glibc 把 A 记录映射成 v6 形式，不代表存在 AAAA。
+- 验证入向端口映射是否生效，从对端做 `tailscale ping <节点>`：升级到 `via <公网IP>:41641` 即通；控制面 Endpoints 里出现 `公网IP:41641` 与之一致。仅凭 `netcheck` 的随机映射端口判断会误判成「没有端口转发」。
 
 ## 高危操作 ⚠️
 

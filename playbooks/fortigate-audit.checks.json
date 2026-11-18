@@ -1,0 +1,269 @@
+{
+  "playbook": "fortigate-audit",
+  "version": 1,
+  "description": "FortiGate 配置合理性巡检的机器可读判据。与 playbooks/fortigate-audit.md 的 F-xx 编号一一对应；每条 assert 描述『裁剪后仍必须能在回显里看到的证据』，用于 test/forti-baseline.test.mjs 的回归。manual 条目无法机械判定，需人工看回显或查官方生命周期页。",
+  "fixture": "test/fixtures/forti/sz-80f-evidence.txt",
+  "checks": [
+    {
+      "id": "F-01", "severity": "P0", "title": "日志不可持久：无硬盘、无 syslog/FAZ",
+      "kb": "kb/fortinet/fortinet-01-system.md",
+      "assert": [
+        { "kind": "present", "pattern": "^config log memory setting$", "min": 1 },
+        { "kind": "absent", "pattern": "^config log syslogd setting$" },
+        { "kind": "absent", "pattern": "^config log fortianalyzer setting$" }
+      ]
+    },
+    {
+      "id": "F-02", "severity": "P0", "title": "管理员全 super_admin，无 trusthost、无 2FA",
+      "kb": "kb/fortinet/fortinet-01-system.md",
+      "assert": [
+        { "kind": "present", "pattern": "set accprofile \"super_admin\"", "min": 2 },
+        { "kind": "absent", "pattern": "set trusthost1" },
+        { "kind": "absent", "pattern": "set two-factor" }
+      ]
+    },
+    {
+      "id": "F-03", "severity": "P0", "title": "管理面协议过宽，终端网段可管设备",
+      "kb": "kb/fortinet/fortinet-03-interface.md",
+      "assert": [
+        { "kind": "present", "pattern": "set allowaccess ping https ssh snmp http fabric speed-test", "min": 1 },
+        { "kind": "present", "pattern": "set allowaccess ping https ssh$", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-04", "severity": "P0", "title": "缺第二道门 local-in-policy",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "absent", "pattern": "^config firewall local-in-policy$" }
+      ]
+    },
+    {
+      "id": "F-05", "severity": "P0", "title": "公网 VIP 直通内网明文 SSH",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set extport 65222", "min": 1 },
+        { "kind": "present", "pattern": "set mappedport 22$", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-06", "severity": "P0", "title": "SNMP community 为 public 且 query 未限源",
+      "kb": "kb/fortinet/fortinet-01-system.md",
+      "assert": [
+        { "kind": "present", "pattern": "set name \"public\"", "min": 1 },
+        { "kind": "present", "pattern": "set query-v1-status enable", "min": 1 },
+        { "kind": "present", "pattern": "set source-ip 0.0.0.0 0.0.0.0", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-07", "severity": "P1", "title": "访客策略 dstintf 含内网接口",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set dstintf \"LocalNet\" \"lan\"", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-08", "severity": "P1", "title": "『深度检测』实为证书检测 + QUIC 旁路",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set status certificate-inspection", "min": 1 },
+        { "kind": "present", "pattern": "set status bypass", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-09", "severity": "P1", "title": "应用控制空转：application-list 无 block 条目",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "manual": true,
+      "manualReason": "application list 整棵子树被 forti-trim 折叠，判据需回 raw 归档执行 `grep -B3 \"set action block\"`，不能在裁剪版上判定",
+      "assert": []
+    },
+    {
+      "id": "F-10", "severity": "P1", "title": "UTM 特征库陈旧",
+      "kb": "kb/fortinet/fortinet-01-system.md",
+      "manual": true,
+      "manualReason": "AV/IPS DB 日期来自 `get system status` 输出，不是 config 段；且订阅状态需 `diagnose autoupdate versions`（只读门禁下拿不到）",
+      "assert": []
+    },
+    {
+      "id": "F-11", "severity": "P1", "title": "内网互访开 NAT",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set name \"ARMT_Guest-220-230\"", "min": 1 },
+        { "kind": "present", "pattern": "set nat enable", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-12", "severity": "P1", "title": "策略无日志 / 无名 / disable 残留",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set logtraffic disable", "min": 2 },
+        { "kind": "present", "pattern": "set status disable", "min": 1, "allowLoss": 3, "note": "ips sensor 子树里的 3 处 set status disable 随折叠一起归纳，policy/VIP 里的必须保留" },
+        { "kind": "present", "pattern": "^ {4}edit 16$", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-13", "severity": "P1", "title": "办公无线与访客网段全通",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set srcintf \"wifi1\"", "min": 1 },
+        { "kind": "present", "pattern": "set dstintf \"wifi2\"", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-14", "severity": "P1", "title": "服务器段与办公段全通、无 UTM 无日志",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set srcintf \"inside_server\"", "min": 1 },
+        { "kind": "present", "pattern": "set dstintf \"lan\"", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-15", "severity": "P1", "title": "VAP 全 pmf disable、仅 wpa2-only、vlanid 0",
+      "kb": "kb/fortinet/fortinet-08-remote-diagnostics.md",
+      "assert": [
+        { "kind": "present", "pattern": "set pmf disable", "min": 2 },
+        { "kind": "present", "pattern": "set security wpa2-only-enterprise", "min": 1 },
+        { "kind": "present", "pattern": "set vlanid 0", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-16", "severity": "P1", "title": "企业级 SSID 无 RADIUS，仅本地账号",
+      "kb": "kb/fortinet/fortinet-08-remote-diagnostics.md",
+      "assert": [
+        { "kind": "present", "pattern": "^config user radius$", "min": 1 },
+        { "kind": "present", "pattern": "set member \"zhangjing\"", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-17", "severity": "P1", "title": "临时/迁移 SSID 与接口未清理",
+      "kb": "kb/fortinet/fortinet-08-remote-diagnostics.md",
+      "assert": [
+        { "kind": "present", "pattern": "^ {4}edit \"MIG-TMP\"$", "min": 2 }
+      ]
+    },
+    {
+      "id": "F-18", "severity": "P1", "title": "无 WIDS/rogue AP 检测、访客无限速",
+      "kb": "kb/fortinet/fortinet-08-remote-diagnostics.md",
+      "assert": [
+        { "kind": "present", "pattern": "^config wireless-controller wtp-profile$", "min": 1 },
+        { "kind": "absent", "pattern": "wids-profile" }
+      ]
+    },
+    {
+      "id": "F-19", "severity": "P1", "title": "DNS 代理缓存关闭、超时过短",
+      "kb": "kb/fortinet/fortinet-01-system.md",
+      "assert": [
+        { "kind": "present", "pattern": "set dns-cache-limit 0", "min": 1 },
+        { "kind": "present", "pattern": "set timeout 1", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-20", "severity": "P1", "title": "NTP 依赖 FortiGuard 且无认证",
+      "kb": "kb/fortinet/fortinet-01-system.md",
+      "assert": [
+        { "kind": "present", "pattern": "set type fortiguard", "min": 1 },
+        { "kind": "present", "pattern": "set authentication disable", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-21", "severity": "P2", "title": "SD-WAN zone 名与语义相反、空 zone",
+      "kb": "kb/fortinet/fortinet-05-static-route.md",
+      "assert": [
+        { "kind": "present", "pattern": "set zone \"LocalNet\"", "min": 2 },
+        { "kind": "present", "pattern": "^ {8}edit \"GlobalNet\"$", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-22", "severity": "P2", "title": "策略引用空 zone",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set dstintf \"GlobalNet\" \"LocalNet\"", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-23", "severity": "P2", "title": "手工 /32 分流路由（distance 1）",
+      "kb": "kb/fortinet/fortinet-05-static-route.md",
+      "assert": [
+        { "kind": "present", "pattern": "set distance 1", "min": 4 }
+      ]
+    },
+    {
+      "id": "F-24", "severity": "P2", "title": "健康检查探测境外站点",
+      "kb": "kb/fortinet/fortinet-05-static-route.md",
+      "assert": [
+        { "kind": "present", "pattern": "set server \"gmail.com\"", "min": 1 },
+        { "kind": "present", "pattern": "set server \"www.google.com\"", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-25", "severity": "P2", "title": "fortilink 聚合口无成员，子接口悬空",
+      "kb": "kb/fortinet/fortinet-03-interface.md",
+      "assert": [
+        { "kind": "present", "pattern": "^ {4}edit \"fortilink\"$", "min": 1 },
+        { "kind": "present", "pattern": "set type aggregate", "min": 1 },
+        { "kind": "absent", "pattern": "set member \"internal1\"" }
+      ]
+    },
+    {
+      "id": "F-26", "severity": "P2", "title": "switch-controller 开启但无受管设备",
+      "kb": "kb/fortinet/fortinet-01-system.md",
+      "assert": [
+        { "kind": "present", "pattern": "set switch-controller enable", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-27", "severity": "P2", "title": "死对象残留（VIP / 地址）",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "^ {4}edit \"test_60e\"$", "min": 1 },
+        { "kind": "present", "pattern": "^ {4}edit \"ipsec-to-BJ_local\"$", "min": 1 },
+        { "kind": "present", "pattern": "^ {4}edit \"tradingview-main\"$", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-28", "severity": "P2", "title": "VIP 的 extip 等于设备自身接口 IP",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set extip 192.168.100.254", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-29", "severity": "P2", "title": "策略 ID 乱序/跳号",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "^ {4}edit 19$", "min": 1 },
+        { "kind": "present", "pattern": "^ {4}edit 24$", "min": 1 },
+        { "kind": "absent", "pattern": "^ {4}edit 8$" }
+      ]
+    },
+    {
+      "id": "F-30", "severity": "P2", "title": "策略关硬件加速 auto-asic-offload disable",
+      "kb": "kb/fortinet/fortinet-07-acl.md",
+      "assert": [
+        { "kind": "present", "pattern": "set auto-asic-offload disable", "min": 2 }
+      ]
+    },
+    {
+      "id": "F-31", "severity": "P2", "title": "DHCP 保留地址落在地址池外",
+      "kb": "kb/fortinet/fortinet-03-interface.md",
+      "assert": [
+        { "kind": "present", "pattern": "set end-ip 192.168.102.199", "min": 1 },
+        { "kind": "present", "pattern": "set ip 192.168.102.200", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-32", "severity": "P2", "title": "接口空置/未命名、wifi 接口 down 但 VAP 仍广播",
+      "kb": "kb/fortinet/fortinet-03-interface.md",
+      "assert": [
+        { "kind": "present", "pattern": "^ {4}edit \"wifi\"$", "min": 1 },
+        { "kind": "present", "pattern": "set status down", "min": 1 }
+      ]
+    },
+    {
+      "id": "F-33", "severity": "P2", "title": "固件版本是否仍在支持分支",
+      "kb": "kb/fortinet/fortinet-01-system.md",
+      "manual": true,
+      "manualReason": "需比对厂商 Product Lifecycle 页面的当前支持分支，无法从回显机械判定",
+      "assert": []
+    }
+  ]
+}

@@ -927,3 +927,58 @@ test('lib/mikrotik-tool.mjs has no @deepseek-ai import (raw ToolDefinition only)
   assert.ok(!/import\s+['"]@deepseek-ai\//.test(source))
   assert.ok(!/require\(\s*['"]@deepseek-ai\//.test(source))
 })
+
+// ---------------------------------------------------------------------------
+// Cancellation (exec.signal)
+// ---------------------------------------------------------------------------
+
+test('an already-aborted signal rejects with AbortError before any client work', async (t) => {
+  const client = createFakeClient()
+  const { factory, state } = createFactory(client)
+  const tool = createWinboxTool({ clientFactory: factory })
+  const file = makeCredentialsFile(t, { default: { username: 'admin', password: PASSWORD } })
+  const controller = new AbortController()
+  controller.abort()
+
+  const error = await captureError(tool.execute(baseArgs(file), { signal: controller.signal }))
+
+  assert.equal(error.name, 'AbortError')
+  assert.equal(state.calls, 0, 'client factory must not be called')
+})
+
+test('aborting mid-command closes the client and rejects with AbortError', async (t) => {
+  const controller = new AbortController()
+  let release
+  const hang = new Promise((resolve) => { release = resolve })
+  const client = createFakeClient({
+    runCommand: async () => {
+      controller.abort()
+      await hang
+      return ''
+    },
+  })
+  const baseClose = client.close
+  client.close = async () => {
+    await baseClose()
+    release()
+  }
+  const { factory } = createFactory(client)
+  const tool = createWinboxTool({ clientFactory: factory })
+  const file = makeCredentialsFile(t, { default: { username: 'admin', password: PASSWORD } })
+
+  const error = await captureError(tool.execute(baseArgs(file), { signal: controller.signal }))
+
+  assert.equal(error.name, 'AbortError')
+  assert.ok(client.calls.close >= 1, 'client must be closed on abort')
+})
+
+test('execute works without an exec context or signal', async (t) => {
+  const client = createFakeClient({ outputs: { '/system resource print': 'ok' } })
+  const { factory } = createFactory(client)
+  const tool = createWinboxTool({ clientFactory: factory })
+  const file = makeCredentialsFile(t, { default: { username: 'admin', password: PASSWORD } })
+
+  const value = await tool.execute(baseArgs(file))
+
+  assert.equal(value.commands[0].ok, true)
+})

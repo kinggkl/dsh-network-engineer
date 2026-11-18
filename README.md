@@ -7,7 +7,7 @@ screenshot reading and online manual lookup, and only answers networking topics.
 devices whose CLI is reachable only through WinBox. v0.1.7 adds a read-only `kb_lookup` tool for
 index-first knowledge-base navigation and a FortiOS configuration trimming helper (`tools/forti-trim.py`).
 
-> **社区延续版本 v0.1.7。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
+> **社区延续版本 v0.1.9。** 本项目基于 [sososilencing/dsh-network-engineer](https://github.com/sososilencing/dsh-network-engineer)
 > 0.1.0（MIT）重构：修复上游 issue #3 的 skill 注册路径与预设工具链缺陷，新增 8 个厂商 64 篇文档，
 > 把知识库扩展到 12 厂商 / 96 篇，v0.1.3 增加原生 MikroTik WinBox 终端工具，v0.1.4 补 Proxmox VE 宿主两篇，v0.1.5 扩到 17 平台 / 130 篇（Linux 三系、Proxmox VE 8 篇、RosZ 平台 2 篇），v0.1.6 扩到 18 平台 / 138 篇（新增 Tailscale 8 篇）。原作者的插件骨架、
 > 预设思路与首批 4 厂商 32 篇文档是这条工作的基础，来源与致谢见 [NOTICE.md](NOTICE.md)。
@@ -261,8 +261,8 @@ npm run validate       # 18 平台 138 篇文档结构校验
 发布渠道为 GitHub Release（不通过 npm 分发）：
 
 1. 确认 `npm test` 与 `npm run validate` 全绿后提交，并在 `main` 上打 tag：
-   `git tag v0.1.7 && git push origin main v0.1.7`。
-2. `gh release create v0.1.7 --title "v0.1.7 — …" --notes-file <notes>` 创建 Release
+   `git tag v0.1.9 && git push origin main v0.1.9`。
+2. `gh release create v0.1.9 --title "v0.1.9 — …" --notes-file <notes>` 创建 Release
    （附变更摘要、校验值与升级说明）。
 3. 向 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 目录提交一条条目；
    [dshmarket](https://dshmarket.com) 通常随后自动收录（详见 `NOTICE.md` 与仓库 Issues）。
