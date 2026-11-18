@@ -2,7 +2,33 @@
 
 本项目遵循语义化版本；上游基线为 `dsh-network-engineer 0.1.0`。
 
-## Unreleased
+## 0.1.8 — 2026-11-17
+
+### Added
+
+- **FortiGate 巡检剧本 `playbooks/fortigate-audit.md` v1**：把 2026-11-16 深圳 FortiWiFi-80F-2R 审计
+  （33 条问题）提炼成可重复的剧本——使用前提 5 条（只读/先备份/串行登录/原文先落盘/diagnose 受限）、
+  批 A–E 采集命令集、**33 条判据 F-01…F-33**（分 P0/P1/P2，每条带「命中即问题」的判据与 KB 篇目引用）、
+  输出模板（P0/P1/P2 + 证据 + 整改顺序 + 待确认前提）、版本注意（7.4.6/7.6.1 起 SD-WAN zone 接口的
+  local-in 只能引用 zone；`set allowaccess` 覆盖式）、维护方式（md / checks.json / 夹具三者同步）。
+- **机器可读判据 `playbooks/fortigate-audit.checks.json`**：33 条与 md 一一对应，每条给出
+  `present`/`absent` 断言、`min` 与 `allowLoss`；F-09（应用清单无 block）、F-10（UTM 库陈旧）、
+  F-33（固件生命周期）标 `manual` 并写明为何无法机械判定。
+- **回归测试 `test/forti-baseline.test.mjs`（7 项）**：校验判据表结构（ID 连续 F-01…F-33、manual 必须带理由）、
+  md ↔ json 检查项完全一致、**红线 4 硬验收**（每条判据的证据行在裁剪后与原始计数 1:1，`allowLoss` 显式声明例外）、
+  四棵子树正文确实不进上下文、噪声与密钥掩码在审计夹具上同样生效、报告六类证据点保留数为 1:1、体积与预算。
+- **审计夹具 `test/fixtures/forti/sz-80f-evidence.txt`**：结构照深圳实测回显重写、密钥已替换的 452 行片段，
+  覆盖 33 条判据的全部证据行与四棵可折叠子树。
+
+### Changed
+
+- `skills/network-command-kb/SKILL.md` 新增「巡检剧本」节：做 FortiGate 审计先读剧本、按批采集、
+  裁剪后照模板出报告；新增检查项须同时改 md、json 与夹具。
+- `package.json` 版本 0.1.7 → 0.1.8，`files` 增补 `playbooks/**`，keywords 增补 `audit`/`playbook`/`fortigate`。
+- `docs/HANDOFF.md` **未改动**：它是 Q8 模型提出的热插拔 KB 设计稿，也是 Claude 评估后修订的记录（结论是改用轻量
+  `kb_lookup`），属于设计决策的历史材料，不作为现状描述；真实结构与待办见本 CHANGELOG、`README.md` 与代码。
+
+## 0.1.7 — 日期待补
 
 ### Added
 
@@ -26,6 +52,7 @@
   路径只来自目录扫描，越界与非法参数一律返回 `{ ok: false, error }` 而不抛异常。
 - `index.js` 以 best-effort 方式注册 `kb_lookup`（`registerKbLookupTool`）：tools 注册表缺失或注册失败时
   只告警并降级，不影响技能与 `mt_winbox_exec`。
+- FortiOS 配置裁剪工具 `tools/forti-trim.py`（由 `tools/forti-trim.sh` 调用）：对大体量 `show full-configuration` 回显做折叠与密钥掩码，并保留审计证据行；配套 `test/forti-trim.test.mjs` 与样例夹 `test/fixtures/forti/`。
 
 ### Changed
 
@@ -45,7 +72,10 @@
   章节匹配、越界路径/非字符串参数拒绝、6000 字符截断、工具契约与 `registerKbLookupTool` 的四条降级路径，
   并对真实 `kb/` 断言 18 平台 / 138 篇与 `huawei` 05 的 7 节目录。
 
-本次改动未修改任何版本号（`package.json` 等仍为 0.1.6）。
+### Release
+
+- 发布渠道改为 GitHub Releases（非 npm），`NOTICE.md`、`README.md`、`cordis.patch.yml` 的安装与版本说明同步更新。
+- 上方 0.1.6 节的 Tailscale 知识库随本版本发布；`package.json` 版本号自 PR #1 起为 0.1.7，0.1.6 未单独发布版本号。
 
 ## 0.1.6 — 2026-11-16
 

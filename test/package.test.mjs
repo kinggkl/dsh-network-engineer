@@ -12,7 +12,7 @@ const pkg = JSON.parse(read('package.json'))
 
 test('package identity and version', () => {
   assert.equal(pkg.name, '@kinggkl/dsh-network-engineer')
-  assert.equal(pkg.version, '0.1.7')
+  assert.equal(pkg.version, '0.1.8')
   assert.equal(pkg.type, 'module')
   assert.equal(pkg.license, 'MIT')
   assert.match(pkg.description, /138 篇/)
@@ -47,6 +47,8 @@ test('files whitelist covers every runtime asset', () => {
     'kb/centos/centos-02-network.md',
     'kb/proxmox/proxmox-08-ha-diagnostics.md',
     'kb/rosz/rosz-01-platform.md',
+    'playbooks/fortigate-audit.md',
+    'playbooks/fortigate-audit.checks.json',
   ]
   const globs = pkg.files
   const covered = (path) =>
