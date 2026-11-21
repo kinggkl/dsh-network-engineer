@@ -1,4 +1,6 @@
 > **⚠️ 已废弃（Deprecated）**：KBLoader 热插拔方案（流式加载、LRU 缓存、事件总线、registerModule）从未落地，已被只读 `kb_lookup` 工具与 DSH 官方 `ctx.skills` provider 机制取代。仅作历史归档，请勿据此实现。
+>
+> 正文中的「已实现 / 待完成」是当时设计稿的假设，v0.1.7–v0.2.x 并未按此实施；真实版本历史见根目录 `CHANGELOG.md`。
 
 # 🔄 插件开发交接：v0.2.1 热插拔知识库
 
