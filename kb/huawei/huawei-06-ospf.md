@@ -29,7 +29,7 @@ updated: 2026-11-04
 | 过滤发布路由 | `filter-policy 2000 export` | OSPF 进程视图 | 仅对引入（ASE）的路由生效 |
 | 设置接口开销 | `ospf cost 10` | 接口视图 | 显式配置优先于按带宽计算 |
 | 调整带宽参考值 | `bandwidth-reference 10000` | OSPF 进程视图 | 缺省 100（Mbps）；需全网统一规划 |
-| 区域认证 | `authentication-mode md5 1 cipher Huawei@123` | OSPF 区域视图 | 两端模式、Key-ID、密钥必须一致 |
+| 区域认证 | `authentication-mode md5 1 cipher Example@123` | OSPF 区域视图 | 两端模式、Key-ID、密钥必须一致 |
 | 查看邻居 | `display ospf peer` | 用户视图 | 状态 Full 表示邻接正常 |
 | 查看邻居摘要 | `display ospf peer brief` | 用户视图 | 批量核对邻居 Router ID、接口与状态 |
 | 查看 OSPF 路由 | `display ip routing-table protocol ospf` | 用户视图 | 确认计算结果已写入路由表 |
@@ -46,7 +46,7 @@ updated: 2026-11-04
 [R1-ospf-1] area 0
 [R1-ospf-1-area-0.0.0.0] network 10.1.12.0 0.0.0.255
 [R1-ospf-1-area-0.0.0.0] network 192.168.1.0 0.0.0.255
-[R1-ospf-1-area-0.0.0.0] authentication-mode md5 1 cipher Huawei@123
+[R1-ospf-1-area-0.0.0.0] authentication-mode md5 1 cipher Example@123
 [R1-ospf-1-area-0.0.0.0] quit
 [R1-ospf-1] import-route static
 [R1-ospf-1] default-route-advertise always

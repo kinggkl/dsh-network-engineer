@@ -67,7 +67,7 @@ updated: 2026-11-04
 [Huawei] sysname CORE-SW-01
 [CORE-SW-01] ntp-service unicast-server 10.0.0.100
 [CORE-SW-01] aaa
-[CORE-SW-01-aaa] local-user admin password irreversible-cipher Huawei@123
+[CORE-SW-01-aaa] local-user admin password irreversible-cipher Example@123
 [CORE-SW-01-aaa] local-user admin privilege level 15
 [CORE-SW-01-aaa] local-user admin service-type telnet ssh
 [CORE-SW-01-aaa] quit

@@ -26,7 +26,7 @@ updated: 2026-11-04
 | 进入 VTY 线路 | `user-interface vty 0 4` | 系统视图 | vty 0~4 共 5 个并发远程会话（上限以版本为准） |
 | 设置认证方式 | `authentication-mode aaa` | VTY 视图 | 使用 AAA 本地用户认证，优于纯密码认证 |
 | 限制登录协议 | `protocol inbound ssh` | VTY 视图 | 仅允许 SSH（all 表示 SSH+Telnet） |
-| 创建本地用户 | `local-user netadmin password irreversible-cipher Huawei@123` | AAA 视图 | 密文存储；避免 simple 明文 |
+| 创建本地用户 | `local-user netadmin password irreversible-cipher Example@123` | AAA 视图 | 密文存储；避免 simple 明文 |
 | 授权用户级别 | `local-user netadmin privilege level 15` | AAA 视图 | 用户级别 0~15；命令级别另有 0~3 缺省映射 |
 | 指定服务类型 | `local-user netadmin service-type ssh` | AAA 视图 | 不配置则该用户无法 SSH 登录 |
 | 配置 SSH 用户 | `ssh user netadmin authentication-type password` | 系统视图 | 密码方式；公钥方式见官方手册 |
@@ -61,7 +61,7 @@ updated: 2026-11-04
 [SW1] rsa local-key-pair create
 [SW1] stelnet server enable
 [SW1] aaa
-[SW1-aaa] local-user netadmin password irreversible-cipher Huawei@123
+[SW1-aaa] local-user netadmin password irreversible-cipher Example@123
 [SW1-aaa] local-user netadmin privilege level 15
 [SW1-aaa] local-user netadmin service-type ssh
 [SW1-aaa] quit
